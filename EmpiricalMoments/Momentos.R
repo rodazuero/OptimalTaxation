@@ -4,12 +4,15 @@ library(dplyr)
 library(StatMeasures)
 library(xtable)
 library(ggplot2)
+library(scales)
+library(gridExtra)
 setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/EmpiricalMoments')
+setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
 ENAHO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/ENAHO/ENAHOARM/OptimaltaxationSubSampleENAHO.csv", header = T, sep=",")
 CENSO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/Census/Modified/OptimaltaxationSubSampleCenso.csv", header = T, sep=",")
 CENSO<-CENSO[which(CENSO$CAP5MONTO1>0),]
 # MOMENTO 1 ---------------------------------------------------------------
-# Informalidad y numero de trabajadores por tamaño de la empresa (ENAHO)
+# Informalidad y numero de trabajadores por tamaño de la empresa (ENAHO).
 
 #Se agrupan las empresas con mas de 50 trabajadores en una misma categoria,
 #si se quiere la informacion sin restringir el tamaÃ±o de la empresa se debe 
