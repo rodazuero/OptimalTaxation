@@ -5,11 +5,11 @@ library(StatMeasures)
 library(xtable)
 library(ggplot2)
 setwd(choose.dir())
-ENAHO<-read.csv("OptimaltaxationSubSampleENAHO.csv", header = T, sep=",")
-CENSO<-read.csv("OptimaltaxationSubSampleCenso.csv", header = T, sep=",")
+ENAHO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/Census/Modified/OptimaltaxationSubSampleENAHO.csv", header = T, sep=",")
+CENSO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/Census/Modified/OptimaltaxationSubSampleCenso.csv", header = T, sep=",")
 
 # MOMENTO 1 ---------------------------------------------------------------
-# Informalidad y numero de trabajadores por tamaño de la empresa (ENAHO)
+# Informalidad y numero de trabajadores por tama?o de la empresa (ENAHO)
 
 #Se agrupan las empresas con mas de 50 trabajadores en una misma categoria,
 #si se quiere la informacion sin restringir el tamaÃ±o de la empresa se debe 
@@ -49,7 +49,7 @@ print(xtable(M2), include.rownames=F)
 
 
 # MOMENTO 3 ---------------------------------------------------------------
-#Informalidad, numero de firmas y de trabajadores por tamaño de la empresa
+#Informalidad, numero de firmas y de trabajadores por tama?o de la empresa
 #(CENSO+ENAHO)
 
 #Se agrupan las empresas con mas de 50 trabajadores en una misma categoria,
@@ -141,7 +141,7 @@ print(xtable(M5.3),include.rownames=F, include.colnames = F)
 
 
 # MOMENTO 6 ---------------------------------------------------------------
-#Distribución de la produccion de las firmas (CENSO)
+#Distribuci?n de la produccion de las firmas (CENSO)
 
 CENSO$PRODUCCIONUSD<-CENSO$CAP5MONTO9*0.315
 
@@ -150,7 +150,7 @@ print(xtable(M6),include.rownames=F)
 
 
 # MOMENTO 7 ---------------------------------------------------------------
-#Pago de impuestos y nivel de producción de la firma (CENSO)
+#Pago de impuestos y nivel de producci?n de la firma (CENSO)
 
 CENSO$PROFITSUSD<-CENSO$CAP5MONTO34*0.315
 
@@ -165,7 +165,7 @@ M7A.2<-distribuciones(CENSO$TAX_PRODA)
 M7A.3<-distribuciones(CENSO$TAX_PROFA)
 
 M7A<-cbind(M7A.1,M7A.2[,2],M7A.3[,2])
-colnames(M7A)<-c(".", "Impuestos","(%)Impuestos/Producción", "(%)Impuestos/Beneficios" )
+colnames(M7A)<-c(".", "Impuestos","(%)Impuestos/Producci?n", "(%)Impuestos/Beneficios" )
 print(xtable(M7A),include.rownames=F)
 
 CENSO$decilesprod<-decile(CENSO$PRODUCCIONUSD)
@@ -193,7 +193,7 @@ M7B.2<-distribuciones(CENSO$TAX_PRODB)
 M7B.3<-distribuciones(CENSO$TAX_PROFB)
 
 M7B<-cbind(M7B.1,M7B.2[,2],M7B.3[,2])
-colnames(M7B)<-c(".", "Impuestos","(%)Impuestos/Producción", "(%)Impuestos/Beneficios" )
+colnames(M7B)<-c(".", "Impuestos","(%)Impuestos/Producci?n", "(%)Impuestos/Beneficios" )
 print(xtable(M7B),include.rownames=F)
 
 
