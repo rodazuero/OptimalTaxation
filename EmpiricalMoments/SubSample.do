@@ -1,4 +1,12 @@
 **************************ENAHO*********************************************
+
+*If needs to translate the file (aÑo, variable 152 might generate troubles). 
+*cd "C:\Users\razuero\Dropbox\OptmalTaxationShared\Data\DataAnalysis\All\ENAHO\ENAHOARM"
+*unicode encoding set latin1
+*unicode translate PER_2007a_BID.dta
+
+
+
 {
 clear all
 set more off
