@@ -7,10 +7,28 @@ library(ggplot2)
 library(scales)
 library(gridExtra)
 setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/EmpiricalMoments')
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
+setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New")
 ENAHO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/ENAHO/ENAHOARM/OptimaltaxationSubSampleENAHO.csv", header = T, sep=",")
 CENSO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/Census/Modified/OptimaltaxationSubSampleCenso.csv", header = T, sep=",")
-CENSO<-CENSO[which(CENSO$CAP5MONTO1>0),]
+graphdirectory<-"C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/GraficasD"
+# TRIMMING ----------------------------------------------------------------
+#A)Variable de interes (CENSO)
+#Ventas (Ventas netas + prestacion de servicios)
+CENSO$VENTAST<-CENSO$CAP5MONTO1+CENSO$CAP5MONTO5
+
+#B)Sub-muestra
+CENSO<-CENSO[which(CENSO$VENTAST>0 & !is.na(CENSO$VENTAST) & !is.na(CENSO$CITAX)),]
+#Se selecciona la variable con la que se realiza el trimming.
+
+#VENTAS
+#CENSO<-CENSO[which(!(CENSO$VENTAST>quantile(CENSO$VENTAST,0.99))),]
+
+#CITAX
+#CENSO<-CENSO[which(CENSO$CITAX<quantile(CENSO$CITAX,0.99)),]
+
+#CITAX O VENTAS
+CENSO<-CENSO[which(!(CENSO$VENTAST>quantile(CENSO$VENTAST,0.99)|CENSO$CITAX>quantile(CENSO$CITAX,0.99))),]
+
 # MOMENTO 1 ---------------------------------------------------------------
 # Informalidad y numero de trabajadores por tamaño de la empresa (ENAHO).
 
@@ -72,6 +90,7 @@ MM3$propcum<-cumsum(MM3$proporcion)
 names(MM3)<-c("Tamano de la empresa","Numero de firmas","% del total de firmas", "% acumulado del total de firmas")
 
 MOMENTO3<-left_join(MM3,MOMENTO1,by=c("Tamano de la empresa","Tamano de la empresa"))
+T15<-MOMENTO3
 
 porctotal<-sum(MOMENTO3$`% del total de firmas`)
 
@@ -84,10 +103,6 @@ row<-c("Total", totalfirmas,porctotal,"",informtotal,trabajadorestotal)
 M3<-rbind(as.matrix.data.frame(MOMENTO3),t(row))
 
 print(xtable(M3, digits =c(0,0,0,3,3,3,0)), include.rownames=F)
-
-
-#ggplot(MOMENTO3, aes(x=`Tamano de la empresa`))+geom_bar(stat = "identity",aes(y=`% del total de firmas`))+
-#geom_line(aes(y= Informalidad))+  scale_y_continuous(sec.axis = sec_axis(~., name = "Informalidad"))
 
 
 # MOMENTO 4 ---------------------------------------------------------------
@@ -228,21 +243,30 @@ print(xtable(MOMENTO8,digits=c(0,0,2,0)),include.rownames=F)
 
 # INFORMACIÓN POR DECILES DE VENTAS-----------------------------------------
 
-CENSO$VENTASUSD<-CENSO$CAP5MONTO1*0.315
+CENSO$TOTALTRAB<-CENSO$NTRABAJADORES8+CENSO$NTRABAJADORES9+CENSO$NTRABAJADORES10
+CENSO$NUMTRAB<-CENSO$TOTALTRAB
+CENSO$NUMTRAB[CENSO$NUMTRAB>50]<-50
+CENSO$nn<-1
+
+
+CENSO$VENTASTUSD<-CENSO$VENTAST*0.315
 CENSO$PROFITSBEFOREUSD<-CENSO$CAP5MONTO34*0.315
 CENSO$PROFITSAFTERUSD<-CENSO$CAP5MONTO37*0.315
+CENSO$TAXTOTALUSD<-(CENSO$CITAX+CENSO$CAP5MONTO35)*0.315
 
-CENSO$decilesventas<-decile(CENSO$CAP5MONTO1)
+CENSO$decilesventast<-decile(CENSO$VENTASTUSD)
 
 DECILES_VENTAS<-CENSO%>%
-  group_by(decilesventas)%>%
-  summarise(Ventas=sum(VENTASUSD)/1000000, BeneficiosAntes=sum(PROFITSBEFOREUSD)/1000000, BeneficiosDespues=sum(PROFITSAFTERUSD)/1000000, Impuestos1=sum(CITAXUSD)/1000000, Impuestos2=sum(TAXTOTALUSD)/1000000)
+  group_by(decilesventast)%>%
+  summarise(Ventas=mean(VENTASTUSD, na.rm = T), BeneficiosAntes=mean(PROFITSBEFOREUSD, na.rm = T), BeneficiosDespues=mean(PROFITSAFTERUSD, na.rm = T), Impuestos1=mean(CITAXUSD, na.rm = T), Impuestos2=mean(TAXTOTALUSD, na.rm = T))
 
 DECILES_VENTAS$TAX1_VENTAS<-DECILES_VENTAS$Impuestos1/DECILES_VENTAS$Ventas
 DECILES_VENTAS$TAX2_VENTAS<-DECILES_VENTAS$Impuestos2/DECILES_VENTAS$Ventas
 
 DECILES_VENTAS$TAX1_BENEFICIOS<-DECILES_VENTAS$Impuestos1/DECILES_VENTAS$BeneficiosDespues
 DECILES_VENTAS$TAX2_BENEFICIOS<-DECILES_VENTAS$Impuestos2/DECILES_VENTAS$BeneficiosDespues
+
+DECILES_VENTAS$Ventas_decil<-quantile(CENSO$VENTASTUSD, c(seq(0.1,1,0.1)))
 
 
 # GRAFICA 1 ---------------------------------------------------------------
@@ -251,9 +275,9 @@ DECILES_VENTAS$TAX2_BENEFICIOS<-DECILES_VENTAS$Impuestos2/DECILES_VENTAS$Benefic
 
 TS<-CENSO%>%
   group_by(NUMTRAB)%>%
-  summarise(firmas=sum(nn), ventas=mean(CAP5MONTO1, na.rm = T))
+  summarise(firmas=sum(nn), ventas=mean(VENTASTUSD, na.rm = T))
 TS$decil<- decile(TS$ventas)
-TS$NUMTRAB
+
 TS<-left_join(TS,MOMENTO1,by=c("NUMTRAB"="Tamano de la empresa"))
 TS$`Numero de trabajadores`<- TS$firmas*TS$NUMTRAB
 TS$Informales<-TS$firmas*TS$NUMTRAB*TS$Informalidad/100
@@ -267,10 +291,14 @@ INF$Informalidad<-INF$Informales/INF$Total
 INF$Formalidad<-1-INF$Informalidad
 INF$Percentil<-c(seq(0.1,1,0.1))
 
+
 G1<-ggplot(data=INF,aes(x=Percentil,y=Informalidad))+
   geom_line()+
-  labs(x=expression(theta~e),y="Proportion Informal Demand")
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
+  labs(x=expression(theta~e),y="Proportion Informal Demand")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+setwd(graphdirectory)
 dev.set()
 png(file="InformalProportionDemandPercentileE.png",width=1600,height=850)
 G1
@@ -283,8 +311,10 @@ dev.off()
 
 G2<-ggplot(data=INF,aes(x=Percentil,y=Formalidad))+
   geom_line()+
-  labs(x=expression(theta~e),y="Proportion Formal Demand")
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
+  labs(x=expression(theta~e),y="Proportion Formal Demand")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
 dev.set()
 png(file="FormalProportionDemandPercentileE.png",width=1600,height=850)
 G2
@@ -295,13 +325,18 @@ dev.off()
 #Número de trabajadores totales (formales e informales) por deciles de ventas de las firmas
 #"TotalLaborDemandPercentile"
 
-MOMENTO2$Percentil<-c(seq(0.1,1,0.1))
+T3<-CENSO%>%
+  group_by(decilesventast)%>%
+  summarise(trabajadores=mean(TOTALTRAB))
 
-G3<-ggplot(data=MOMENTO2,aes(x=Percentil,y=`Numero de trabajadores`))+
+T3$Percentil<-c(seq(0.1,1,0.1))
+
+G3<-ggplot(data=T3,aes(x=Percentil,y=trabajadores))+
   geom_line()+
-  labs(x=expression(theta~e),y="Total Labor Demand")
+  labs(x=expression(theta~e),y="Total Labor Demand (Average number of workers)")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
 dev.set()
 png(file="TotalLaborDemandE.png",width=1600,height=850)
 G3
@@ -317,9 +352,10 @@ DECILES_VENTAS$Percentil<-c(seq(0.1,1,0.1))
 
 G4<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=BeneficiosAntes))+
   geom_line()+
-  labs(x=expression(theta~e),y="Profits Distribution (Millions of dollars)")
+  labs(x=expression(theta~e),y="Profits Distribution (USD dollars)")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
 dev.set()
 png(file="PretaxProfitPercentileE.png",width=1600,height=850)
 G4
@@ -332,25 +368,28 @@ dev.off()
 
 G5<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=BeneficiosDespues))+
   geom_line()+
-  labs(x=expression(theta~e),y="After Tax Profits Distribution (Millions of dollars)")
+  labs(x=expression(theta~e),y="After Tax Profits Distribution (USD dollars)")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
+
 dev.set()
 png(file="AfterTaxProfitPercentileE.png",width=1600,height=850)
 G5
 dev.off()
 
-
-
 # GRAFICA 6 ---------------------------------------------------------------
 #Niveles de venta (valor) en cada decil de ventas.
 #“ProductionPercentile”
 
-G6<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=Ventas))+
-  geom_line()+
-  labs(x=expression(theta~e),y="Production Distribution")
+DECILES_VENTAS$VM<-DECILES_VENTAS$Ventas_decil/1000
 
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
+G6<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=VM))+
+  geom_line()+
+  labs(x=expression(theta~e),y="Production Distribution (Thousands of USD dollars)")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
 dev.set()
 png(file="ProductionPercentileE.png",width=1600,height=850)
 G6
@@ -359,11 +398,13 @@ dev.off()
 
 # GRAFICA 7 ---------------------------------------------------------------
 #Valor de pago de impuesto en cada decil de ventas (CITAX)
+#Valor de pago de impuesto en cada decil de ventas (CITAX)
 G7.1<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=Impuestos1))+
   geom_line()+
-  labs(x=expression(theta~e),y="Taxes Payed (CITAX - Millions of dollars)")
+  labs(x=expression(theta~e),y="Taxes Payed (CITAX - USD dollars)")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
 dev.set()
 png(file="Taxes1E.png",width=1600,height=850)
 G7.1
@@ -372,9 +413,10 @@ dev.off()
 #Valor de pago de impuesto en cada decil de ventas (CITAX+Transferencias)
 G7.2<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=Impuestos2))+
   geom_line()+
-  labs(x=expression(theta~e),y="Taxes Payed (CITAX+Transferencias - Millions of dollars)")
+  labs(x=expression(theta~e),y="Taxes Payed (CITAX+Transferencias - USD dollars)")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
 dev.set()
 png(file="Taxes2E.png",width=1600,height=850)
 G7.2
@@ -385,32 +427,35 @@ dev.off()
 #Valor de pago de impuesto como proporción de ventas, en cada decil de ventas (CITAX)
 G8.1<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=TAX1_VENTAS))+
   geom_line()+
-  labs(x=expression(theta~e),y="Taxes Payed (CITAX) / Production")
-
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
+  labs(x=expression(theta~e),y="Taxes Payed (CITAX) / Production")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 dev.set()
 png(file="Taxes_Sales1E.png",width=1600,height=850)
 G8.1
 dev.off()
 
-#Valor de pago de impuesto como proporción de ventas, en cada decil de ventas (CITAX+TRANSFERENCIAS)
+#Valor de pago de impuesto como proporciÃÂ³n de ventas, en cada decil de ventas (CITAX+TRANSFERENCIAS)
 G8.2<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=TAX2_VENTAS))+
   geom_line()+
-  labs(x=expression(theta~e),y="Taxes Payed (CITAX+Transferencias) / Production")
+  labs(x=expression(theta~e),y="Taxes Payed (CITAX+Transferencias) / Production")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
 dev.set()
 png(file="Taxes_Sales2E.png",width=1600,height=850)
 G8.2
 dev.off()
 
+
 # GRAFICA 9 ---------------------------------------------------------------
 #Valor de pago de impuesto como proporción de los beneficios, en cada decil de ventas
 G9.1<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=TAX1_BENEFICIOS))+
   geom_line()+
-  labs(x=expression(theta~e),y="Taxes Payed (CITAX)  / Profits")
+  labs(x=expression(theta~e),y="Taxes Payed (CITAX)  / Profits")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
 dev.set()
 png(file="Taxes_Profits1E.png",width=1600,height=850)
 G9.1
@@ -419,9 +464,9 @@ dev.off()
 #Valor de pago de impuesto en cada decil de ventas (CITAX+Transferencias)
 G9.2<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=TAX2_BENEFICIOS))+
   geom_line()+
-  labs(x=expression(theta~e),y="Taxes Payed  (CITAX+Transferencias)  / Profits")
-
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
+  labs(x=expression(theta~e),y="Taxes Payed  (CITAX+Transferencias)  / Profits")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 dev.set()
 png(file="Taxes_Profits2E.png",width=1600,height=850)
 G9.2
@@ -437,11 +482,12 @@ ENAHOT$salarionorm<-(ENAHOT$salarioUSD-mins)/(maxs-mins)
 
 
 G10<-ggplot(ENAHOT[which(ENAHOT$informal_empleado==0),],aes(x=salarionorm))+
-  geom_histogram(aes(y=..density..))+
-  stat_density(geom = "line")+
-  labs(x="w (Formal workers)", y="")
+  geom_histogram(aes(y=..ncount..))+
+  geom_density(aes(y=..scaled..))+
+  labs(x="Wage (Formal workers)", y="Density")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
 dev.set()
 png(file="FormalSupplyPercentiles.png",width=1600,height=850)
 G10
@@ -452,11 +498,11 @@ dev.off()
 #Distribución de ingresos de los trabajadores informales
 
 G11<-ggplot(ENAHOT[which(ENAHOT$informal_empleado==1),],aes(x=salarionorm))+
-  geom_histogram(aes(y=..density..))+
-  stat_density(geom = "line")+
-  labs(x="w (Informal workers)", y="")
-
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
+  geom_histogram(aes(y=..ncount..))+
+  geom_density(aes(y=..scaled..))+
+  labs(x="Wage (Informal workers)", y="Density")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 dev.set()
 png(file="InformalSupplyPercentiles.png",width=1600,height=850)
 G11
@@ -466,30 +512,64 @@ dev.off()
 #Distribución de ingresos de los trabajadores (formales e informales)
 
 G12<-ggplot(ENAHOT,aes(x=salarionorm))+
-  geom_histogram(aes(y=..density..))+
-  stat_density(geom = "line")+
-  labs(x="w (Total labor supply)", y="")
+  geom_histogram(aes(y=..ncount..))+
+  geom_density(aes(y=..scaled..))+
+  labs(x="Wage (Total labor supply)", y="Density")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
 dev.set()
 png(file="TotalLaborSupplyPercentiles.png",width=1600,height=850)
 G12
 dev.off()
 
-
 # GRAFICA 13 --------------------------------------------------------------
 #Distribución de trabajadores informales como proporción de todos los trabajadores organizados por deciles de ingresos.
 
-MOMENTO8$Informales<-MOMENTO8$Observaciones*MOMENTO8$`Informalidad (%)`/100
-MOMENTO8$Propinformales<-MOMENTO8$Informales/sum(MOMENTO8$Observaciones)
-MOMENTO8$Percentil<-c(seq(0.1,1,0.1))
+ENAHOT$decilesing<-decile(ENAHOT$salarioUSD)
 
-G13<-ggplot(data=MOMENTO8,aes(x=Percentil,y=Propinformales))+
+T13<-ENAHOT%>%
+  group_by(decilesing)%>%
+  summarise(informalidad=mean(informal_empleado,na.rm = T)*100, trabajadores=sum(nn))
+T13$Percentil<-c(seq(0.1,1,0.1))
+
+G13<-ggplot(data=T13,aes(x=Percentil,y=informalidad/100))+
   geom_line()+
-  labs(x=expression(theta~w),y="Proportion Informal Supply")
+  labs(x=expression(theta~w),y="Proportion Informal Supply")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
 
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/Graficas")
+
 dev.set()
 png(file="InformalProportionSupplyPercentiles.png",width=1600,height=850)
 G13
 dev.off()
+
+# GRAFICA 14 --------------------------------------------------------------
+#Proporción de informales por tamaño de firma
+
+G14<-ggplot(data=MOMENTO1,aes(x=`Tamano de la empresa`,y=Informalidad/100))+
+  geom_line()+
+  labs(x="Firm Size (Number of workers)",y="Proportion Informal Supply")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+dev.set()
+png(file="InformalFirmSize.png",width=1600,height=850)
+G14
+dev.off()
+
+# GRAFICA 15 --------------------------------------------------------------
+#Informalidad por percentiles de tamaño de la firma
+
+G15<-ggplot(data=T15,aes(x=`% acumulado del total de firmas`/100,y=Informalidad/100))+
+  geom_line()+
+  labs(x="Firm Size Percentile",y="Proportion Informal Supply")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+dev.set()
+png(file="InformalFirmSizePercentiles.png",width=1600,height=850)
+G15
+dev.off()
+
