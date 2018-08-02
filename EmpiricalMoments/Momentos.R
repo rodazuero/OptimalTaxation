@@ -18,16 +18,20 @@ CENSO$VENTAST<-CENSO$CAP5MONTO1+CENSO$CAP5MONTO5
 
 #B)Sub-muestra
 CENSO<-CENSO[which(CENSO$VENTAST>0 & !is.na(CENSO$VENTAST) & !is.na(CENSO$CITAX)),]
+
 #Se selecciona la variable con la que se realiza el trimming.
 
-#VENTAS
-#CENSO<-CENSO[which(!(CENSO$VENTAST>quantile(CENSO$VENTAST,0.99))),]
+#CITAX O VENTAS
+CENSO<-CENSO[which(!(CENSO$VENTAST>quantile(CENSO$VENTAST,0.99)|CENSO$CITAX>quantile(CENSO$CITAX,0.99))),]
 
 #CITAX
 #CENSO<-CENSO[which(CENSO$CITAX<quantile(CENSO$CITAX,0.99)),]
 
-#CITAX O VENTAS
-CENSO<-CENSO[which(!(CENSO$VENTAST>quantile(CENSO$VENTAST,0.99)|CENSO$CITAX>quantile(CENSO$CITAX,0.99))),]
+#VENTAS
+#CENSO<-CENSO[which(!(CENSO$VENTAST>quantile(CENSO$VENTAST,0.99))),]
+
+#BENEFICIOS
+#CENSO<-CENSO[which(CENSO$CAP5MONTO34<quantile(CENSO$CAP5MONTO34,0.99)),]
 
 # MOMENTO 1 ---------------------------------------------------------------
 # Informalidad y numero de trabajadores por tamaño de la empresa (ENAHO).
