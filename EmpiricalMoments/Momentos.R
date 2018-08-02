@@ -268,6 +268,21 @@ DECILES_VENTAS$TAX2_BENEFICIOS<-DECILES_VENTAS$Impuestos2/DECILES_VENTAS$Benefic
 
 DECILES_VENTAS$Ventas_decil<-quantile(CENSO$VENTASTUSD, c(seq(0.1,1,0.1)))
 
+# INFORMACION POR DECILES DE BENEFICIOS -----------------------------------
+
+CENSO$decilesbeneficios<-decile(CENSO$PROFITSBEFOREUSD)
+
+DECILES_BENEFICIOS<-CENSO%>%
+  group_by(decilesbeneficios)%>%
+  summarise(Ventas=mean(VENTASTUSD, na.rm = T), BeneficiosAntes=mean(PROFITSBEFOREUSD, na.rm = T), BeneficiosDespues=mean(PROFITSAFTERUSD, na.rm = T), Impuestos1=mean(CITAXUSD, na.rm = T), Impuestos2=mean(TAXTOTALUSD, na.rm = T))
+
+DECILES_BENEFICIOS$TAX1_VENTAS<-DECILES_BENEFICIOS$Impuestos1/DECILES_BENEFICIOS$Ventas
+DECILES_BENEFICIOS$TAX2_VENTAS<-DECILES_BENEFICIOS$Impuestos2/DECILES_BENEFICIOS$Ventas
+
+DECILES_BENEFICIOS$TAX1_BENEFICIOS<-DECILES_BENEFICIOS$Impuestos1/DECILES_BENEFICIOS$BeneficiosDespues
+DECILES_BENEFICIOS$TAX2_BENEFICIOS<-DECILES_BENEFICIOS$Impuestos2/DECILES_BENEFICIOS$BeneficiosDespues
+
+DECILES_BENEFICIOS$Beneficios_decil<-quantile(CENSO$PROFITSBEFOREUSD, c(seq(0.1,1,0.1)))
 
 # GRAFICA 1 ---------------------------------------------------------------
 #Proporción de trabajadores informales por deciles de ventas de las firmas
@@ -431,7 +446,6 @@ G8.1<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=TAX1_VENTAS))+
   theme(axis.text=element_text(size=24),
         axis.title=element_text(size=24,face="bold"))
 dev.set()
-png(file="Taxes_Sales1E.png",width=1600,height=850)
 G8.1
 dev.off()
 
@@ -443,7 +457,7 @@ G8.2<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=TAX2_VENTAS))+
         axis.title=element_text(size=24,face="bold"))
 
 dev.set()
-png(file="Taxes_Sales2E.png",width=1600,height=850)
+png(file="TaxesSales2E.png",width=1600,height=850)
 G8.2
 dev.off()
 
@@ -457,7 +471,7 @@ G9.1<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=TAX1_BENEFICIOS))+
         axis.title=element_text(size=24,face="bold"))
 
 dev.set()
-png(file="Taxes_Profits1E.png",width=1600,height=850)
+png(file="TaxesProfits1E.png",width=1600,height=850)
 G9.1
 dev.off()
 
@@ -468,7 +482,7 @@ G9.2<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=TAX2_BENEFICIOS))+
   theme(axis.text=element_text(size=24),
         axis.title=element_text(size=24,face="bold"))
 dev.set()
-png(file="Taxes_Profits2E.png",width=1600,height=850)
+png(file="TaxesProfits2E.png",width=1600,height=850)
 G9.2
 dev.off()
 
@@ -572,4 +586,72 @@ dev.set()
 png(file="InformalFirmSizePercentiles.png",width=1600,height=850)
 G15
 dev.off()
+
+# GRAFICA 16 --------------------------------------------------------------
+#Niveles de beneficios (valor) en cada decil de beneficios.
+
+
+DECILES_BENEFICIOS$Percentil<-c(seq(0.1,1,0.1))
+DECILES_BENEFICIOS$BM<-DECILES_BENEFICIOS$Beneficios_decil/1000
+
+G16<-ggplot(data=DECILES_BENEFICIOS,aes(x=Percentil,y=BM))+
+  geom_line()+
+  labs(x=expression("Profits Percentile"),y="Profits Distribution (Thousands of USD dollars)")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+dev.set()
+png(file="ProfitsPercentileE.png",width=1600,height=850)
+G16
+dev.off()
+
+
+# GRAFICA 17 --------------------------------------------------------------
+#Valor de pago de impuesto como proporción de ventas, en cada decil de beneficios (CITAX)
+G17.1<-ggplot(data=DECILES_BENEFICIOS,aes(x=Percentil,y=TAX1_VENTAS))+
+  geom_line()+
+  labs(x="Profits Percentile",y="Taxes Payed (CITAX) / Production")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+dev.set()
+png(file="PTaxesSales1E.png",width=1600,height=850)
+G17.1
+dev.off()
+
+#Valor de pago de impuesto como proporción de ventas, en cada decil de beneficios (CITAX+TRANSFERENCIAS)
+G17.2<-ggplot(data=DECILES_BENEFICIOS,aes(x=Percentil,y=TAX2_VENTAS))+
+  geom_line()+
+  labs(x="Profits Percentile",y="Taxes Payed (CITAX+Transferencias) / Production")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+dev.set()
+png(file="PTaxesSales2E.png",width=1600,height=850)
+G17.2
+dev.off()
+
+# GRAFICA 18 ---------------------------------------------------------------
+#Valor de pago de impuesto como proporción de los beneficios, en cada decil de beneficios (CITAX)
+G18.1<-ggplot(data=DECILES_BENEFICIOS,aes(x=Percentil,y=TAX1_BENEFICIOS))+
+  geom_line()+
+  labs(x="Profits Percentile",y="Taxes Payed (CITAX)  / Profits")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+dev.set()
+png(file="PTaxesProfits1E.png",width=1600,height=850)
+G18.1
+dev.off()
+
+#Valor de pago de impuesto como proporción de los beneficios, en cada decil de beneficios (CITAX+Transferencias)
+G18.2<-ggplot(data=DECILES_BENEFICIOS,aes(x=Percentil,y=TAX2_BENEFICIOS))+
+  geom_line()+
+  labs(x="Profits Percentile",y="Taxes Payed  (CITAX+Transferencias)  / Profits")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+dev.set()
+png(file="PTaxesProfits2E.png",width=1600,height=850)
+G18.2
+dev.off()
+
 
