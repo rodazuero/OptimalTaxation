@@ -33,6 +33,10 @@ CENSO<-CENSO[which(!(CENSO$VENTAST>quantile(CENSO$VENTAST,0.99)|CENSO$CITAX>quan
 #BENEFICIOS
 #CENSO<-CENSO[which(CENSO$CAP5MONTO34<quantile(CENSO$CAP5MONTO34,0.99)),]
 
+#C)Percentiles 
+#Se define el numero de grupos
+nq<-20
+
 # MOMENTO 1 ---------------------------------------------------------------
 # Informalidad y numero de trabajadores por tamaño de la empresa (ENAHO).
 
@@ -258,7 +262,7 @@ CENSO$PROFITSBEFOREUSD<-CENSO$CAP5MONTO34*0.315
 CENSO$PROFITSAFTERUSD<-CENSO$CAP5MONTO37*0.315
 CENSO$TAXTOTALUSD<-(CENSO$CITAX+CENSO$CAP5MONTO35)*0.315
 
-CENSO$decilesventast<-decile(CENSO$VENTASTUSD)
+CENSO$decilesventast<-ntile(CENSO$VENTASTUSD,nq)
 
 DECILES_VENTAS<-CENSO%>%
   group_by(decilesventast)%>%
@@ -270,11 +274,11 @@ DECILES_VENTAS$TAX2_VENTAS<-DECILES_VENTAS$Impuestos2/DECILES_VENTAS$Ventas
 DECILES_VENTAS$TAX1_BENEFICIOS<-DECILES_VENTAS$Impuestos1/DECILES_VENTAS$BeneficiosDespues
 DECILES_VENTAS$TAX2_BENEFICIOS<-DECILES_VENTAS$Impuestos2/DECILES_VENTAS$BeneficiosDespues
 
-DECILES_VENTAS$Ventas_decil<-quantile(CENSO$VENTASTUSD, c(seq(0.1,1,0.1)))
+DECILES_VENTAS$Ventas_decil<-quantile(CENSO$VENTASTUSD, c(seq(1/nq,1,1/nq)))
 
 # INFORMACION POR DECILES DE BENEFICIOS -----------------------------------
 
-CENSO$decilesbeneficios<-decile(CENSO$PROFITSBEFOREUSD)
+CENSO$decilesbeneficios<-ntile(CENSO$PROFITSBEFOREUSD,nq)
 
 DECILES_BENEFICIOS<-CENSO%>%
   group_by(decilesbeneficios)%>%
@@ -286,7 +290,7 @@ DECILES_BENEFICIOS$TAX2_VENTAS<-DECILES_BENEFICIOS$Impuestos2/DECILES_BENEFICIOS
 DECILES_BENEFICIOS$TAX1_BENEFICIOS<-DECILES_BENEFICIOS$Impuestos1/DECILES_BENEFICIOS$BeneficiosDespues
 DECILES_BENEFICIOS$TAX2_BENEFICIOS<-DECILES_BENEFICIOS$Impuestos2/DECILES_BENEFICIOS$BeneficiosDespues
 
-DECILES_BENEFICIOS$Beneficios_decil<-quantile(CENSO$PROFITSBEFOREUSD, c(seq(0.1,1,0.1)))
+DECILES_BENEFICIOS$Beneficios_decil<-quantile(CENSO$PROFITSBEFOREUSD, c(seq(1/nq,1,1/nq)))
 
 # GRAFICA 1 ---------------------------------------------------------------
 #Proporción de trabajadores informales por deciles de ventas de las firmas
@@ -295,7 +299,7 @@ DECILES_BENEFICIOS$Beneficios_decil<-quantile(CENSO$PROFITSBEFOREUSD, c(seq(0.1,
 TS<-CENSO%>%
   group_by(NUMTRAB)%>%
   summarise(firmas=sum(nn), ventas=mean(VENTASTUSD, na.rm = T))
-TS$decil<- decile(TS$ventas)
+TS$decil<- ntile(TS$ventas,nq)
 
 TS<-left_join(TS,MOMENTO1,by=c("NUMTRAB"="Tamano de la empresa"))
 TS$`Numero de trabajadores`<- TS$firmas*TS$NUMTRAB
@@ -308,7 +312,7 @@ INF<-TS%>%
 
 INF$Informalidad<-INF$Informales/INF$Total
 INF$Formalidad<-1-INF$Informalidad
-INF$Percentil<-c(seq(0.1,1,0.1))
+INF$Percentil<-c(seq(1/nq,1,1/nq))
 
 
 G1<-ggplot(data=INF,aes(x=Percentil,y=Informalidad))+
@@ -348,7 +352,7 @@ T3<-CENSO%>%
   group_by(decilesventast)%>%
   summarise(trabajadores=mean(TOTALTRAB))
 
-T3$Percentil<-c(seq(0.1,1,0.1))
+T3$Percentil<-c(seq(1/nq,1,1/nq))
 
 G3<-ggplot(data=T3,aes(x=Percentil,y=trabajadores))+
   geom_line()+
@@ -367,7 +371,7 @@ dev.off()
 #Niveles de beneficios antes de impuestos por deciles de ventas.
 #“PretaxProfitPercentile”.
 
-DECILES_VENTAS$Percentil<-c(seq(0.1,1,0.1))
+DECILES_VENTAS$Percentil<-c(seq(1/nq,1,1/nq))
 
 G4<-ggplot(data=DECILES_VENTAS,aes(x=Percentil,y=BeneficiosAntes))+
   geom_line()+
@@ -544,10 +548,10 @@ dev.off()
 # GRAFICA 13 --------------------------------------------------------------
 #Distribución de trabajadores informales como proporción de todos los trabajadores organizados por deciles de ingresos.
 
-ENAHOT$decilesing<-decile(ENAHOT$salarioUSD)
+ENAHOT$percentiling<-ntile(ENAHOT$salarioUSD,nq)
 
 T13<-ENAHOT%>%
-  group_by(decilesing)%>%
+  group_by(percentiling)%>%
   summarise(informalidad=mean(informal_empleado,na.rm = T)*100, trabajadores=sum(nn))
 T13$Percentil<-c(seq(0.1,1,0.1))
 
@@ -595,7 +599,7 @@ dev.off()
 #Niveles de beneficios (valor) en cada decil de beneficios.
 
 
-DECILES_BENEFICIOS$Percentil<-c(seq(0.1,1,0.1))
+DECILES_BENEFICIOS$Percentil<-c(seq(1/nq,1,1/nq))
 DECILES_BENEFICIOS$BM<-DECILES_BENEFICIOS$Beneficios_decil/1000
 
 G16<-ggplot(data=DECILES_BENEFICIOS,aes(x=Percentil,y=BM))+
