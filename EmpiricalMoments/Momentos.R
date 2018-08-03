@@ -33,7 +33,7 @@ CENSO<-CENSO[which(!(CENSO$VENTAST>quantile(CENSO$VENTAST,0.99)|CENSO$CITAX>quan
 #BENEFICIOS
 #CENSO<-CENSO[which(CENSO$CAP5MONTO34<quantile(CENSO$CAP5MONTO34,0.99)),]
 
-#C)Percentiles 
+#C)Quantiles 
 #Se define el numero de grupos
 nq<-20
 
