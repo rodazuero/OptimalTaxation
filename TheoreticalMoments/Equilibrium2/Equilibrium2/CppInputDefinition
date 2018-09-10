@@ -1,0 +1,51 @@
+#EqWagesNumericVector vector of input is VecOthers 
+#VecOthers is input as the following:
+VecOthers of size 20. defined. 
+It is the vector counterpart of others
+VecOthers[it]=Others[it]
+
+
+
+
+
+#Others is defined as following:
+Double vector of size 20. 
+#The first 14 lines are defined as whatever ParamDecisionExcessDemandis
+
+Others[0]=aalpha;
+Others[1]=ddelta;
+Others[2]=ggamma;
+Others[3]=bbeta;
+Others[4]=ssigma;
+Others[5]=kkappa;
+Others[6]=rrho;
+Others[7]=psi;
+Others[8]=chi;
+Others[9]=mmu1;
+Others[10]=mmu2;
+Others[11]=ssigma1;
+Others[12]=ssigma2;
+Others[13]=rho12;
+Others[14]=InitLWorkersDecision[0];
+Others[15]=InitLWorkersDecision[1];
+Others[16]=InitProfDecision[0];
+Others[17]=InitProfDecision[1];
+Others[18]=InitProfDecision[2];
+
+
+
+#ParamsDecisionExcessDemand. Vector of size 14 with the following inputs
+ParamsDecisionExcessDemand[0]=aalpha;
+ParamsDecisionExcessDemand[1]=ddelta;
+ParamsDecisionExcessDemand[2]=ggamma;
+ParamsDecisionExcessDemand[3]=bbeta;
+ParamsDecisionExcessDemand[4]=ssigma;
+ParamsDecisionExcessDemand[5]=kkappa;
+ParamsDecisionExcessDemand[6]=rrho;
+ParamsDecisionExcessDemand[7]=psi;
+ParamsDecisionExcessDemand[8]=chi;
+ParamsDecisionExcessDemand[9]=mmu1;
+ParamsDecisionExcessDemand[10]=mmu2;
+ParamsDecisionExcessDemand[11]=ssigma1;
+ParamsDecisionExcessDemand[12]=ssigma2;
+ParamsDecisionExcessDemand[13]=rho12;

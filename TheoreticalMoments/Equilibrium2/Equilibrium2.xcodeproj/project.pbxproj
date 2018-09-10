@@ -1,0 +1,298 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B857CB4D20C717F000AE5EB6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B857CB4C20C717F000AE5EB6 /* main.cpp */; };
+		B857CB5420C7199A00AE5EB6 /* libnlopt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B857CB5320C7199A00AE5EB6 /* libnlopt.a */; };
+		B857CB5620C71C3F00AE5EB6 /* R.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B857CB5520C71C3F00AE5EB6 /* R.framework */; };
+		B857CB5820C71EBE00AE5EB6 /* libR.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B857CB5720C71EBE00AE5EB6 /* libR.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B857CB4720C717F000AE5EB6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		B857CB4920C717F000AE5EB6 /* Equilibrium2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Equilibrium2; sourceTree = BUILT_PRODUCTS_DIR; };
+		B857CB4C20C717F000AE5EB6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		B857CB5320C7199A00AE5EB6 /* libnlopt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnlopt.a; path = ../../../../../../../usr/local/lib/libnlopt.a; sourceTree = "<group>"; };
+		B857CB5520C71C3F00AE5EB6 /* R.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = R.framework; path = ../../../../../../../Library/Frameworks/R.framework; sourceTree = "<group>"; };
+		B857CB5720C71EBE00AE5EB6 /* libR.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libR.dylib; path = ../../../../../../../Library/Frameworks/R.framework/Versions/3.3/Resources/lib/libR.dylib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B857CB4620C717F000AE5EB6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B857CB5420C7199A00AE5EB6 /* libnlopt.a in Frameworks */,
+				B857CB5620C71C3F00AE5EB6 /* R.framework in Frameworks */,
+				B857CB5820C71EBE00AE5EB6 /* libR.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B857CB4020C717F000AE5EB6 = {
+			isa = PBXGroup;
+			children = (
+				B857CB5320C7199A00AE5EB6 /* libnlopt.a */,
+				B857CB5720C71EBE00AE5EB6 /* libR.dylib */,
+				B857CB5520C71C3F00AE5EB6 /* R.framework */,
+				B857CB4B20C717F000AE5EB6 /* Equilibrium2 */,
+				B857CB4A20C717F000AE5EB6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B857CB4A20C717F000AE5EB6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B857CB4920C717F000AE5EB6 /* Equilibrium2 */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B857CB4B20C717F000AE5EB6 /* Equilibrium2 */ = {
+			isa = PBXGroup;
+			children = (
+				B857CB4C20C717F000AE5EB6 /* main.cpp */,
+			);
+			path = Equilibrium2;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B857CB4820C717F000AE5EB6 /* Equilibrium2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B857CB5020C717F000AE5EB6 /* Build configuration list for PBXNativeTarget "Equilibrium2" */;
+			buildPhases = (
+				B857CB4520C717F000AE5EB6 /* Sources */,
+				B857CB4620C717F000AE5EB6 /* Frameworks */,
+				B857CB4720C717F000AE5EB6 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Equilibrium2;
+			productName = Equilibrium2;
+			productReference = B857CB4920C717F000AE5EB6 /* Equilibrium2 */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B857CB4120C717F000AE5EB6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0730;
+				ORGANIZATIONNAME = "Rodrigo Azuero Melo";
+				TargetAttributes = {
+					B857CB4820C717F000AE5EB6 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
+				};
+			};
+			buildConfigurationList = B857CB4420C717F000AE5EB6 /* Build configuration list for PBXProject "Equilibrium2" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = B857CB4020C717F000AE5EB6;
+			productRefGroup = B857CB4A20C717F000AE5EB6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B857CB4820C717F000AE5EB6 /* Equilibrium2 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B857CB4520C717F000AE5EB6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B857CB4D20C717F000AE5EB6 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B857CB4E20C717F000AE5EB6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B857CB4F20C717F000AE5EB6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		B857CB5120C717F000AE5EB6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/Rcpp/include/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/include/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/RcppArmadillo/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/RcppArmadillo/include/,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/include/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/Rcpp/include/,
+					"$(LOCAL_LIBRARY_DIR)/Frameworks/R.framework/Versions/3.3/Resources/lib",
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/lib/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/RcppArmadillo/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/RcppArmadillo/include/,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B857CB5220C717F000AE5EB6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/Rcpp/include/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/include/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/RcppArmadillo/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/RcppArmadillo/include/,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/include/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/Rcpp/include/,
+					"$(LOCAL_LIBRARY_DIR)/Frameworks/R.framework/Versions/3.3/Resources/lib",
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/lib/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/RcppArmadillo/,
+					/Library/Frameworks/R.framework/Versions/3.3/Resources/library/RcppArmadillo/include/,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B857CB4420C717F000AE5EB6 /* Build configuration list for PBXProject "Equilibrium2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B857CB4E20C717F000AE5EB6 /* Debug */,
+				B857CB4F20C717F000AE5EB6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B857CB5020C717F000AE5EB6 /* Build configuration list for PBXNativeTarget "Equilibrium2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B857CB5120C717F000AE5EB6 /* Debug */,
+				B857CB5220C717F000AE5EB6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B857CB4120C717F000AE5EB6 /* Project object */;
+}
