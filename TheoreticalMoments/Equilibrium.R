@@ -29,7 +29,7 @@ nf=0.53*70
 ggamma=0.5
 ddelta=0.12
 bbeta=0.15
-ssigma=0.1
+ssigma=0.2
 kkappa=0.1
 psi=0.4
 chi=1.5
@@ -485,9 +485,9 @@ wfEq=WEq[2]
 if(1==2){
   
   W=c(5.63,6.36)
-  W=c(14.00,20.00)
+  W=c(wiEq,wfEq)
   #W=c(wi,wf)
-  Excess(c(15.77,18.0332))
+  #Excess(c(15.77,18.0332))
   Res<-optim(W,Excess,control=list(abstol=1.0e-2))
   wiEq<-Res$par[1]
   wfEq<-Res$par[2]
@@ -625,7 +625,7 @@ tte=0
 while(Dec==0){
   tte<-tte+1
   tthetavec<-c(minTtw,tthetae_Sample[tte])
-  tthetavec<-c(1.0e-9,tthetae_Sample[tte])
+  tthetavec<-c(0.0001,tthetae_Sample[tte])
   Dec<-iDecision(tthetavec,params,InitLWorkers,InitProf)$Decission
 }
 minEnt<-tthetae_Sample[tte]
@@ -636,7 +636,7 @@ Dec=1
 ttw=0
 while(Dec==1){
   ttw<-ttw+1
-  tthetavec<-c(tthetaw_Sample[ttw],0.01)
+  tthetavec<-c(tthetaw_Sample[ttw],minTte)
   Dec<-iDecision(tthetavec,params,InitLWorkers,InitProf)$Decission
 }
 minWork<-tthetaw_Sample[ttw]
@@ -646,8 +646,8 @@ tthetae_Dist<-pnorm(log(tthetae_Sample),mean=mu[2],sd=sqrt(Sigma[2,2]))
 
 
 #Normalization of the truncated distribution
-Zentrep=pnorm(log(maxEnt),mean=mu[2],sd=sqrt(Sigma[2,2])-
-                pnorm(log(minEnt),mean=mu[2],sd=sqrt(Sigma[2,2])))
+Zentrep=pnorm(log(maxEnt),mean=mu[2],sd=sqrt(Sigma[2,2]))-
+                pnorm(log(minEnt),mean=mu[2],sd=sqrt(Sigma[2,2]))
 
 PPHI_MINENTREP=pnorm(log(minEnt),mean=mu[2],sd=sqrt(Sigma[2,2]))
 
@@ -728,12 +728,15 @@ for (tte in 1:le){
 }
 
 
+#Total revenue
+TaxpayedProp<-Taxpayed/sum(Taxpayed)
 
 
 #Ploting the corresponding relationships
 zevasion1<-as.data.frame(cbind(tthetae_Sample,tthetae_Dist,Zoptimal,InformalDemand,
                                FormalDemand,TotalLaborForce,InformalProportion,PretaxProfit,Zproportion,
-                               Production,AfterTaxProfit,Taxpayed,TaxSales,TaxProfits,tthetae_Trunc,Zproportion2))
+                               Production,AfterTaxProfit,Taxpayed,TaxSales,TaxProfits,tthetae_Trunc,Zproportion2,
+                               TaxpayedProp))
 
 
 
@@ -743,7 +746,7 @@ zevasion1<-subset(zevasion1,tthetae_Sample<=maxEnt)
 
 
 #Obtaining percentiles
-perc<-seq(0.1,0.9,0.1)
+perc<-seq(0.1,0.9,0.01)
 length_perc<-length(perc)
 
 A1<-subset(zevasion1,tthetae_Trunc==quantile(tthetae_Trunc,c(perc[1]),type=3))
@@ -754,7 +757,7 @@ for(p in 2:length_perc){
 }
 
 #If want to do moments based on percentiles, not the whole data, run the following line:
-#zevasion1<-A1
+zevasion1<-A1
 
 
 
@@ -980,6 +983,21 @@ p
 dev.off()
 
 
+
+#Evasion values percentiles 
+p<-ggplot(data=zevasion1,aes(x=tthetae_Trunc,y=Zoptimal))+geom_line()
+p<-p+labs(x=expression(theta~e),y="Evasion values percentiles")
+p<-p+theme(axis.text=element_text(size=48),
+           axis.title=element_text(size=48,face="bold"),
+           legend.title=element_text(size=48),
+           legend.text=element_text(size=48))
+p
+dev.set()
+png(file="EvasionValuesPercentiles.png",width=1600,height=850)
+p
+dev.off()
+
+
 #Taxes payed as proportino of sales
 p<-ggplot(data=zevasion1,aes(x=tthetae_Trunc,y=TaxSales))+geom_line()
 p<-p+labs(x=expression(theta~e),y="Evasion proportion percentiles")
@@ -993,7 +1011,34 @@ png(file="TaxesPayed.png",width=1600,height=850)
 p
 dev.off()
 
-#
+
+#Taxes payed
+p<-ggplot(data=zevasion1,aes(x=tthetae_Trunc,y=TaxSales))+geom_line()
+p<-p+labs(x=expression(theta~e),y="Taxes payed percentiles")
+p<-p+theme(axis.text=element_text(size=48),
+           axis.title=element_text(size=48,face="bold"),
+           legend.title=element_text(size=48),
+           legend.text=element_text(size=48))
+p
+dev.set()
+png(file="TaxesPayed.png",width=1600,height=850)
+p
+dev.off()
+
+
+#Taxes payed proportion
+p<-ggplot(data=zevasion1,aes(x=tthetae_Trunc,y=TaxpayedProp))+geom_line()
+p<-p+labs(x=expression(theta~e),y="Taxes payed proportion percentiles")
+p<-p+theme(axis.text=element_text(size=48),
+           axis.title=element_text(size=48,face="bold"),
+           legend.title=element_text(size=48),
+           legend.text=element_text(size=48))
+p
+dev.set()
+png(file="TaxesPayedProportion.png",width=1600,height=850)
+p
+dev.off()
+
 
 
 
@@ -1079,7 +1124,7 @@ Worker<-subset(Worker,tthetaw_Sample>=minWork)
 Worker<-subset(Worker,tthetaw_Sample<=maxWork)
 
 #Obtaining percentiles
-perc<-seq(0.1,0.9,0.1)
+perc<-seq(0.1,0.9,0.01)
 length_perc<-length(perc)
 
 A1<-subset(Worker,tthetaw_Trunc==quantile(tthetaw_Trunc,c(perc[1]),type=3))

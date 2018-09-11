@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  10 SEP 2018 17:21
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  11 SEP 2018 17:01
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1688,17 +1688,14 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 198--199
 [][] 
  []
 
-
-</Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/EvasionProportionPercentiles.png, id=44, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/EvasionProportionPercentiles.png Graphic file (type png)
+n/TheoreticalMoments/EvasionProportion.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/EvasionProportionPercentiles.png>
+/TheoreticalMoments/EvasionProportion.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/EvasionProportionPercentiles.png used o
-n input line 200.
+/git/OptimalTaxation/TheoreticalMoments/EvasionProportion.png used on input lin
+e 200.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 200--201
@@ -1707,18 +1704,19 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 200--201
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/FormalDemand.png, id=45, 1606.0pt x 853.1875pt> [2 </Users/rodr
-igoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMome
-nts/AfterTaxProfitPercentile.png> </Users/rodrigoazuero/Dropbox/OptmalTaxationS
-hared/Data/git/OptimalTaxation/TheoreticalMoments/EvasionProportion.png>]
+oreticalMoments/EvasionProportionPercentiles.png, id=44, 1606.0pt x 853.1875pt>
+[2 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/
+TheoreticalMoments/AfterTaxProfitPercentile.png> </Users/rodrigoazuero/Dropbox/
+OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/EvasionProport
+ion.png>]
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/FormalDemand.png Graphic file (type png)
+n/TheoreticalMoments/EvasionProportionPercentiles.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/FormalDemand.png>
+/TheoreticalMoments/EvasionProportionPercentiles.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/FormalDemand.png used on input line 202
-.
+/git/OptimalTaxation/TheoreticalMoments/EvasionProportionPercentiles.png used o
+n input line 202.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 202--203
@@ -1727,15 +1725,15 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 202--203
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/FormalDemandPercentile.png, id=52, 1606.0pt x 853.1875pt>
+oreticalMoments/EvasionValuesPercentiles.png, id=51, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/FormalDemandPercentile.png Graphic file (type png)
+n/TheoreticalMoments/EvasionValuesPercentiles.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/FormalDemandPercentile.png>
+/TheoreticalMoments/EvasionValuesPercentiles.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/FormalDemandPercentile.png used on inpu
-t line 204.
+/git/OptimalTaxation/TheoreticalMoments/EvasionValuesPercentiles.png used on in
+put line 204.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 204--205
@@ -1744,18 +1742,17 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 204--205
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/FormalSupply.png, id=53, 1606.0pt x 853.1875pt> [3 </Users/rodr
-igoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMome
-nts/EvasionProportionPercentiles.png> </Users/rodrigoazuero/Dropbox/OptmalTaxat
-ionShared/Data/git/OptimalTaxation/TheoreticalMoments/FormalDemand.png>]
+oreticalMoments/TaxesPayedProportion.png, id=52, 1606.0pt x 853.1875pt>
+[3 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/
+TheoreticalMoments/EvasionProportionPercentiles.png>]
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/FormalSupply.png Graphic file (type png)
+n/TheoreticalMoments/TaxesPayedProportion.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/FormalSupply.png>
+/TheoreticalMoments/TaxesPayedProportion.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/FormalSupply.png used on input line 206
-.
+/git/OptimalTaxation/TheoreticalMoments/TaxesPayedProportion.png used on input 
+line 206.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 206--207
@@ -1764,15 +1761,15 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 206--207
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/FormalSupplyPercentiles.png, id=60, 1606.0pt x 853.1875pt>
+oreticalMoments/FormalDemand.png, id=58, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/FormalSupplyPercentiles.png Graphic file (type png)
+n/TheoreticalMoments/FormalDemand.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/FormalSupplyPercentiles.png>
+/TheoreticalMoments/FormalDemand.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/FormalSupplyPercentiles.png used on inp
-ut line 208.
+/git/OptimalTaxation/TheoreticalMoments/FormalDemand.png used on input line 208
+.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 208--209
@@ -1781,18 +1778,19 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 208--209
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/InformalDemand.png, id=61, 1606.0pt x 853.1875pt> [4 </Users/ro
-drigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMo
-ments/FormalDemandPercentile.png> </Users/rodrigoazuero/Dropbox/OptmalTaxationS
-hared/Data/git/OptimalTaxation/TheoreticalMoments/FormalSupply.png>]
+oreticalMoments/FormalDemandPercentile.png, id=59, 1606.0pt x 853.1875pt>
+[4 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/
+TheoreticalMoments/EvasionValuesPercentiles.png> </Users/rodrigoazuero/Dropbox/
+OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/TaxesPayedProp
+ortion.png>]
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/InformalDemand.png Graphic file (type png)
+n/TheoreticalMoments/FormalDemandPercentile.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/InformalDemand.png>
+/TheoreticalMoments/FormalDemandPercentile.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/InformalDemand.png used on input line 2
-10.
+/git/OptimalTaxation/TheoreticalMoments/FormalDemandPercentile.png used on inpu
+t line 210.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 210--211
@@ -1801,15 +1799,15 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 210--211
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/InformalDemandPercentile.png, id=68, 1606.0pt x 853.1875pt>
+oreticalMoments/FormalSupply.png, id=66, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/InformalDemandPercentile.png Graphic file (type png)
+n/TheoreticalMoments/FormalSupply.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/InformalDemandPercentile.png>
+/TheoreticalMoments/FormalSupply.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/InformalDemandPercentile.png used on in
-put line 212.
+/git/OptimalTaxation/TheoreticalMoments/FormalSupply.png used on input line 212
+.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 212--213
@@ -1818,19 +1816,19 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 212--213
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/InformalProportionDemand.png, id=69, 1606.0pt x 853.1875pt>
+oreticalMoments/FormalSupplyPercentiles.png, id=67, 1606.0pt x 853.1875pt>
 [5 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/
-TheoreticalMoments/FormalSupplyPercentiles.png> </Users/rodrigoazuero/Dropbox/O
-ptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/InformalDemand.
-png>]
+TheoreticalMoments/FormalDemand.png> </Users/rodrigoazuero/Dropbox/OptmalTaxati
+onShared/Data/git/OptimalTaxation/TheoreticalMoments/FormalDemandPercentile.png
+>]
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/InformalProportionDemand.png Graphic file (type png)
+n/TheoreticalMoments/FormalSupplyPercentiles.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/InformalProportionDemand.png>
+/TheoreticalMoments/FormalSupplyPercentiles.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/InformalProportionDemand.png used on in
-put line 214.
+/git/OptimalTaxation/TheoreticalMoments/FormalSupplyPercentiles.png used on inp
+ut line 214.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 214--215
@@ -1839,17 +1837,15 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 214--215
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/InformalProportionDemandPercentile.png, id=76, 1606.0pt x 853.1
-875pt>
+oreticalMoments/InformalDemand.png, id=74, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/InformalProportionDemandPercentile.png Graphic file (type 
-png)
+n/TheoreticalMoments/InformalDemand.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/InformalProportionDemandPercentile.png>
+/TheoreticalMoments/InformalDemand.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/InformalProportionDemandPercentile.png 
-used on input line 216.
+/git/OptimalTaxation/TheoreticalMoments/InformalDemand.png used on input line 2
+16.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 216--217
@@ -1858,18 +1854,18 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 216--217
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/InformalProportionSupply.png, id=77, 1606.0pt x 853.1875pt>
+oreticalMoments/InformalDemandPercentile.png, id=75, 1606.0pt x 853.1875pt>
 [6 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/
-TheoreticalMoments/InformalDemandPercentile.png> </Users/rodrigoazuero/Dropbox/
-OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/InformalPropor
-tionDemand.png>]
+TheoreticalMoments/FormalSupply.png> </Users/rodrigoazuero/Dropbox/OptmalTaxati
+onShared/Data/git/OptimalTaxation/TheoreticalMoments/FormalSupplyPercentiles.pn
+g>]
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/InformalProportionSupply.png Graphic file (type png)
+n/TheoreticalMoments/InformalDemandPercentile.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/InformalProportionSupply.png>
+/TheoreticalMoments/InformalDemandPercentile.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/InformalProportionSupply.png used on in
+/git/OptimalTaxation/TheoreticalMoments/InformalDemandPercentile.png used on in
 put line 218.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
@@ -1879,17 +1875,15 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 218--219
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/InformalProportionSupplyPercentiles.png, id=84, 1606.0pt x 853.
-1875pt>
+oreticalMoments/InformalProportionDemand.png, id=82, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/InformalProportionSupplyPercentiles.png Graphic file (type
- png)
+n/TheoreticalMoments/InformalProportionDemand.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/InformalProportionSupplyPercentiles.png>
+/TheoreticalMoments/InformalProportionDemand.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/InformalProportionSupplyPercentiles.png
- used on input line 220.
+/git/OptimalTaxation/TheoreticalMoments/InformalProportionDemand.png used on in
+put line 220.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 220--221
@@ -1898,19 +1892,20 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 220--221
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/InformalSupply.png, id=85, 1606.0pt x 853.1875pt> [7 </Users/ro
-drigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMo
-ments/InformalProportionDemandPercentile.png> </Users/rodrigoazuero/Dropbox/Opt
-malTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/InformalProportio
-nSupply.png>]
+oreticalMoments/InformalProportionDemandPercentile.png, id=83, 1606.0pt x 853.1
+875pt> [7 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTa
+xation/TheoreticalMoments/InformalDemand.png> </Users/rodrigoazuero/Dropbox/Opt
+malTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/InformalDemandPer
+centile.png>]
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/InformalSupply.png Graphic file (type png)
+n/TheoreticalMoments/InformalProportionDemandPercentile.png Graphic file (type 
+png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/InformalSupply.png>
+/TheoreticalMoments/InformalProportionDemandPercentile.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/InformalSupply.png used on input line 2
-22.
+/git/OptimalTaxation/TheoreticalMoments/InformalProportionDemandPercentile.png 
+used on input line 222.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 222--223
@@ -1919,15 +1914,15 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 222--223
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/InformalSupplyPercentiles.png, id=93, 1606.0pt x 853.1875pt>
+oreticalMoments/InformalProportionSupply.png, id=91, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/InformalSupplyPercentiles.png Graphic file (type png)
+n/TheoreticalMoments/InformalProportionSupply.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/InformalSupplyPercentiles.png>
+/TheoreticalMoments/InformalProportionSupply.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/InformalSupplyPercentiles.png used on i
-nput line 224.
+/git/OptimalTaxation/TheoreticalMoments/InformalProportionSupply.png used on in
+put line 224.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 224--225
@@ -1936,19 +1931,20 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 224--225
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/PretaxProfit.png, id=94, 1606.0pt x 853.1875pt> [8 </Users/rodr
-igoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMome
-nts/InformalProportionSupplyPercentiles.png> </Users/rodrigoazuero/Dropbox/Optm
-alTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/InformalSupply.png
->]
+oreticalMoments/InformalProportionSupplyPercentiles.png, id=92, 1606.0pt x 853.
+1875pt> [8 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalT
+axation/TheoreticalMoments/InformalProportionDemand.png> </Users/rodrigoazuero/
+Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Inform
+alProportionDemandPercentile.png>]
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/PretaxProfit.png Graphic file (type png)
+n/TheoreticalMoments/InformalProportionSupplyPercentiles.png Graphic file (type
+ png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/PretaxProfit.png>
+/TheoreticalMoments/InformalProportionSupplyPercentiles.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/PretaxProfit.png used on input line 226
-.
+/git/OptimalTaxation/TheoreticalMoments/InformalProportionSupplyPercentiles.png
+ used on input line 226.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 226--227
@@ -1957,15 +1953,15 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 226--227
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/PretaxProfitPercentile.png, id=101, 1606.0pt x 853.1875pt>
+oreticalMoments/InformalSupply.png, id=99, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/PretaxProfitPercentile.png Graphic file (type png)
+n/TheoreticalMoments/InformalSupply.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/PretaxProfitPercentile.png>
+/TheoreticalMoments/InformalSupply.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/PretaxProfitPercentile.png used on inpu
-t line 228.
+/git/OptimalTaxation/TheoreticalMoments/InformalSupply.png used on input line 2
+28.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 228--229
@@ -1974,17 +1970,19 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 228--229
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/Production.png, id=102, 1606.0pt x 853.1875pt> [9 </Users/rodri
-goazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMomen
-ts/InformalSupplyPercentiles.png> </Users/rodrigoazuero/Dropbox/OptmalTaxationS
-hared/Data/git/OptimalTaxation/TheoreticalMoments/PretaxProfit.png>]
+oreticalMoments/InformalSupplyPercentiles.png, id=100, 1606.0pt x 853.1875pt>
+[9 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/
+TheoreticalMoments/InformalProportionSupply.png> </Users/rodrigoazuero/Dropbox/
+OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/InformalPropor
+tionSupplyPercentiles.png>]
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/Production.png Graphic file (type png)
+n/TheoreticalMoments/InformalSupplyPercentiles.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/Production.png>
+/TheoreticalMoments/InformalSupplyPercentiles.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/Production.png used on input line 230.
+/git/OptimalTaxation/TheoreticalMoments/InformalSupplyPercentiles.png used on i
+nput line 230.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 230--231
@@ -1993,15 +1991,15 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 230--231
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/ProductionPercentile.png, id=109, 1606.0pt x 853.1875pt>
+oreticalMoments/PretaxProfit.png, id=107, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/ProductionPercentile.png Graphic file (type png)
+n/TheoreticalMoments/PretaxProfit.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/ProductionPercentile.png>
+/TheoreticalMoments/PretaxProfit.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/ProductionPercentile.png used on input 
-line 232.
+/git/OptimalTaxation/TheoreticalMoments/PretaxProfit.png used on input line 232
+.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 232--233
@@ -2010,18 +2008,19 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 232--233
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/TotalLaborDemand.png, id=110, 1606.0pt x 853.1875pt> [10 </User
-s/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/Theoretic
-alMoments/PretaxProfitPercentile.png> </Users/rodrigoazuero/Dropbox/OptmalTaxat
-ionShared/Data/git/OptimalTaxation/TheoreticalMoments/Production.png>]
+oreticalMoments/PretaxProfitPercentile.png, id=108, 1606.0pt x 853.1875pt>
+[10 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
+/TheoreticalMoments/InformalSupply.png> </Users/rodrigoazuero/Dropbox/OptmalTax
+ationShared/Data/git/OptimalTaxation/TheoreticalMoments/InformalSupplyPercentil
+es.png>]
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/TotalLaborDemand.png Graphic file (type png)
+n/TheoreticalMoments/PretaxProfitPercentile.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/TotalLaborDemand.png>
+/TheoreticalMoments/PretaxProfitPercentile.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/TotalLaborDemand.png used on input line
- 234.
+/git/OptimalTaxation/TheoreticalMoments/PretaxProfitPercentile.png used on inpu
+t line 234.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 234--235
@@ -2030,15 +2029,14 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 234--235
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/TotalLaborDemandPercentile.png, id=117, 1606.0pt x 853.1875pt>
+oreticalMoments/Production.png, id=115, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/TotalLaborDemandPercentile.png Graphic file (type png)
+n/TheoreticalMoments/Production.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/TotalLaborDemandPercentile.png>
+/TheoreticalMoments/Production.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/TotalLaborDemandPercentile.png used on 
-input line 236.
+/git/OptimalTaxation/TheoreticalMoments/Production.png used on input line 236.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 236--237
@@ -2047,18 +2045,19 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 236--237
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/TotalLaborSupply.png, id=118, 1606.0pt x 853.1875pt> [11 </User
-s/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/Theoretic
-alMoments/ProductionPercentile.png> </Users/rodrigoazuero/Dropbox/OptmalTaxatio
-nShared/Data/git/OptimalTaxation/TheoreticalMoments/TotalLaborDemand.png>]
+oreticalMoments/ProductionPercentile.png, id=116, 1606.0pt x 853.1875pt>
+[11 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
+/TheoreticalMoments/PretaxProfit.png> </Users/rodrigoazuero/Dropbox/OptmalTaxat
+ionShared/Data/git/OptimalTaxation/TheoreticalMoments/PretaxProfitPercentile.pn
+g>]
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/TotalLaborSupply.png Graphic file (type png)
+n/TheoreticalMoments/ProductionPercentile.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/TotalLaborSupply.png>
+/TheoreticalMoments/ProductionPercentile.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/TotalLaborSupply.png used on input line
- 238.
+/git/OptimalTaxation/TheoreticalMoments/ProductionPercentile.png used on input 
+line 238.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 238--239
@@ -2067,15 +2066,15 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 238--239
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/TotalLaborSupplyPercentiles.png, id=125, 1606.0pt x 853.1875pt>
+oreticalMoments/TotalLaborDemand.png, id=123, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/TotalLaborSupplyPercentiles.png Graphic file (type png)
+n/TheoreticalMoments/TotalLaborDemand.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/TotalLaborSupplyPercentiles.png>
+/TheoreticalMoments/TotalLaborDemand.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/TotalLaborSupplyPercentiles.png used on
- input line 240.
+/git/OptimalTaxation/TheoreticalMoments/TotalLaborDemand.png used on input line
+ 240.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 240--241
@@ -2084,18 +2083,18 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 240--241
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/ValueWorker.png, id=126, 1606.0pt x 853.1875pt> [12 </Users/rod
-rigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMom
-ents/TotalLaborDemandPercentile.png> </Users/rodrigoazuero/Dropbox/OptmalTaxati
-onShared/Data/git/OptimalTaxation/TheoreticalMoments/TotalLaborSupply.png>]
+oreticalMoments/TotalLaborDemandPercentile.png, id=124, 1606.0pt x 853.1875pt>
+[12 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
+/TheoreticalMoments/Production.png> </Users/rodrigoazuero/Dropbox/OptmalTaxatio
+nShared/Data/git/OptimalTaxation/TheoreticalMoments/ProductionPercentile.png>]
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/ValueWorker.png Graphic file (type png)
+n/TheoreticalMoments/TotalLaborDemandPercentile.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/ValueWorker.png>
+/TheoreticalMoments/TotalLaborDemandPercentile.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/ValueWorker.png used on input line 242.
-
+/git/OptimalTaxation/TheoreticalMoments/TotalLaborDemandPercentile.png used on 
+input line 242.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 242--243
@@ -2104,15 +2103,15 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 242--243
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/ValueWorkerPercentiles.png, id=133, 1606.0pt x 853.1875pt>
+oreticalMoments/TotalLaborSupply.png, id=131, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
-n/TheoreticalMoments/ValueWorkerPercentiles.png Graphic file (type png)
+n/TheoreticalMoments/TotalLaborSupply.png Graphic file (type png)
 
 <use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/ValueWorkerPercentiles.png>
+/TheoreticalMoments/TotalLaborSupply.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
-/git/OptimalTaxation/TheoreticalMoments/ValueWorkerPercentiles.png used on inpu
-t line 244.
+/git/OptimalTaxation/TheoreticalMoments/TotalLaborSupply.png used on input line
+ 244.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
 Overfull \hbox (10.0pt too wide) in paragraph at lines 244--245
@@ -2121,11 +2120,66 @@ Overfull \hbox (10.0pt too wide) in paragraph at lines 244--245
 
 
 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
-oreticalMoments/TotalIncomePercentiles.png, id=134, 1606.0pt x 853.1875pt>
+oreticalMoments/TotalLaborSupplyPercentiles.png, id=132, 1606.0pt x 853.1875pt>
 [13 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/TotalLaborSupplyPercentiles.png> </Users/rodrigoazuero/Drop
-box/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/ValueWorke
-r.png>]
+/TheoreticalMoments/TotalLaborDemand.png> </Users/rodrigoazuero/Dropbox/OptmalT
+axationShared/Data/git/OptimalTaxation/TheoreticalMoments/TotalLaborDemandPerce
+ntile.png>]
+File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
+n/TheoreticalMoments/TotalLaborSupplyPercentiles.png Graphic file (type png)
+
+<use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
+/TheoreticalMoments/TotalLaborSupplyPercentiles.png>
+Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
+/git/OptimalTaxation/TheoreticalMoments/TotalLaborSupplyPercentiles.png used on
+ input line 246.
+(pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
+
+Overfull \hbox (10.0pt too wide) in paragraph at lines 246--247
+[][] 
+ []
+
+
+</Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
+oreticalMoments/ValueWorker.png, id=140, 1606.0pt x 853.1875pt>
+File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
+n/TheoreticalMoments/ValueWorker.png Graphic file (type png)
+
+<use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
+/TheoreticalMoments/ValueWorker.png>
+Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
+/git/OptimalTaxation/TheoreticalMoments/ValueWorker.png used on input line 248.
+
+(pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
+
+Overfull \hbox (10.0pt too wide) in paragraph at lines 248--249
+[][] 
+ []
+
+
+</Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
+oreticalMoments/ValueWorkerPercentiles.png, id=141, 1606.0pt x 853.1875pt>
+[14 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
+/TheoreticalMoments/TotalLaborSupply.png> </Users/rodrigoazuero/Dropbox/OptmalT
+axationShared/Data/git/OptimalTaxation/TheoreticalMoments/TotalLaborSupplyPerce
+ntiles.png>]
+File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
+n/TheoreticalMoments/ValueWorkerPercentiles.png Graphic file (type png)
+
+<use /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
+/TheoreticalMoments/ValueWorkerPercentiles.png>
+Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
+/git/OptimalTaxation/TheoreticalMoments/ValueWorkerPercentiles.png used on inpu
+t line 250.
+(pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
+
+Overfull \hbox (10.0pt too wide) in paragraph at lines 250--251
+[][] 
+ []
+
+
+</Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/The
+oreticalMoments/TotalIncomePercentiles.png, id=148, 1606.0pt x 853.1875pt>
 File: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
 n/TheoreticalMoments/TotalIncomePercentiles.png Graphic file (type png)
 
@@ -2133,10 +2187,10 @@ n/TheoreticalMoments/TotalIncomePercentiles.png Graphic file (type png)
 /TheoreticalMoments/TotalIncomePercentiles.png>
 Package pdftex.def Info: /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data
 /git/OptimalTaxation/TheoreticalMoments/TotalIncomePercentiles.png used on inpu
-t line 246.
+t line 252.
 (pdftex.def)             Requested size: 443.57848pt x 235.64925pt.
 
-Overfull \hbox (10.0pt too wide) in paragraph at lines 246--247
+Overfull \hbox (10.0pt too wide) in paragraph at lines 252--253
 [][] 
  []
 
@@ -2148,33 +2202,34 @@ See the caption package documentation for explanation.
 Package caption Warning: Unused \captionsetup[subtable] on input line 159.
 See the caption package documentation for explanation.
 
-[14 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
-/TheoreticalMoments/ValueWorkerPercentiles.png> </Users/rodrigoazuero/Dropbox/O
-ptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/TotalIncomePerc
-entiles.png>]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 250.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 250.
+[15 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation
+/TheoreticalMoments/ValueWorker.png> </Users/rodrigoazuero/Dropbox/OptmalTaxati
+onShared/Data/git/OptimalTaxation/TheoreticalMoments/ValueWorkerPercentiles.png
+>] [16 </Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxat
+ion/TheoreticalMoments/TotalIncomePercentiles.png>]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 256.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 256.
  (./Figures.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 250.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 250.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 256.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 256.
 Package rerunfilecheck Info: File `Figures.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 250.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 256.
  ) 
 Here is how much of TeX's memory you used:
- 34275 strings out of 493014
- 645829 string characters out of 6133351
+ 34287 strings out of 493014
+ 646893 string characters out of 6133351
  751983 words of memory out of 5000000
- 37206 multiletter control sequences out of 15000+600000
+ 37214 multiletter control sequences out of 15000+600000
  24856 words of font info for 51 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  62i,7n,100p,10405b,486s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2016/texmf-dist/fonts/enc/dvips/tex-gyre/q-rm.enc}</usr/l
 ocal/texlive/2016/texmf-dist/fonts/type1/public/tex-gyre/qplr.pfb>
-Output written on Figures.pdf (14 pages, 1759223 bytes).
+Output written on Figures.pdf (16 pages, 1763136 bytes).
 PDF statistics:
- 160 PDF objects out of 1000 (max. 8388607)
- 70 compressed objects within 1 object stream
- 15 named destinations out of 1000 (max. 500000)
- 249 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 172 PDF objects out of 1000 (max. 8388607)
+ 76 compressed objects within 1 object stream
+ 17 named destinations out of 1000 (max. 500000)
+ 259 words of extra memory for PDF output out of 10000 (max. 10000000)
 
