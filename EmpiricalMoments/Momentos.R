@@ -553,7 +553,7 @@ ENAHOT$percentiling<-ntile(ENAHOT$salarioUSD,nq)
 T13<-ENAHOT%>%
   group_by(percentiling)%>%
   summarise(informalidad=mean(informal_empleado,na.rm = T)*100, trabajadores=sum(nn))
-T13$Percentil<-c(seq(0.1,1,0.1))
+T13$Percentil<-c(seq(1/nq,1,1/nq))
 
 G13<-ggplot(data=T13,aes(x=Percentil,y=informalidad/100))+
   geom_line()+
