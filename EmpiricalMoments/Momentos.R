@@ -35,7 +35,7 @@ CENSO<-CENSO[which(!(CENSO$VENTAST>quantile(CENSO$VENTAST,0.99)|CENSO$CITAX>quan
 
 #C)Quantiles 
 #Se define el numero de grupos
-nq<-20
+nq<-10
 
 # MOMENTO 1 ---------------------------------------------------------------
 # Informalidad y numero de trabajadores por tamaño de la empresa (ENAHO).
@@ -662,4 +662,47 @@ png(file="PTaxesProfits2E.png",width=1600,height=850)
 G18.2
 dev.off()
 
+# MOMENTO 19 --------------------------------------------------------------
+#Horas promedio de participación en el mercado laboral por decil de ingresos
 
+T19<-ENAHOT[which(ENAHOT$horastot_ci>0),]%>%
+  group_by(percentiling)%>%
+  summarise(horas=mean(horastot_ci,na.rm = T))
+
+T19$Percentil<-c(seq(1/nq,1,1/nq))
+
+G19<-ggplot(data=T19,aes(x=Percentil,y=horas))+
+  geom_line()+
+  labs(x=expression(theta~w),y="Number of hours worked")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+dev.set()
+png(file="HoursWorked.png",width=1600,height=850)
+G19
+dev.off()
+
+
+# MOMENTO 20 --------------------------------------------------------------
+#Participación en el mercado laboral por decil de ingresos
+
+ENAHO$ingreso_totUSD<-ENAHO$salarioUSD+(ENAHO$ynlm_ci+ENAHO$ynlnm_ci)*0.315
+ENAHO$perc_ingt<-ntile(ENAHO$ingreso_totUSD,nq) 
+
+T20<-ENAHO%>%
+  group_by(perc_ingt)%>%
+  summarise(ocupados=sum(emp_ci), desocupados=sum(desemp_ci))
+
+T20$Percentil<-c(seq(1/nq,1,1/nq))
+T20$Participacion<-T20$ocupados/(T20$ocupados+T20$desocupados)
+
+G20<-ggplot(data=T20,aes(x=Percentil,y=Participacion))+
+  geom_line()+
+  labs(x=expression(theta~w),y="Participation in labor market")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+dev.set()
+png(file="ParticipationLaborMarket.png",width=1600,height=850)
+G20
+dev.off()
