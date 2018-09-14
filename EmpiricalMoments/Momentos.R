@@ -663,7 +663,7 @@ G18.2
 dev.off()
 
 # MOMENTO 19 --------------------------------------------------------------
-#Horas promedio de participación en el mercado laboral por decil de ingresos
+#Horas promedio (semanales) de participación en el mercado laboral por decil de ingresos
 
 T19<-ENAHOT[which(ENAHOT$horastot_ci>0),]%>%
   group_by(percentiling)%>%
@@ -673,7 +673,7 @@ T19$Percentil<-c(seq(1/nq,1,1/nq))
 
 G19<-ggplot(data=T19,aes(x=Percentil,y=horas))+
   geom_line()+
-  labs(x=expression(theta~w),y="Number of hours worked")+
+  labs(x=expression(theta~w),y="Number of hours worked per week")+
   theme(axis.text=element_text(size=24),
         axis.title=element_text(size=24,face="bold"))
 
