@@ -136,7 +136,10 @@ long double TcActual(double z, double ni, double nf, double aalpha, double tthet
     double ans=0;
     double tax=0;
     double prod=tthetae*pow((ni+nf),aalpha);
-    if (prod-z<189){
+    if(prod-z<=0){
+        ans=0;
+    }
+    else if (prod-z<189){
         ans=0.756;
     } else if (prod-z<302.4){
         ans=1.89;
@@ -168,18 +171,18 @@ long double TcActual(double z, double ni, double nf, double aalpha, double tthet
 
 //5. Personal income tax
 long double PIT(double tthetaw, double wf, double lf){
-    double taxburden=tthetaw*wf*lf;
-    double taxrate=0.3;
-    if(taxburden<24150){
-        taxrate=0.3;
-    }else if(taxburden<117300){
-        taxrate=0.3;
-    }else if(taxburden<210450){
-        taxrate=0.3;
-    }else if(taxburden>=210450){
-        taxrate=0.3;
+    double x=tthetaw*wf*lf;
+    double a=1000;
+    double ans=0;
+    if(x<a){
+        ans=(100/a)*x-100;
+    }else if(x<36000){
+        ans=0.0;
+    }else if(x<66000){
+        ans=pow(x,2)/100000-9*x/25;
+    }else if(x>=66000){
+        ans=0.3*x;
     }
-    double ans=taxrate*taxburden;
     return(ans);
 }
 
@@ -726,6 +729,8 @@ double ExcessDemandFunctions(vector<double>Wages,vector<double>Params,vector<dou
     double ExcessTotal=0;
     ExcessTotal=pow(InformalExcessDemand,2)+pow(FormalExcessDemand,2);
     ExcessTotal=ExcessTotal/M;
+    cout << InformalExcessDemand << " InformalExcessDemand "<< endl;
+    cout << FormalExcessDemand << " FormalExcessDemand "<< endl;
     cout << ExcessTotal << " ExcessTotal"<< endl;
     return(ExcessTotal);
 }
@@ -765,7 +770,7 @@ double StandardizedExcessDemands(const double *Wages, double Others[20]){
     
     //Return the function
     
-    return(ExcessDemandFunctions(WagesVector,Params,InitLWorkers,InitProf));
+    return(pow(ExcessDemandFunctions(WagesVector,Params,InitLWorkers,InitProf),0.5));
 }
 
 
@@ -882,9 +887,11 @@ arma::vec EqWagesNumericVector(arma::vec Others, arma::vec WagesInit){
     nlopt_set_lower_bounds(ExcessDemand, lbExcessDemmand);
     nlopt_set_min_objective(ExcessDemand, ExcessDemandsTotal,(void *)&DOthers);
     
-    
-    nlopt_set_xtol_rel(ExcessDemand, 1.0e-8);
+    //Originally:
+    //nlopt_set_xtol_rel(ExcessDemand, 1.0e-8);
     nlopt_set_ftol_abs(ExcessDemand,1.0e-8);
+    
+    //nlopt_set_stopval(ExcessDemand, 0.1);
     double ExcessDemandValueFinal; /* the minimum objective value, upon return */
     
     
@@ -922,18 +929,19 @@ int main(int argc, const char * argv[]) {
     double aalpha=0.8;
     double tthetae=12.84209;
     double tthetaw=3.873585;
-    double wi=6.051327;
-    double wf=8.469509;
+    double wi=6.7051327;
+    double wf=7.7469509;
+
     double ni=2.3;
     double nf=0.53*70;
-    double ggamma=0.5;
+    double ggamma=0.28;
     double ddelta=0.12;
     double bbeta=0.15;
     double ssigma=0.2;
     double kkappa=0.1;
     double psi=0.4;
     double chi=1.5;
-    double rrho=0.1;
+    double rrho=0.9;
     double lf=2.1;
     double li=2.1;
     double z=24;
@@ -1302,7 +1310,20 @@ int main(int argc, const char * argv[]) {
     cout << Decision[2][2]<< " VWorker "<< endl;
     
     //Vector of final answer
+    
+    WageEx[0]=6.9425;
+    WageEx[1]=7.69912;
+    cout << StandardizedExcessDemands(WageEx,  Others) << " Standardized1" << endl;
+    cout << " ---"<< endl;
+    WageEx[0]=6.9425;
+    WageEx[1]=7.69912;
+    cout << StandardizedExcessDemands(WageEx,  Others) << " modified" << endl;
     arma::vec WagesEquilibrium=arma::zeros(2);
+    
+    WageEx[0]=6.94398;
+    WageEx[1]=7.699953;
+    cout << StandardizedExcessDemands(WageEx,  Others) << " modified2" << endl;
+    
     
     WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
     
