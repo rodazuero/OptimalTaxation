@@ -734,7 +734,7 @@ G20
 dev.off()
 
 # MOMENTO 21 --------------------------------------------------------------
-#Horas promedio (semanales) de participación en el mercado laboral por decil de ingresos (PET)
+#Horas promedio (semanales) de participación en el mercado laboral por decil de ingresos (PET/ Nivel de ingreso del hogar)
 ENAHOTPET<-subset(ENAHO,ENAHO$edad_ci>=18 & ENAHO$edad_ci<=65 & !(ENAHO$categopri_ci=="Patron" | ENAHO$categopri_ci=="Cuenta propia" | is.na(ENAHO$categopri_ci)))
 ENAHOTPET$percentil_hogar<-ntile(ENAHOTPET$ing_ch_pc,nq)
 T21<-ENAHOTPET[!is.na(ENAHOTPET$ing_ch_pc),]%>%
