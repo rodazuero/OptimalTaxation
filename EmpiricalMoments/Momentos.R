@@ -664,7 +664,7 @@ dev.off()
 
 # MOMENTO 19 --------------------------------------------------------------
 #Horas promedio (semanales) de participación en el mercado laboral por decil de ingresos
-
+#Version 1 (Trabajadores)
 T19<-ENAHOT[which(ENAHOT$horastot_ci>0),]%>%
   group_by(percentiling)%>%
   summarise(horas=mean(horastot_ci,na.rm = T))
@@ -682,6 +682,31 @@ png(file="HoursWorked.png",width=1600,height=850)
 G19
 dev.off()
 
+#Versión 2 (PEA (incluye a quienes no trabajan) // Nivel de ingresos del hogar)
+ENAHO$ing_ch<- ENAHO$ylm_ch + ENAHO$ylnm_ch
+ENAHO$ing_ch_pc<-ENAHO$ing_ch/ENAHO$nmiembros_ch
+
+ENAHO$horas_trab<- ENAHO$horastot_ci
+ENAHO$horas_trab[is.na(ENAHO$horas_trab)]<-0
+
+ENAHOPEA<-ENAHO[which(ENAHO$condocup_ci=="Ocupado"|ENAHO$condocup_ci=="Desocupado"),]
+ENAHOPEA$percentil_hogar<-ntile(ENAHOPEA$ing_ch_pc,nq)
+T19.2<-ENAHOPEA[!is.na(ENAHOPEA$ing_ch_pc),]%>%
+  group_by(percentil_hogar)%>%
+  summarise(horas=mean(horas_trab,na.rm = T))
+
+T19.2$Percentil<-c(seq(1/nq,1,1/nq))
+
+G19.2<-ggplot(data=T19.2,aes(x=Percentil,y=horas))+
+  geom_line()+
+  labs(x=expression(theta~w),y="Number of hours worked per week")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+dev.set()
+png(file="HoursWorkedPEA.png",width=1600,height=850)
+G19.2
+dev.off()
 
 # MOMENTO 20 --------------------------------------------------------------
 #Participación en el mercado laboral por decil de ingresos
