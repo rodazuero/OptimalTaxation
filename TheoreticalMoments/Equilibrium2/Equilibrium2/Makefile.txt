@@ -68,8 +68,8 @@ INCDIR1=/usr/include/c++/3.4.6/backward/
 INCDIR2=/usr/lib64/R/library/BH/include/
 INCDIR3=$(HOME)install/include/
 
-#Generating the INC for all the paths
-#INC=$(INCDIR1) $(INCDIR2) $(INCDIR3) -> This is for tesla
+#Generating the INC for all the paths -> This is for tesla
+INC=$(INCDIR1) $(INCDIR2) $(INCDIR3) 
 INC=$(INCDIR3)
 INC_PARAMS=$(foreach d, $(INC), -I$d)
 #-------------------------------------

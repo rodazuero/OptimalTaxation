@@ -178,4 +178,88 @@ double aalpha=0.5;
 #Code v14. going back to see which code actually works. 
 
 
+#Trying to modify the tax function to have a smooth thing that can generate something similar to the one in the legislation. 
+
+
+Works in C++ but not in R?? 
+long double PIT(double tthetaw, double wf, double lf){
+    double taxburden=tthetaw*wf*lf;
+    double taxrate=pow(taxburden,0.015)-1;
+    double ans=taxrate*taxburden;
+    return(ans);
+}
+
+
+#Modifying bit the wages does not change that much the overall outcomes. 
+
+
+#10-01-2018. Need to:
+
+1. Increase proportion of people who are entrepreneurs. Theoretical 3% real 36%. 
+2. INcrease inequality in labor income. 
+
+3. Increase Informality of labor supply
+
+#Solutions:
+Increase mmu2 to increase the proportion of people who are entrepreneurs. Setting it initially to 2 just lead to 3%. 
+
+Trying to decrease the distribution of mmu so that the demands do not blow out of proportion. This will imply that we have to change the tax settings as well. 
+
+The parameters were effectively decreased to: 
+
+
+double aalpha=0.8;
+    double tthetae=12.84209;
+    double tthetaw=3.873585;
+    double wi=1.38;
+    double wf=1.46;
+
+    double ni=2.3;
+    double nf=0.53*70;
+    double ggamma=0.28;
+    double ddelta=0.12;
+    double bbeta=0.15;
+    double ssigma=0.2;
+    double kkappa=0.1;
+    double psi=0.4;
+    double chi=1.5;
+    double rrho=0.9;
+    double lf=2.1;
+    double li=2.1;
+    double z=24;
+    double mmu1=0.4;
+    double mmu2=0.7;
+    double ssigma1=0.2;
+    double ssigma2=0.3;
+    double rho12=0.1;
+
+
+This works nicely. Lesson learned: if we increase the distribution of ttheta, demands and supplies explode!
+
+This combination works better!!!
+
+double wi=6.81;
+    double wf=7.13;
+
+    double ni=2.3;
+    double nf=0.53*70;
+    double ggamma=0.28;
+    double ddelta=0.12;
+    double bbeta=0.15;
+    double ssigma=0.2;
+    double kkappa=0.1;
+    double psi=0.4;
+    double chi=1.5;
+    double rrho=0.9;
+    double lf=2.1;
+    double li=2.1;
+    double z=24;
+    double mmu1=0.2;
+    double mmu2=1.3;
+    double ssigma1=0.1;
+    double ssigma2=0.9;
+    double rho12=0.08;
+
+Problem keeps being the small number of entrepreneurs. Probably increasing chi or other stuff might help
+
 

@@ -1,5 +1,5 @@
 #install.packages('nleqslv')
-rm(list=ls(all=TRUE))
+#rm(list=ls(all=TRUE))
 library(nleqslv)
 library(lattice)
 library(ggplot2)
@@ -12,7 +12,7 @@ Rcpp::sourceCpp('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/Opti
 GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments"
 
 
-
+ 
 #------------#
 #Housekeeping#
 #------------#
@@ -22,8 +22,8 @@ GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxati
   
   #Parameter definition
   aalpha=0.8
-  wi=7.2
-  wf=7.59
+  wi=1.38
+  wf=1.46
   ni=2.3
   nf=0.53*70
   ggamma=0.28
@@ -37,11 +37,11 @@ GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxati
   z=24
   li=2.1
   lf=2.1
-  mmu1<-1.1
-  mmu2<-2
-  ssigma1<-0.5
-  ssigma2<-1.1
-  rho12<-0.3
+  mmu1<-0.2
+  mmu2<-1.3
+  ssigma1<-0.1
+  ssigma2<-0.9
+  rho12<-0.08
   #Obtaining the mean ttheta:
   Sigma <- matrix(c(ssigma1,rho12,rho12,ssigma2),2,2)
   mu=c(mmu1,mmu2)
@@ -54,6 +54,7 @@ GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxati
   tthetaw<-mean(tthetaw)
   tthetaw
   min(exp(logtthetavec[,1]))
+  max(exp(logtthetavec[,2]))
   
   
   
@@ -463,7 +464,7 @@ GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxati
     
   }
   
-  M=100
+  M=10000
   #ExcessDemandFunctions(c(wi,wf),Params,M,InitLWorkers,InitProf)
   
   
@@ -503,11 +504,11 @@ GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxati
   WagesInitialGuess=c(wi,wf)
   
   #Trying the equilibrium function
-  #WEq=EqWagesNumericVector(ParamsDecisionExcessDemand,WagesInitialGuess)
+  WEq=EqWagesNumericVector(ParamsDecisionExcessDemand,WagesInitialGuess)
   wiEq=WEq[1]
   wfEq=WEq[2]
-  wiEq=wi
-  wfEq=wf
+  #wiEq=wi
+  #wfEq=wf
   
   
   #If you want to find the equilibrium in R:
@@ -570,9 +571,9 @@ GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxati
   
   tthetavec<-c(2,1)
   iDecision(tthetavec,params,InitLWorkers,InitProf)$Decission
-  
+  setwd(GRAPHS)
   #Graph of entrepreneur-worker takes a while. Put it in conditional while testing parameters
-  if(1==1){
+  if(1==2){
   
   it=1
   for (tte in 1:lw){
@@ -648,6 +649,13 @@ GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxati
   #the tthetas based on their distribution. 
   
   logtthetavec<-rmvnorm(100000, mean = mu, Sigma)
+  EntrepV<-numeric(100000)
+  for(i in 1:10000){
+    EntrepV[i]=iDecision(exp(logtthetavec[i,]),params,InitLWorkers,InitProf)$Decission
+  }
+  PropEntrep<-sum(EntrepV)/10000
+  PropEntrep
+  
   tthetae_Sample<-sort(exp(logtthetavec[,2]))
   maxEnt<-max(tthetae_Sample)
   maxWork<-max(tthetaw_Sample)

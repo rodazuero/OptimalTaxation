@@ -6,11 +6,10 @@ library(xtable)
 library(ggplot2)
 library(scales)
 library(gridExtra)
-setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/EmpiricalMoments')
-setwd("C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New")
+setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/EmpiricalMoments')
 ENAHO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/ENAHO/ENAHOARM/OptimaltaxationSubSampleENAHO.csv", header = T, sep=",")
 CENSO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/Census/Modified/OptimaltaxationSubSampleCenso.csv", header = T, sep=",")
-graphdirectory<-"C:/Users/mr.porras10/OneDrive - Universidad de Los Andes/W/New/GraficasD"
+graphdirectory<-"/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/EmpiricalMoments/Graphs"
 # TRIMMING ----------------------------------------------------------------
 #A)Variable de interes (CENSO)
 #Ventas (Ventas netas + prestacion de servicios)
@@ -682,17 +681,16 @@ png(file="HoursWorked.png",width=1600,height=850)
 G19
 dev.off()
 
-
-#Version 2:PEA // Nivel de ingresos del hogar
+#Versión 2 (PEA (incluye a quienes no trabajan) // Nivel de ingresos del hogar)
 ENAHO$ing_ch<- ENAHO$ylm_ch + ENAHO$ylnm_ch
 ENAHO$ing_ch_pc<-ENAHO$ing_ch/ENAHO$nmiembros_ch
 
 ENAHO$horas_trab<- ENAHO$horastot_ci
 ENAHO$horas_trab[is.na(ENAHO$horas_trab)]<-0
 
-ENAHOTPEA<-ENAHO[which(ENAHO$condocup_ci=="Desocupado" | ENAHO$categopri_ci=="Empleado"),]
-ENAHOTPEA$percentil_hogar<-ntile(ENAHOTPEA$ing_ch_pc,nq)
-T19.2<-ENAHOTPEA[!is.na(ENAHOTPEA$ing_ch_pc),]%>%
+ENAHOPEA<-ENAHO[which(ENAHO$condocup_ci=="Ocupado"|ENAHO$condocup_ci=="Desocupado"),]
+ENAHOPEA$percentil_hogar<-ntile(ENAHOPEA$ing_ch_pc,nq)
+T19.2<-ENAHOPEA[!is.na(ENAHOPEA$ing_ch_pc),]%>%
   group_by(percentil_hogar)%>%
   summarise(horas=mean(horas_trab,na.rm = T))
 
@@ -731,25 +729,4 @@ G20<-ggplot(data=T20,aes(x=Percentil,y=Participacion))+
 dev.set()
 png(file="ParticipationLaborMarket.png",width=1600,height=850)
 G20
-dev.off()
-
-# MOMENTO 21 --------------------------------------------------------------
-#Horas promedio (semanales) de participación en el mercado laboral por decil de ingresos (PET/ Nivel de ingreso del hogar)
-ENAHOTPET<-subset(ENAHO,ENAHO$edad_ci>=18 & ENAHO$edad_ci<=65 & !(ENAHO$categopri_ci=="Patron" | ENAHO$categopri_ci=="Cuenta propia" | is.na(ENAHO$categopri_ci)))
-ENAHOTPET$percentil_hogar<-ntile(ENAHOTPET$ing_ch_pc,nq)
-T21<-ENAHOTPET[!is.na(ENAHOTPET$ing_ch_pc),]%>%
-  group_by(percentil_hogar)%>%
-  summarise(horas=mean(horas_trab,na.rm = T))
-
-T21$Percentil<-c(seq(1/nq,1,1/nq))
-
-G21<-ggplot(data=T21,aes(x=Percentil,y=horas))+
-  geom_line()+
-  labs(x=expression(theta~w),y="Number of hours worked per week")+
-  theme(axis.text=element_text(size=24),
-        axis.title=element_text(size=24,face="bold"))
-
-dev.set()
-png(file="HoursWorkedPET.png",width=1600,height=850)
-G21
 dev.off()

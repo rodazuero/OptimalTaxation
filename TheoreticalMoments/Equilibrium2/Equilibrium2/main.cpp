@@ -451,7 +451,7 @@ vector<vector<double> > iDecision(vector<double> Ttheta,
                                   vector<double> InitLWorkers,
                                   vector<double> InitProf){
     
-    //Loading parameters
+    //Loading paradmeters
     double wi=Params[0];
     double wf=Params[1];
     double aalpha=Params[2];
@@ -791,7 +791,7 @@ double ExcessDemandsTotal(unsigned n, const double *x, double *grad, void *Exces
 
 //12. Creating function to find equilibrium wages conditional on parameters
 // [[Rcpp::export]]
-double EqWages(vector <double> Others, vector<double> WagesInit){
+vector<double> EqWages(vector <double> Others, vector<double> WagesInit){
     
     //Others: Vector of parameters used to find equilibrium.
     //        Need to reconvert to double.
@@ -849,7 +849,7 @@ double EqWages(vector <double> Others, vector<double> WagesInit){
     WagesVector[0]=Winitial[0];
     WagesVector[1]=Winitial[1];
     
-    return(2);
+    return(WagesVector);
 }
 
 
@@ -929,8 +929,8 @@ int main(int argc, const char * argv[]) {
     double aalpha=0.8;
     double tthetae=12.84209;
     double tthetaw=3.873585;
-    double wi=6.7051327;
-    double wf=7.7469509;
+    double wi=6.81;
+    double wf=7.13;
 
     double ni=2.3;
     double nf=0.53*70;
@@ -945,11 +945,11 @@ int main(int argc, const char * argv[]) {
     double lf=2.1;
     double li=2.1;
     double z=24;
-    double mmu1=1.1;
-    double mmu2=2;
-    double ssigma1=0.5;
-    double ssigma2=1.1;
-    double rho12=0.3;
+    double mmu1=0.2;
+    double mmu2=1.3;
+    double ssigma1=0.1;
+    double ssigma2=0.9;
+    double rho12=0.08;
     
     
     //0. Payroll taxes marginal
@@ -1323,6 +1323,23 @@ int main(int argc, const char * argv[]) {
     WageEx[0]=6.94398;
     WageEx[1]=7.699953;
     cout << StandardizedExcessDemands(WageEx,  Others) << " modified2" << endl;
+    
+    
+    vector<double> WagesInEqWages;
+    WagesInEqWages.resize(2);
+    WagesInEqWages[0]=Winitial[0];
+    WagesInEqWages[1]=Winitial[1];
+    
+    vector<double> VOthers;
+    VOthers.resize(20);
+    for(int i=0;i<20;i++){
+        VOthers[i]=Others[i];
+    }
+    
+    
+    //vector<double> WagesEq=EqWages(VOthers, WagesInEqWages);
+    //cout << WagesEq[0]<< " wi "<< endl;
+    //cout << WagesEq[1]<< " wi "<< endl;
     
     
     WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
