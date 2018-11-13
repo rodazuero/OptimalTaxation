@@ -190,17 +190,21 @@ M7A.2<-distribuciones(CENSO$TAX_PRODA)
 M7A.3<-distribuciones(CENSO$TAX_PROFA)
 
 M7A<-cbind(M7A.1,M7A.2[,2],M7A.3[,2])
-colnames(M7A)<-c(".", "Impuestos","(%)Impuestos/Producción", "(%)Impuestos/Beneficios" )
+colnames(M7A)<-c(".", "Impuestos","(%)Impuestos/ProducciÃ³n", "(%)Impuestos/Beneficios" )
 print(xtable(M7A),include.rownames=F)
 
 CENSO$decilesprod<-decile(CENSO$PRODUCCIONUSD)
+corte<-quantile(CENSO$PRODUCCIONUSD,c(seq(1/nq,1,1/nq)))
+
 MOMENTO7A<-CENSO%>%
   group_by(decilesprod)%>%
   summarise(produccion=sum(PRODUCCIONUSD), beneficios=sum(PROFITSUSD), impuestos=sum(CITAXUSD))
 
 MOMENTO7A$propprod<-MOMENTO7A$impuestos/MOMENTO7A$produccion*100
 MOMENTO7A$propprof<-MOMENTO7A$impuestos/MOMENTO7A$beneficios*100
-MOMENTO7A<-cbind(MOMENTO7A[,1], MOMENTO7A[,2:4]/1000, MOMENTO7A[,5:6])
+MOMENTO7A$corte_produccion<-quantile(CENSO$PRODUCCIONUSD,c(seq(1/nq,1,1/nq)))
+MOMENTO7A<-cbind(MOMENTO7A[,7], MOMENTO7A[,2:4]/1000, MOMENTO7A[,5:6])
+
 
 names(MOMENTO7A)<-c("Decil de produccion","Produccion","Beneficios","Impuestos","Impuestos/Produccion (%)","Impuestos/Beneficios (%)")
 print(xtable(MOMENTO7A),include.rownames=F)
