@@ -198,6 +198,7 @@ corte<-quantile(CENSO$PRODUCCIONUSD,c(seq(1/nq,1,1/nq)))
 
 #El summarise calcula el agregado de la produccion, pero en las lineas posteriores el dato correspondiente a "Decil de producción" 
 #se reemplaza con el punto de corte del decil.
+#Unidades***
 
 MOMENTO7A<-CENSO%>%
   group_by(decilesprod)%>%
@@ -205,8 +206,8 @@ MOMENTO7A<-CENSO%>%
 
 MOMENTO7A$propprod<-MOMENTO7A$impuestos/MOMENTO7A$produccion*100
 MOMENTO7A$propprof<-MOMENTO7A$impuestos/MOMENTO7A$beneficios*100
-MOMENTO7A$corte_produccion<-quantile(CENSO$PRODUCCIONUSD,c(seq(1/nq,1,1/nq)))
-MOMENTO7A<-cbind(MOMENTO7A[,7], MOMENTO7A[,2:4]/1000, MOMENTO7A[,5:6])
+MOMENTO7A$produccion<-quantile(CENSO$PRODUCCIONUSD,c(seq(1/nq,1,1/nq)))
+MOMENTO7A<-cbind(MOMENTO7A[,1], MOMENTO7A[,2:4]/1000, MOMENTO7A[,5:6])
 
 
 names(MOMENTO7A)<-c("Decil de produccion","Produccion","Beneficios","Impuestos","Impuestos/Produccion (%)","Impuestos/Beneficios (%)")
