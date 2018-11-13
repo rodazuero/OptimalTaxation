@@ -196,6 +196,9 @@ print(xtable(M7A),include.rownames=F)
 CENSO$decilesprod<-decile(CENSO$PRODUCCIONUSD)
 corte<-quantile(CENSO$PRODUCCIONUSD,c(seq(1/nq,1,1/nq)))
 
+#El summarise calcula el agregado de la produccion, pero en las lineas posteriores el dato correspondiente a "Decil de producción" 
+#se reemplaza con el punto de corte del decil.
+
 MOMENTO7A<-CENSO%>%
   group_by(decilesprod)%>%
   summarise(produccion=sum(PRODUCCIONUSD), beneficios=sum(PROFITSUSD), impuestos=sum(CITAXUSD))
