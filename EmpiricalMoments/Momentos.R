@@ -198,16 +198,15 @@ corte<-quantile(CENSO$PRODUCCIONUSD,c(seq(1/nq,1,1/nq)))
 
 MOMENTO7A<-CENSO%>%
   group_by(decilesprod)%>%
-  summarise(produccion=max(PRODUCCIONUSD), beneficios=sum(PROFITSUSD), impuestos=sum(CITAXUSD))
+  summarise(produccion=max(PRODUCCIONUSD), beneficios=sum(PROFITSUSD), impuestos=sum(CITAXUSD),  impuestos_corte=mean(CITAXUSD[PRODUCCIONUSD==max(PRODUCCIONUSD)]))
 
 MOMENTO7A$propprod<-MOMENTO7A$impuestos/MOMENTO7A$produccion*100
 MOMENTO7A$propprof<-MOMENTO7A$impuestos/MOMENTO7A$beneficios*100
-MOMENTO7A<-cbind(MOMENTO7A[,1], MOMENTO7A[,2:4]/1000, MOMENTO7A[,5:6])
+MOMENTO7A<-cbind(MOMENTO7A[,1], MOMENTO7A[,2:5]/1000, MOMENTO7A[,6:7])
 #Unidades: Miles de USD**
 
-names(MOMENTO7A)<-c("Decil de produccion","Produccion","Beneficios","Impuestos","Impuestos/Produccion (%)","Impuestos/Beneficios (%)")
+names(MOMENTO7A)<-c("Decil de produccion","Produccion","Beneficios","Impuestos","Corte de impuestos","Impuestos/Produccion (%)","Impuestos/Beneficios (%)")
 print(xtable(MOMENTO7A),include.rownames=F)
-
 
 #B)Impuestos totales (CITAX + Transferencias de utilidades a trabajadores)
 CENSO$TAXTOTALUSD<-(CENSO$CITAX+CENSO$CAP5MONTO35)*0.315
