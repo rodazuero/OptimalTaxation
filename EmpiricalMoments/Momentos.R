@@ -198,14 +198,17 @@ corte<-quantile(CENSO$PRODUCCIONUSD,c(seq(1/nq,1,1/nq)))
 
 MOMENTO7A<-CENSO%>%
   group_by(decilesprod)%>%
-  summarise(produccion=max(PRODUCCIONUSD), beneficios=sum(PROFITSUSD), impuestos=sum(CITAXUSD),  impuestos_corte=mean(CITAXUSD[PRODUCCIONUSD==max(PRODUCCIONUSD)]))
+  summarise(produccion=max(PRODUCCIONUSD), beneficios=sum(PROFITSUSD), impuestos=sum(CITAXUSD))
 
+MOMENTO7A$impuestos_acumulado<-cumsum(MOMENTO7A$impuestos)
 MOMENTO7A$propprod<-MOMENTO7A$impuestos/MOMENTO7A$produccion*100
 MOMENTO7A$propprof<-MOMENTO7A$impuestos/MOMENTO7A$beneficios*100
-MOMENTO7A<-cbind(MOMENTO7A[,1], MOMENTO7A[,2:5]/1000, MOMENTO7A[,6:7])
+MOMENTO7A$propimp<-MOMENTO7A$impuestos/sum(MOMENTO7A$impuestos)*100
+MOMENTO7A$propimpcum<-MOMENTO7A$impuestos_acumulado/sum(MOMENTO7A$impuestos)*100
+MOMENTO7A<-cbind(MOMENTO7A[,1], MOMENTO7A[,2:5]/1000, MOMENTO7A[,6:9])
 #Unidades: Miles de USD**
 
-names(MOMENTO7A)<-c("Decil de produccion","Produccion","Beneficios","Impuestos","Corte de impuestos","Impuestos/Produccion (%)","Impuestos/Beneficios (%)")
+names(MOMENTO7A)<-c("Decil de produccion","Produccion","Beneficios","Impuestos","Impuestos acumulados","Impuestos/Produccion (%)","Impuestos/Beneficios (%)","Proporción de pago de impuestos","Proporción de pago de impuestos acumulada")
 print(xtable(MOMENTO7A),include.rownames=F)
 
 #B)Impuestos totales (CITAX + Transferencias de utilidades a trabajadores)
