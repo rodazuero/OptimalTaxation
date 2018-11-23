@@ -61,6 +61,10 @@ names(MOMENTO1)<-c("Tamano de la empresa","Informalidad","Numero de trabajadores
 M1<-as.matrix.data.frame(MOMENTO1,rownames.force = F)
 print(xtable(M1,digits = c(0,0,3,0)), include.rownames=F)
 
+#MOMENTO1$`Tamano de la empresa`<- Tamaño de la empresa reportado por los trabajadores en la ENAHO
+#MOMENTO1$Informalidad<- Proporción de trabajadores informales en las firmas de tamaño x
+#MOMENTO1$`Numero de trabajadores`<- Número de trabajadores que reportan trabajar en una firma de tamaño x
+
 
 # MOMENTO 2  --------------------------------------------------------------
 #Numero de trabajadores por decil de ventas (CENSO)
@@ -74,7 +78,6 @@ MOMENTO2<-sub%>%
 names(MOMENTO2)<-c("Decil de ventas","Numero de trabajadores")
 M2<-as.matrix.data.frame(MOMENTO2,rownames.force = F)
 print(xtable(M2), include.rownames=F)
-
 
 # MOMENTO 3 ---------------------------------------------------------------
 #Informalidad, numero de firmas y de trabajadores por tamaño de la empresa
@@ -110,6 +113,14 @@ row<-c("Total", totalfirmas,porctotal,"",informtotal,trabajadorestotal)
 M3<-rbind(as.matrix.data.frame(MOMENTO3),t(row))
 
 print(xtable(M3, digits =c(0,0,0,3,3,3,0)), include.rownames=F)
+
+#MOMENTO3$`Tamano de la empresa`<-Numero de trabajadores en la empresa
+#MOMENTO3$`Numero de firmas`<- Numero de firmas que reportan tener x trabajadores (CENSO)
+#MOMENTO3$`% del total de firmas`
+#MOMENTO3$`% acumulado del total de firmas`
+#MOMENTO3$Informalidad<- Proporción de trabajadores informales en las firmas de tamaño x (ENAHO)
+#MOMENTO3$`Numero de trabajadores`<- Número de trabajadores que reportan trabajar en una firma de tamaño x (ENAHO)
+
 
 
 # MOMENTO 4 ---------------------------------------------------------------
@@ -165,6 +176,7 @@ M5.3<-rbind(c(".","Todos","Informales","Formales"),cbind(M5.3A,M5.3B[,2],M5.3C[,
 print(xtable(M5.3),include.rownames=F, include.colnames = F)
 
 
+
 # MOMENTO 6 ---------------------------------------------------------------
 #Distribución de la produccion de las firmas (CENSO)
 
@@ -210,6 +222,15 @@ MOMENTO7A<-cbind(MOMENTO7A[,1], MOMENTO7A[,2:5]/1000, MOMENTO7A[,6:9])
 
 names(MOMENTO7A)<-c("Decil de produccion","Produccion","Beneficios","Impuestos","Impuestos acumulados","Impuestos/Produccion (%)","Impuestos/Beneficios (%)","Proporción de pago de impuestos","Proporción de pago de impuestos acumulada")
 print(xtable(MOMENTO7A),include.rownames=F)
+
+#MOMENTO7A$`Decil de produccion`
+#MOMENTO7A$Produccion->Producción de las firmas que se encuentran en el punto de corte del decil
+#MOMENTO7A$Beneficios->Beneficios agregados de todas las firmas en el decil x
+#MOMENTO7A$Impuestos-> Pago de impuestos agregados de las firmas en el punto de corte del decil 
+#MOMENTO7A$`Impuestos acumulados`-> Pago de impuestos agregados de las firmas hasta el decil
+#MOMENTO7A$`Impuestos/Produccion (%)`-> ´Fracción de los impuestos pagos (agregados) de las firmas en el decil x
+#MOMENTO7A$`Impuestos/Beneficios (%)`-> Pago de impuestos agregados de las firmas en el decil x
+
 
 #B)Impuestos totales (CITAX + Transferencias de utilidades a trabajadores)
 CENSO$TAXTOTALUSD<-(CENSO$CITAX+CENSO$CAP5MONTO35)*0.315
