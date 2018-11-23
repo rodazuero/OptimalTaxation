@@ -210,26 +210,28 @@ corte<-quantile(CENSO$PRODUCCIONUSD,c(seq(1/nq,1,1/nq)))
 
 MOMENTO7A<-CENSO%>%
   group_by(decilesprod)%>%
-  summarise(produccion=max(PRODUCCIONUSD), beneficios=sum(PROFITSUSD), impuestos=sum(CITAXUSD))
+  summarise(produccion=max(PRODUCCIONUSD), produccion_agregada=sum(PRODUCCIONUSD), beneficios=sum(PROFITSUSD), impuestos=sum(CITAXUSD))
 
 MOMENTO7A$impuestos_acumulado<-cumsum(MOMENTO7A$impuestos)
-MOMENTO7A$propprod<-MOMENTO7A$impuestos/MOMENTO7A$produccion*100
+MOMENTO7A$propprod<-MOMENTO7A$impuestos/MOMENTO7A$produccion_agregada*100
 MOMENTO7A$propprof<-MOMENTO7A$impuestos/MOMENTO7A$beneficios*100
 MOMENTO7A$propimp<-MOMENTO7A$impuestos/sum(MOMENTO7A$impuestos)*100
 MOMENTO7A$propimpcum<-MOMENTO7A$impuestos_acumulado/sum(MOMENTO7A$impuestos)*100
-MOMENTO7A<-cbind(MOMENTO7A[,1], MOMENTO7A[,2:5]/1000, MOMENTO7A[,6:9])
+MOMENTO7A<-cbind(MOMENTO7A[,1], MOMENTO7A[,2:6]/1000, MOMENTO7A[,7:10])
 #Unidades: Miles de USD**
 
-names(MOMENTO7A)<-c("Decil de produccion","Produccion","Beneficios","Impuestos","Impuestos acumulados","Impuestos/Produccion (%)","Impuestos/Beneficios (%)","Proporción de pago de impuestos","Proporción de pago de impuestos acumulada")
+names(MOMENTO7A)<-c("Decil de produccion","Produccion","Produccion agregada","Beneficios","Impuestos","Impuestos acumulados","Impuestos/Produccion (%)","Impuestos/Beneficios (%)","Proporción de pago de impuestos","Proporción de pago de impuestos acumulada")
 print(xtable(MOMENTO7A),include.rownames=F)
 
 #MOMENTO7A$`Decil de produccion`
 #MOMENTO7A$Produccion->Producción de las firmas que se encuentran en el punto de corte del decil
 #MOMENTO7A$Beneficios->Beneficios agregados de todas las firmas en el decil x
-#MOMENTO7A$Impuestos-> Pago de impuestos agregados de las firmas en el punto de corte del decil 
-#MOMENTO7A$`Impuestos acumulados`-> Pago de impuestos agregados de las firmas hasta el decil
-#MOMENTO7A$`Impuestos/Produccion (%)`-> ´Fracción de los impuestos pagos (agregados) de las firmas en el decil x
-#MOMENTO7A$`Impuestos/Beneficios (%)`-> Pago de impuestos agregados de las firmas en el decil x
+#MOMENTO7A$Impuestos-> Pago de impuestos agregados de las firmas en el decil 
+#MOMENTO7A$`Impuestos acumulados`-> Pago de impuestos agregados de las firmas hasta el decil x
+#MOMENTO7A$`Impuestos/Produccion (%)`-> Impuestos pagos como proporción de la producción 
+#MOMENTO7A$`Impuestos/Beneficios (%)`-> Impuestos pagos como proporción de los beneficios
+#MOMENTO7A$`Proporción de pago de impuestos`-> Impuestos pagos por el decil x como proporción del total de impuestos
+#MOMENTO7A$`Proporción de pago de impuestos acumulada`-> Impuestos pagos desde el decil 1 hasta el decil x como proporción del total de impuestos
 
 
 #B)Impuestos totales (CITAX + Transferencias de utilidades a trabajadores)
@@ -250,14 +252,28 @@ print(xtable(M7B),include.rownames=F)
 
 MOMENTO7B<-CENSO%>%
   group_by(decilesprod)%>%
-  summarise(produccion=sum(PRODUCCIONUSD), beneficios=sum(PROFITSUSD), impuestos=sum(TAXTOTALUSD))
+  summarise(produccion=sum(PRODUCCIONUSD),produccion_agregada=sum(PRODUCCIONUSD),  beneficios=sum(PROFITSUSD), impuestos=sum(TAXTOTALUSD))
 
-MOMENTO7B$propprod<-MOMENTO7B$impuestos/MOMENTO7B$produccion*100
+MOMENTO7B$impuestos_acumulado<-cumsum(MOMENTO7B$impuestos)
+MOMENTO7B$propprod<-MOMENTO7B$impuestos/MOMENTO7B$produccion_agregada*100
 MOMENTO7B$propprof<-MOMENTO7B$impuestos/MOMENTO7B$beneficios*100
-MOMENTO7B<-cbind(MOMENTO7B[,1], MOMENTO7B[,2:4]/1000, MOMENTO7B[,5:6])
+MOMENTO7B$propimp<-MOMENTO7B$impuestos/sum(MOMENTO7B$impuestos)*100
+MOMENTO7B$propimpcum<-MOMENTO7B$impuestos_acumulado/sum(MOMENTO7B$impuestos)*100
+MOMENTO7B<-cbind(MOMENTO7B[,1], MOMENTO7B[,2:6]/1000, MOMENTO7B[,7:10])
+#Unidades: Miles de USD**
 
-names(MOMENTO7B)<-c("Decil de produccion","Produccion","Beneficios","Impuestos","Impuestos/Produccion (%)","Impuestos/Beneficios (%)")
+names(MOMENTO7B)<-c("Decil de produccion","Produccion","Produccion agregada","Beneficios","Impuestos","Impuestos acumulados","Impuestos/Produccion (%)","Impuestos/Beneficios (%)","Proporción de pago de impuestos","Proporción de pago de impuestos acumulada")
 print(xtable(MOMENTO7B),include.rownames=F)
+
+#MOMENTO7B$`Decil de produccion`
+#MOMENTO7B$Produccion->Producción de las firmas que se encuentran en el punto de corte del decil
+#MOMENTO7B$Beneficios->Beneficios agregados de todas las firmas en el decil x
+#MOMENTO7B$Impuestos-> Pago de impuestos agregados de las firmas en el decil 
+#MOMENTO7B$`Impuestos acumulados`-> Pago de impuestos agregados de las firmas hasta el decil x
+#MOMENTO7B$`Impuestos/Produccion (%)`-> Impuestos pagos como proporción de la producción 
+#MOMENTO7B$`Impuestos/Beneficios (%)`-> Impuestos pagos como proporción de los beneficios
+#MOMENTO7B$`Proporción de pago de impuestos`-> Impuestos pagos por el decil x como proporción del total de impuestos
+#MOMENTO7B$`Proporción de pago de impuestos acumulada`-> Impuestos pagos desde el decil 1 hasta el decil x como proporción del total de impuestos
 
 
 # MOMENTO 8 ---------------------------------------------------------------
@@ -273,6 +289,7 @@ names(MOMENTO8)<-c("Decil de ingresos" ,"Informalidad (%)", "Observaciones")
 
 print(xtable(MOMENTO8,digits=c(0,0,2,0)),include.rownames=F)
 
+#MOMENTO8$`Informalidad (%)`-> Proporcion de trabajadores informales en el decil de ingresos
 
 # INFORMACIÓN POR DECILES DE VENTAS-----------------------------------------
 
