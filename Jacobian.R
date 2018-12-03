@@ -1,0 +1,1476 @@
+
+#Author: Rodrigo Azuero
+
+#Created: Nov, 2018. 
+
+#Description:
+#This files analyzes the relationship between parameters and the moments, including how likely are 
+#combination of parameters to generate an equilibrium. 
+
+#Once a combination of parameters is generated, together with the predicted moments and the
+#corresponding distances, it can be analyzed. 
+
+#------------#
+#Housekeeping#
+#------------#
+
+
+
+rm(list=ls(all=TRUE))
+
+
+
+#Obtaining the empirical moments#
+source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/EmpiricalMoments/Momentos.R')
+
+
+
+setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Naive2/')
+
+
+
+#install.packages("ggplot2", dependencies=TRUE, INSTALL_opts = c('--no-lock'))
+#install.packages('tidyverse',dependencies=TRUE)
+#install.packages('rlang',dependencies=TRUE)
+#devtools::install_github("r-lib/rlang", build_vignettes = TRUE)
+#library(nleqslv)
+#library(lattice)
+#library("gridExtra")
+#library("cowplot")
+#library(ggpubr)
+#library(ggplot2)
+#library(reshape)
+#library(grid)
+
+#library(data.table)
+#library(pastecs)
+
+#----------------------#
+#Loading the files     #
+#----------------------#
+
+
+#Loading the parameters
+Parameters<-read.csv("ParametersCSV.csv", header = F, sep=",")
+
+#Loading distance from theoretical to empirical moments
+DistanceMom<-read.csv("DistanceMoments.csv", header = F, sep=",")
+stat.desc(subset(DistanceMom[,1],DistanceMom[,1]!=5.71312e+01)) 
+
+colnames(DistanceMom)<-"Distance"
+
+#Loading equilibrium 
+EqValues<-read.csv("EquilibriumValue.csv", header = F, sep=",")
+EqValues<-EqValues[,1]
+
+#Loading the moments
+ProductionMoments<-read.csv("ThMoments0CSV.csv", header = F, sep=",")
+colnames(ProductionMoments)<-paste0(rep("Production",10),colnames(ProductionMoments))
+
+
+Taxesproportionally<-read.csv("ThMoments1CSV.csv", header = F, sep=",")
+colnames(Taxesproportionally)<-paste0(rep("Taxesproportionally",10),colnames(Taxesproportionally))
+
+
+TotalWorkersDemanded<-read.csv("ThMoments2CSV.csv", header = F, sep=",")
+colnames(TotalWorkersDemanded)<-paste0(rep("TotalWorkersDemanded",10),colnames(TotalWorkersDemanded))
+
+InformalDemandProportion<-read.csv("ThMoments3CSV.csv", header = F, sep=",")
+colnames(InformalDemandProportion)<-paste0(rep("InformalDemandProportion",10),colnames(InformalDemandProportion))
+
+IncomeDistribution<-read.csv("ThMoments4CSV.csv", header = F, sep=",")
+colnames(IncomeDistribution)<-paste0(rep("IncomeDistribution",10),colnames(IncomeDistribution))
+
+InformalLaborSupplyProp<-read.csv("ThMoments5CSV.csv", header = F, sep=",")
+colnames(InformalLaborSupplyProp)<-paste0(rep("InformalLaborSupplyProp",10),colnames(InformalLaborSupplyProp))
+
+TotalLaborSupply<-read.csv("ThMoments6CSV.csv", header = F, sep=",")
+colnames(TotalLaborSupply)<-paste0(rep("TotalLaborSupply",10),colnames(TotalLaborSupply))
+
+
+
+#We only need first column of prop entrepreneurs
+PropEntrepreneurs<-read.csv("ThMoments7CSV.csv", header = F, sep=",")
+PropEntrepreneurs<-PropEntrepreneurs[,1]
+
+
+
+
+
+
+AllMmoments<-data.table(ProductionMoments,Taxesproportionally,
+                        TotalWorkersDemanded,InformalDemandProportion,
+                        IncomeDistribution,InformalLaborSupplyProp,
+                        TotalLaborSupply,PropEntrepreneurs,EqValues)
+
+#We need a column indicating if the equilibrium is successful or not. We will call it Indic. 
+#This will be if: 
+#1. TotalLaborSupply!=0.
+AllMmoments[,Indic1 :=1-(TotalLaborSupplyV1+TotalLaborSupplyV2+TotalLaborSupplyV3
+                        +TotalLaborSupplyV4+ TotalLaborSupplyV5 + TotalLaborSupplyV6+
+                          TotalLaborSupplyV7+TotalLaborSupplyV8+TotalLaborSupplyV9==0)]
+
+#2. If Total Labor supply ==1000
+AllMmoments[,Indic2 :=1-(TotalLaborSupplyV1==1000)]
+
+#3. If total Production ==0
+AllMmoments[,Indic3 :=1-(ProductionV1+ProductionV2+ProductionV3
+                        +ProductionV4+ ProductionV5 + ProductionV6+
+                          ProductionV7+ProductionV8+ProductionV9==0)]
+
+
+#4. Total
+AllMmoments[,Indic :=1-1*(Indic1==0|Indic2==0|Indic3==0)]
+
+#5. And remove Indic1, Indic2, Indic3
+AllMmoments[,Indic1:=NULL]
+AllMmoments[,Indic2:=NULL]
+AllMmoments[,Indic3:=NULL]
+
+names<-c("aalpha","ggamma","ddelta","bbeta","ssigma","kkappa","psi","chi",
+         "rho","mmu1","mmu2","ssigma1","ssigma2","rho12","NA")
+colnames(Parameters)<-names
+
+Everything<-data.table(Parameters,DistanceMom,AllMmoments)
+
+#----------------------------------------------------------------------#
+#We only take those where positive number of entrepreneurs where found #
+#----------------------------------------------------------------------#
+
+#The combinations with problems throw 666 into  InformalDemandProportion[,1]. 
+#We take only the moments where InformalDemandProprtion[,1]!=666
+
+
+#-----------------------------------#
+#Analyzing Parameters and equilibria#
+#-----------------------------------#
+
+
+Parameters<-data.table(Parameters,AllMmoments$Indic)
+setnames(Parameters,16,"Indic")
+#For those where there is equilibrium, set Indic =1. 
+
+#Subsetting the two 
+ParametersEquilibria=subset(Parameters,Indic!=0)
+ParametersNoEquilibria=subset(Parameters,Indic==0)
+
+#----------------------------------------------------------#
+#Conditional distributions of each parameter on equilibrium#
+#----------------------------------------------------------#
+
+
+#1. Aalpha
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$aalpha)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = aalpha))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=1,ymin=-6,ymax=-3)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$aalpha)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = aalpha))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=1,ymin=-100,ymax=-90)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/aalpha.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+#2 ggamma
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$ggamma)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = ggamma))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$ggamma)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = ggamma))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/ggamma.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+#3 ddelta
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$ddelta)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = ddelta))
+m<-m + geom_histogram(binwidth = 10) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$ddelta)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = ddelta))
+m<-m + geom_histogram(binwidth = 10) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/ddelta.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+#4 bbeta
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$bbeta)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = bbeta))
+m<-m + geom_histogram(binwidth = 10) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$bbeta)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = bbeta))
+m<-m + geom_histogram(binwidth = 10) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/bbeta.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+#5. ssigma
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$ssigma)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = ssigma))
+m<-m + geom_histogram(binwidth = 0.1) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$ssigma)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = ssigma))
+m<-m + geom_histogram(binwidth = 0.1) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/ssigma.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+
+#6. kkappa
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$kkappa)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = kkappa))
+m<-m + geom_histogram(binwidth = 10) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$kkappa)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = kkappa))
+m<-m + geom_histogram(binwidth = 10) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/kkappa.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+
+
+#7. psi
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$psi)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = psi))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$psi)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = psi))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/psi.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+
+
+#8. chi
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$chi)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = chi))
+m<-m + geom_histogram(binwidth = 10) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$chi)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = chi))
+m<-m + geom_histogram(binwidth = 10) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/chi.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+
+
+#9. rho
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$rho)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = rho))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$rho)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = rho))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/rho.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+#10. mmu1
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$mmu1)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = mmu1))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$mmu1)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = mmu1))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/mmu1.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+#11. mmu2
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$mmu2)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = mmu2))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$mmu2)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = mmu2))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/mmu2.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+
+
+#12. ssigma1
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$ssigma1)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = ssigma1))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$ssigma1)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = ssigma1))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/ssigma1.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+
+
+#13. ssigma2
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$ssigma2)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = ssigma2))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$ssigma2)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = ssigma2))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/ssigma2.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+
+
+#14. rho12
+#1.1 Equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$rho12)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = rho12))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$rho12)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = rho12))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/rho12.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+#15. chi/mean(tthetaw)
+
+Parameters$chithe=Parameters$chi/(Parameters$mmu1+0.5*Parameters$chi)
+ParametersEquilibria$chithe=ParametersEquilibria$chi/(ParametersEquilibria$mmu1+0.5*ParametersEquilibria$chi)
+ParametersNoEquilibria$chithe=ParametersNoEquilibria$chi/(ParametersNoEquilibria$mmu1+0.5*ParametersNoEquilibria$chi)
+
+
+
+
+#Extra text
+Desc<-stat.desc(ParametersEquilibria$chithe)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersEquilibria, aes(x = chithe))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gt <- ggplot_gtable(ggplot_build(m))
+gt$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gt)
+
+
+#1.2. No equilibrium
+
+
+#Extra text
+Desc<-stat.desc(ParametersNoEquilibria$chithe)
+Desc<-data.frame(as.list(Desc))
+Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
+
+
+
+#Plot
+m <- ggplot(ParametersNoEquilibria, aes(x = chithe))
+m<-m + geom_histogram(binwidth = 0.02) 
+m<-m+labs(title="No Equilibria")
+m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
+m<-m+theme(plot.margin = unit(c(1,1,2,1), "lines"))
+gtN <- ggplot_gtable(ggplot_build(m))
+gtN$layout$clip[gt$layout$name=="panel"] <- "off"
+grid.draw(gtN)
+
+
+
+dev.set()
+png(file="Figures/chithe.png",width=398,height=389)
+ggarrange(gtN, gt)
+dev.off()
+
+
+
+#Probit model to analyze the relationship between parameters and equilibria
+
+
+mod<-lm( Indic~ aalpha+ggamma+ddelta+bbeta+ssigma+kkappa+psi+chi+rho+mmu1+mmu2+ssigma1+ssigma2+rho12, Parameters)
+
+
+
+print(coef(summary(mod)))
+write(print(coef(summary(mod))),file="ProbabilityParameters.txt")
+lapply(coef(summary(mod)), write, "ProbabilityParameters.txt", append=TRUE)
+coef(summary(mod))[, "Std. Error"]
+sink("ProbabilityParameters.txt")
+print(coef(summary(mod)))
+sink()
+
+#------------------------------#
+#Conclusion after the analysis:
+#------------------------------#
+
+#1. Decrease the values of ddelta. Have it between 0 and 200. 
+#2. Decrease chi. Between 0 and 30. 
+
+
+#----------------------#
+#Analyzing the distance#
+#----------------------#
+
+
+#Equilibrium
+EverythingEq<-subset(Everything,Indic!=0)
+
+#Sort by the distance
+EverythingEqDistance<-EverythingEq[order(Distance)]
+
+
+
+head(EverythingEqDistance)
+EverythingEq$InformalLaborSupplyPropV1
+EverythingEq$PropEntrepreneurs
+
+
+#------------------------------------------------#
+# Comparing the theoretical and empirical moments#
+#------------------------------------------------#
+
+
+#Generating the data.table to create graphs
+Comparing<-data.table(as.factor(c(rep(1,9),rep(0,9))))
+colnames(Comparing)<-c("Sample")
+Comparing$Decile<-c(seq(1,9,1),seq(1,9,1))
+
+
+#Deciding which observation to be analyzed
+i=1
+
+#Including the theoretical and empirical moments
+
+#1. Production
+
+ProductionTheoretical<-c(EverythingEqDistance$ProductionV1[i],
+              EverythingEqDistance$ProductionV2[i],
+              EverythingEqDistance$ProductionV3[i],
+              EverythingEqDistance$ProductionV4[i],
+              EverythingEqDistance$ProductionV5[i],
+              EverythingEqDistance$ProductionV6[i],
+              EverythingEqDistance$ProductionV7[i],
+              EverythingEqDistance$ProductionV8[i],
+              EverythingEqDistance$ProductionV9[i])
+
+
+Comparing$Production <-  c(ProductionTheoretical/1000, MOMENTO7A$Produccion[1:9])
+
+
+#2. Taxes Proportionally cumulative
+
+
+
+Taxesproportionally<-c(EverythingEqDistance$TaxesproportionallyV1[i],
+                         EverythingEqDistance$TaxesproportionallyV2[i],
+                         EverythingEqDistance$TaxesproportionallyV3[i],
+                         EverythingEqDistance$TaxesproportionallyV4[i],
+                         EverythingEqDistance$TaxesproportionallyV5[i],
+                         EverythingEqDistance$TaxesproportionallyV6[i],
+                         EverythingEqDistance$TaxesproportionallyV7[i],
+                         EverythingEqDistance$TaxesproportionallyV8[i],
+                         EverythingEqDistance$TaxesproportionallyV9[i])
+
+
+Comparing$TaxesPayedProportionally <-  c(Taxesproportionally, MOMENTO7A$`Proporción de pago de impuestos acumulada`[1:9]/sum(MOMENTO7A$`Proporción de pago de impuestos acumulada`[1:9]))
+
+
+#3. Total workers demanded
+
+DemandTotalWorkers<-c(EverythingEqDistance$TotalWorkersDemandedV1[i],
+                       EverythingEqDistance$TotalWorkersDemandedV2[i],
+                       EverythingEqDistance$TotalWorkersDemandedV3[i],
+                       EverythingEqDistance$TotalWorkersDemandedV4[i],
+                       EverythingEqDistance$TotalWorkersDemandedV5[i],
+                       EverythingEqDistance$TotalWorkersDemandedV6[i],
+                       EverythingEqDistance$TotalWorkersDemandedV7[i],
+                       EverythingEqDistance$TotalWorkersDemandedV8[i],
+                       EverythingEqDistance$TotalWorkersDemandedV9[i])
+
+
+Comparing$TotalDemandWorkers <-  c(DemandTotalWorkers,MOMENTO2$`Numero de trabajadores`[1:9] )
+
+
+
+
+#4. Informal Demand proportion
+InformalDemandProportion<-c(EverythingEqDistance$InformalDemandProportionV4[i],
+                            EverythingEqDistance$InformalDemandProportionV7[i],
+                            EverythingEqDistance$InformalDemandProportionV8[i])
+
+InformalPROPDemand <- data.table(c(MOMENTO3$Informalidad[1]/100,MOMENTO3$Informalidad[2]/100,MOMENTO3$Informalidad[3]/100,
+                                   InformalDemandProportion))
+
+InformalPROPDemand$Decile<-c(4,7,8,4,7,8)
+InformalPROPDemand$Sample<-as.factor(c(0,0,0,1,1,1))
+
+
+
+#5. Income distribution
+
+
+Income<-c(EverythingEqDistance$IncomeDistributionV1[i],
+          EverythingEqDistance$IncomeDistributionV2[i],
+          EverythingEqDistance$IncomeDistributionV3[i],
+          EverythingEqDistance$IncomeDistributionV4[i],
+          EverythingEqDistance$IncomeDistributionV5[i],
+          EverythingEqDistance$IncomeDistributionV6[i],
+          EverythingEqDistance$IncomeDistributionV7[i],
+          EverythingEqDistance$IncomeDistributionV8[i],
+          EverythingEqDistance$IncomeDistributionV9[i])
+
+
+
+Comparing$IncomeDistribution <-  c(Income,as.numeric(M5.3A[4:12,2]) )
+
+
+#6. Informal labor supply
+
+
+InformalLaborSupply<-c(EverythingEqDistance$InformalLaborSupplyPropV1[i],
+          EverythingEqDistance$InformalLaborSupplyPropV2[i],
+          EverythingEqDistance$InformalLaborSupplyPropV3[i],
+          EverythingEqDistance$InformalLaborSupplyPropV4[i],
+          EverythingEqDistance$InformalLaborSupplyPropV5[i],
+          EverythingEqDistance$InformalLaborSupplyPropV6[i],
+          EverythingEqDistance$InformalLaborSupplyPropV7[i],
+          EverythingEqDistance$InformalLaborSupplyPropV8[i],
+          EverythingEqDistance$InformalLaborSupplyPropV9[i])
+
+
+
+Comparing$InformalLaborSupply <-  c(InformalLaborSupply,MOMENTO8$`Informalidad (%)`[1:9]/100 )
+
+
+
+
+
+#7. Total labor supply
+
+
+TotalLaborSupply<-c(EverythingEqDistance$TotalLaborSupplyV1[i],
+                       EverythingEqDistance$TotalLaborSupplyV2[i],
+                       EverythingEqDistance$TotalLaborSupplyV3[i],
+                       EverythingEqDistance$TotalLaborSupplyV4[i],
+                       EverythingEqDistance$TotalLaborSupplyV5[i],
+                       EverythingEqDistance$TotalLaborSupplyV6[i],
+                       EverythingEqDistance$TotalLaborSupplyV7[i],
+                       EverythingEqDistance$TotalLaborSupplyV8[i],
+                       EverythingEqDistance$TotalLaborSupplyV9[i])
+
+
+
+Comparing$TotalLaborSupply <-  c(TotalLaborSupply,T19$horas[1:9]/T19$horas[5] )
+
+
+
+#8. Proportion of entrepreneurs
+PropEntrep<-data.table(c(EverythingEqDistance$PropEntrepreneurs[i],(M4[2,2]/(M4[2,1]+M4[2,2]))))
+PropEntrep$Sample<-c(as.factor(c(0,1)))
+InformalPROPDemand
+
+
+
+
+
+#-----#
+#Plots#
+#-----#
+
+#Set directory
+setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Naive2/ModelFit')
+
+#Size of line
+sizeline=3
+
+#Production
+Production<-ggplot(data=Comparing,aes(x=Decile,y=Production,colour=Sample))+geom_line(size=sizeline)+geom_point()
+Production<-Production+scale_colour_discrete(labels=c("Data","Model")  )
+Production<-Production+ theme_bw()
+Production<-Production+scale_x_continuous(breaks = seq(1,9,1))
+Production<-Production + theme(
+  plot.title = element_text(hjust=0.5,size = rel(2)),
+  axis.title=element_text(size = rel(2)),
+  axis.text.x=element_text(size = rel(2)),
+  axis.text.y=element_text(size = rel(2)),
+  legend.text=element_text(size = rel(2)),
+  legend.title=element_text(size=rel(0)))
+
+Production<-Production+ggtitle("Production") +ylab("Thousands of S/.")
+Production
+
+dev.set()
+png(file="Production.png",width=1600,height=850)
+Production
+dev.off()
+
+
+
+
+
+#Taxes
+Taxes<-ggplot(data=Comparing,aes(x=Decile,y=TaxesPayedProportionally,colour=Sample))+geom_line(size=sizeline)+geom_point()
+Taxes<-Taxes+scale_colour_discrete(labels=c("Data","Model")  )
+Taxes<-Taxes+ theme_bw()
+Taxes<-Taxes+scale_x_continuous(breaks = seq(1,9,1))
+Taxes<-Taxes + theme(
+  plot.title = element_text(hjust=0.5,size = rel(2)),
+  axis.title=element_text(size = rel(2)),
+  axis.text.x=element_text(size = rel(2)),
+  axis.text.y=element_text(size = rel(2)),
+  legend.text=element_text(size = rel(2)),
+  legend.title=element_text(size=rel(0)))
+
+Taxes<-Taxes+ggtitle("Taxes payed proportionally") +ylab("%")
+Taxes
+
+dev.set()
+png(file="Taxes.png",width=1600,height=850)
+Taxes
+dev.off()
+
+
+#Total demand workers
+
+#DemandWorkers
+DemandWorkers<-ggplot(data=Comparing,aes(x=Decile,y=TotalDemandWorkers,colour=Sample))+geom_line(size=sizeline)+geom_point()
+DemandWorkers<-DemandWorkers+scale_colour_discrete(labels=c("Data","Model")  )
+DemandWorkers<-DemandWorkers+ theme_bw()
+DemandWorkers<-DemandWorkers+scale_x_continuous(breaks = seq(1,9,1))
+DemandWorkers<-DemandWorkers + theme(
+  plot.title = element_text(hjust=0.5,size = rel(2)),
+  axis.title=element_text(size = rel(2)),
+  axis.text.x=element_text(size = rel(2)),
+  axis.text.y=element_text(size = rel(2)),
+  legend.text=element_text(size = rel(2)),
+  legend.title=element_text(size=rel(0)))
+
+DemandWorkers<-DemandWorkers+ggtitle("Demand of workers") +ylab("#")
+DemandWorkers
+
+dev.set()
+png(file="DemandWorkers.png",width=1600,height=850)
+DemandWorkers
+dev.off()
+
+
+#IncomeDistribution
+IncomeDistribution<-ggplot(data=Comparing,aes(x=Decile,y=IncomeDistribution,colour=Sample))+geom_line(size=sizeline)+geom_point()
+IncomeDistribution<-IncomeDistribution+scale_colour_discrete(labels=c("Data","Model")  )
+IncomeDistribution<-IncomeDistribution+ theme_bw()
+IncomeDistribution<-IncomeDistribution+scale_x_continuous(breaks = seq(1,9,1))
+IncomeDistribution<-IncomeDistribution + theme(
+  plot.title = element_text(hjust=0.5,size = rel(2)),
+  axis.title=element_text(size = rel(2)),
+  axis.text.x=element_text(size = rel(2)),
+  axis.text.y=element_text(size = rel(2)),
+  legend.text=element_text(size = rel(2)),
+  legend.title=element_text(size=rel(0)))
+
+IncomeDistribution<-IncomeDistribution+ggtitle("Income Distribution") +ylab("#")
+IncomeDistribution
+
+dev.set()
+png(file="IncomeDistribution.png",width=1600,height=850)
+IncomeDistribution
+dev.off()
+
+#InformalLaborSupply
+InformalLaborSupply<-ggplot(data=Comparing,aes(x=Decile,y=InformalLaborSupply,colour=Sample))+geom_line(size=sizeline)+geom_point()
+InformalLaborSupply<-InformalLaborSupply+scale_colour_discrete(labels=c("Data","Model")  )
+InformalLaborSupply<-InformalLaborSupply+ theme_bw()
+InformalLaborSupply<-InformalLaborSupply+scale_x_continuous(breaks = seq(1,9,1))
+InformalLaborSupply<-InformalLaborSupply + theme(
+  plot.title = element_text(hjust=0.5,size = rel(2)),
+  axis.title=element_text(size = rel(2)),
+  axis.text.x=element_text(size = rel(2)),
+  axis.text.y=element_text(size = rel(2)),
+  legend.text=element_text(size = rel(2)),
+  legend.title=element_text(size=rel(0)))
+
+InformalLaborSupply<-InformalLaborSupply+ggtitle("Income Distribution") +ylab("#")
+InformalLaborSupply
+
+dev.set()
+png(file="InformalLaborSupply.png",width=1600,height=850)
+InformalLaborSupply
+dev.off()
+
+
+#TotalLaborSupply
+TotalLaborSupply<-ggplot(data=Comparing,aes(x=Decile,y=TotalLaborSupply,colour=Sample))+geom_line(size=sizeline)+geom_point()
+TotalLaborSupply<-TotalLaborSupply+scale_colour_discrete(labels=c("Data","Model")  )
+TotalLaborSupply<-TotalLaborSupply+ theme_bw()
+TotalLaborSupply<-TotalLaborSupply+scale_x_continuous(breaks = seq(1,9,1))
+TotalLaborSupply<-TotalLaborSupply + theme(
+  plot.title = element_text(hjust=0.5,size = rel(2)),
+  axis.title=element_text(size = rel(2)),
+  axis.text.x=element_text(size = rel(2)),
+  axis.text.y=element_text(size = rel(2)),
+  legend.text=element_text(size = rel(2)),
+  legend.title=element_text(size=rel(0)))
+
+TotalLaborSupply<-TotalLaborSupply+ggtitle("Total labor supply") +ylab("#")
+
+
+dev.set()
+png(file="TotalLaborSupply.png",width=1600,height=850)
+TotalLaborSupply
+dev.off()
+
+
+#Informal proportion demand
+InformalDemand<-ggplot(data=InformalPROPDemand,aes(x=Decile,y=V1,colour=Sample))+geom_line(size=sizeline)+geom_point()
+InformalDemand<-InformalDemand+scale_colour_discrete(labels=c("Data","Model")  )
+InformalDemand<-InformalDemand+ theme_bw()
+InformalDemand<-InformalDemand+scale_x_continuous(breaks = seq(1,9,1))
+InformalDemand<-InformalDemand + theme(
+  plot.title = element_text(hjust=0.5,size = rel(2)),
+  axis.title=element_text(size = rel(2)),
+  axis.text.x=element_text(size = rel(2)),
+  axis.text.y=element_text(size = rel(2)),
+  legend.text=element_text(size = rel(2)),
+  legend.title=element_text(size=rel(0)))
+
+InformalDemand<-InformalDemand+ggtitle("Informal labor demand") +ylab("#")
+InformalDemand
+
+dev.set()
+png(file="InformalLaborDemand.png",width=1600,height=850)
+InformalDemand
+dev.off()
+
+#Proportion of entrepreneurs
+PropEntrep$Sample<-c("Model","Data")
+PropEntrepGraph<-ggplot(data=PropEntrep,aes(y=V1,x=Sample))+geom_bar(stat="identity")
+PropEntrepGraph<-PropEntrepGraph+ggtitle("Proportion entrepreneurs") +ylab("%")
+dev.set()
+png(file="PropEntrepGraph.png",width=1600,height=850)
+PropEntrepGraph
+dev.off()
+
+
+
+#------------------------------------------------#
+#Plot relationship between moments and parameters#
+#------------------------------------------------#
+
+
+
+#1.Parameters and entrepreneurs
+ParamPropentrep<-data.table(Parameters,PropEntrepreneurs)
+setnames(ParamPropentrep,15,"Entrepreneurs")
+
+#Graphs with regressions
+
+#1. Aalpha
+p<-ggplot(data=ParamPropentrep,aes(x=aalpha,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="Aalpha.png",width=1600,height=850)
+p
+dev.off()
+
+
+#2. Ggamma
+p<-ggplot(data=ParamPropentrep,aes(x=ggamma,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="Ggama.png",width=1600,height=850)
+p
+dev.off()
+
+#3. Ddelta
+p<-ggplot(data=ParamPropentrep,aes(x=ddelta,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="Ddelta.png",width=1600,height=850)
+p
+dev.off()
+
+
+#4. Bbeta
+p<-ggplot(data=ParamPropentrep,aes(x=bbeta,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="bbeta.png",width=1600,height=850)
+p
+dev.off()
+
+
+
+#5. ssigma
+p<-ggplot(data=ParamPropentrep,aes(x=ssigma,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="ssigma.png",width=1600,height=850)
+p
+dev.off()
+
+
+#6. kkappa
+p<-ggplot(data=ParamPropentrep,aes(x=kkappa,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="kkappa.png",width=1600,height=850)
+p
+dev.off()
+
+#7. psi
+p<-ggplot(data=ParamPropentrep,aes(x=psi,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="psi.png",width=1600,height=850)
+p
+dev.off()
+
+
+#8. chi
+p<-ggplot(data=ParamPropentrep,aes(x=chi,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="chi.png",width=1600,height=850)
+p
+dev.off()
+
+
+#9. rho
+p<-ggplot(data=ParamPropentrep,aes(x=rho,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="rho.png",width=1600,height=850)
+p
+dev.off()
+
+
+#10. mmu1
+p<-ggplot(data=ParamPropentrep,aes(x=mmu1,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="mmu1.png",width=1600,height=850)
+p
+dev.off()
+
+
+#11. mmu2
+p<-ggplot(data=ParamPropentrep,aes(x=mmu2,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="mmu2.png",width=1600,height=850)
+p
+dev.off()
+
+
+#12. ssigma1
+p<-ggplot(data=ParamPropentrep,aes(x=ssigma1,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="ssigma1.png",width=1600,height=850)
+p
+dev.off()
+
+
+#13. ssigma2
+p<-ggplot(data=ParamPropentrep,aes(x=ssigma2,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="ssigma2.png",width=1600,height=850)
+p
+dev.off()
+
+
+#14. rho12
+p<-ggplot(data=ParamPropentrep,aes(x=rho12,y=Entrepreneurs))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="rho12.png",width=1600,height=850)
+p
+dev.off()
+
+
+
+
+
+lm( Entrepreneurs~ aalpha+bbeta+ddelta+ggamma+kkappa+ssigma+rho+ssigma1+ssigma2+rho12, ParamPropentrep)
+
+
+mod <- lm(Entrepreneurs ~ aalpha + 
+            ggamma +
+            ddelta+
+            bbeta+
+            ssigma+
+            kkappa+
+            psi+
+            chi+
+            rho+
+            mmu1+
+            mmu2+
+            ssigma1+
+            ssigma2+
+            rho12
+            ,ParamPropentrep)
+
+coef(summary(mod))
+
+or
+
+coef(summary(mod))[, "Std. Error"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

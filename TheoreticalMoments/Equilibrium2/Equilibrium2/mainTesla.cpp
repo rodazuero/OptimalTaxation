@@ -36,27 +36,28 @@
 #include <nlopt.hpp>
 #include <utility>
 //#include <Rcpp.h> -> Not necessary if rcpparmadillo included
-#include <RcppArmadillo.h>
+#include <armadillo>
+#include <iterator>
 //#include <bits/stdc++.h>
 
 using std::vector;
 using namespace std;
-using namespace Rcpp;
+//using namespace Rcpp;
 
-ofstream ThMoments0CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments0CSV.csv");
-ofstream ThMoments1CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments1CSV.csv");
-ofstream ThMoments2CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments2CSV.csv");
-ofstream ThMoments3CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments3CSV.csv");
-ofstream ThMoments4CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments4CSV.csv");
-ofstream ThMoments5CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments5CSV.csv");
-ofstream ThMoments6CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments6CSV.csv");
-ofstream ThMoments7CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments7CSV.csv");
+ofstream ThMoments0CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments0CSV.csv");
+ofstream ThMoments1CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments1CSV.csv");
+ofstream ThMoments2CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments2CSV.csv");
+ofstream ThMoments3CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments3CSV.csv");
+ofstream ThMoments4CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments4CSV.csv");
+ofstream ThMoments5CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments5CSV.csv");
+ofstream ThMoments6CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments6CSV.csv");
+ofstream ThMoments7CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments7CSV.csv");
 
-ofstream ParametersCSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ParametersCSV.csv");
+ofstream ParametersCSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ParametersCSV.csv");
 
-ofstream DistanceMoments("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/DistanceMoments.csv");
+ofstream DistanceMoments("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/DistanceMoments.csv");
 
-ofstream EquilibriumValue("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/EquilibriumValue.csv");
+ofstream EquilibriumValue("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/EquilibriumValue.csv");
 
 
 typedef std::pair<double,double> mypair;
@@ -464,9 +465,6 @@ vector<double> valueWorkerFinMaxim(double InitialCond[2],
     ans.resize(3);
     ans[0]=x3Worker[0];
     ans[1]=x3Worker[1];
-    
-    //cout << ans[0] << " ans[0]"<< endl;
-    //wcout << ans[1] << " ans[1]"<< endl;
     ans[2]=MaxfWorker;
     return(ans);
     
@@ -798,7 +796,7 @@ double StandardizedExcessDemands(const double *Wages, double Others[20]){
     
     //Return the function
     
-
+    
     
     return(pow(ExcessDemandFunctions(WagesVector,Params,InitLWorkers,InitProf),0.5));
 }
@@ -811,7 +809,7 @@ double ExcessDemandsTotal(unsigned n, const double *x, double *grad, void *Exces
     //Void to double
     //cout << profitsFinMaxim_data<< " this stuff"<< endl;
     double *Params = (double *)ExcessDemandsTotal_data;
-    
+    cout << " about to run standardizedexcessdemands"<< endl;
     double result=StandardizedExcessDemands(x, Params);
     //cout << result << " evalF"<< endl;
     iteratExcessDemands=iteratExcessDemands+1;
@@ -881,8 +879,8 @@ vector<double> EqWages(vector <double> Others, vector<double> WagesInit){
     WagesVector[2]=ExcessDemandValueFinal;
     
     return(WagesVector);
-   
-
+    
+    
     
 }
 
@@ -893,7 +891,7 @@ arma::vec EqWagesNumericVector(arma::vec Others, arma::vec WagesInit){
     
     //Others: Vector of parameters used to find equilibrium.
     //        Need to reconvert to double.
-    cout << Others[15] << " Others[15] in "<< endl;
+    cout << Others[15] << " EqWagesNumericVector "<< endl;
     double DOthers[19];
     for(int it=0; it<19;it++){
         DOthers[it]=Others[it];
@@ -925,6 +923,8 @@ arma::vec EqWagesNumericVector(arma::vec Others, arma::vec WagesInit){
     //nlopt_set_xtol_rel(ExcessDemand, 1.0e-8);
     nlopt_set_ftol_abs(ExcessDemand,1.0e-8);
     
+    
+    cout << " about to run excess demandvaluefinal"<< endl;
     //nlopt_set_stopval(ExcessDemand, 0.1);
     double ExcessDemandValueFinal; /* the minimum objective value, upon return */
     
@@ -945,7 +945,7 @@ arma::vec EqWagesNumericVector(arma::vec Others, arma::vec WagesInit){
         printf("found minimum at f(%g) = %0.10g\n",Winitial[0], ExcessDemandValueFinal);
     }
     
-    EquilibriumValue.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/EquilibriumValue.csv", ios::out | ios::app);
+    EquilibriumValue.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/EquilibriumValue.csv", ios::out | ios::app);
     
     EquilibriumValue<<ExcessDemandValueFinal << " , " ;
     EquilibriumValue << endl;
@@ -967,7 +967,9 @@ arma::vec EqWagesNumericVector(arma::vec Others, arma::vec WagesInit){
 
 //14. Obtaining the theoretical moments
 vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium,
-                      arma::vec armaInitLWorkers,arma::vec armaInitProf){
+                                    arma::vec armaInitLWorkers,arma::vec armaInitProf){
+    
+    cout << " running theomoments "<< endl;
     //Others: Vector of parameters used to determine equilibrium stuff.
     //It is used as arma::vec, translate it to a double vector;
     double DOthers[19];
@@ -975,6 +977,8 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         DOthers[it]=Others[it];
     }
     
+    
+    cout << " finished loading"<< endl;
     
     //WagesInit: Vector of equilibrium wages to
     //Need to translate from vector to double
@@ -1144,15 +1148,26 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         
     }
     
-
+    
     //We have now the indeces of those who are workers and those who are entrepreneurs with their corresponding tthetas. Now we need to: 1. Sort them, 2. Generate the corresponding moments.
     //Need to generate pairs between entrepr ad their skils. Sort them by ttheta_e(TthetasEntreprenIndex
     //and then obtain the corresponding indeces.
     //int N=10;
+    
+    
+    cout << " here 1"<< endl;
+    cout << NumberEntrep << " number entrep"<< endl;
     double NumberOriginalEntrep=NumberEntrep;
-    if(NumberEntrep==0){
-        NumberEntrep=10;
+  
+    vector<vector<double> > answer(10);
+    for(int it=0; it<10; it++){
+        answer[it].resize(10);
     }
+    
+    
+    if(NumberEntrep!=0 & NumberWorkers!=0){
+        cout << NumberEntrep << " number entrep2" << endl;
+    cout << " here 2"<< endl;
     vector<pair<double, double> > EntreprenVecPair (NumberEntrep, std::make_pair(0, 0));
     
     for(int it=0; it<NumberEntrep;it++){
@@ -1172,8 +1187,8 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
     //It will be sorted by the second element
     
     
-
     
+    cout << " here 3"<< endl;
     std::sort(EntreprenVecPair.begin(), EntreprenVecPair.end());
     std::sort(WorkersVecPair.begin(), WorkersVecPair.end());
     
@@ -1182,11 +1197,11 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
     vector<int> EntrepIndexFinal(NumberEntrep);
     
     
-  
     
     
-
-
+    
+    
+    
     
     //Vectors already sorted out.
     // Generating the corresponding deciles:
@@ -1206,10 +1221,8 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         decileEntrep[it]=NumberEntrep*(it+1)/10;
         Tthetae[it]= EntreprenVecPair[decileEntrep[it]].first;
         Tthetaw[it]= WorkersVecPair[decileWorkers[it]].first;
-        cout << Tthetae[it] << " Tthetae[it] in obtaining deciles"<< endl;
-
     }
-    
+    cout << " here 4"<< endl;
     //Vectors are sorted. Now I will obtain the corresponding taxes payed proportionally.
     double TaxesPayedTotal=0;
     //Entrepreneur
@@ -1223,7 +1236,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         
         
         WsolTAXES=profitsFinMaxim(InitProfdouble,  wi,wf,aalpha,ddelta, ggamma,bbeta,
-                             ssigma, EntreprenVecPair[it].first);
+                                  ssigma, EntreprenVecPair[it].first);
         
         //Wsol contains: ni, nf, z, prof
         
@@ -1355,11 +1368,11 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         cout <<taxesCumulative[it] << " taxes "<< endl;
     }
     
-
     
     
     
-   
+    
+    
     //Entrepreneur
     vector<double> Wsol(4);
     vector<double> Production(9);
@@ -1371,7 +1384,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
     
     for(int it=0;it<9;it++){
         Wsol=profitsFinMaxim(InitProfdouble,  wi,wf,aalpha,ddelta, ggamma,bbeta,
-                        ssigma, Tthetae[it]);
+                             ssigma, Tthetae[it]);
         
         //Wsol contains: ni, nf, z, prof
         
@@ -1390,8 +1403,8 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         cout << Wsol[0]+Wsol[1] << " Wsol[0]+Wsol[1] "<< endl;
         
         //4. Proportioninformaldemanded
-        PropInformalDemanded[it]=Wsol[0]/(max(WorkersTotalDemanded[it],0.001));
-        cout << PropInformalDemanded[it] << "Wsol[0]/WorkersTotalDemanded[it]  "<< endl;
+        PropInformalDemanded[it]=Wsol[0]/WorkersTotalDemanded[it];
+        cout << Wsol[0]/WorkersTotalDemanded[it] << "Wsol[0]/WorkersTotalDemanded[it]  "<< endl;
         
         
     }
@@ -1425,27 +1438,24 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         TotalIncome[it]=SolWorker[0]*Tthetaw[it]*wi+SolWorker[1]*Tthetaw[it]*wf;
         
         //2. Informal labor supply proportion
-
-        InformalLaborSupplyProp[it]=SolWorker[0]/max(SolWorker[0]+SolWorker[1],0.00001);
-        cout << InformalLaborSupplyProp[it] << " InformalLaborSupplyProp[it]"<< endl;
+        cout << " --informal labor supply---- "<< endl;
+        cout << InitLWorkersDouble[0] << " InitLWorkersDouble[0]   " << endl;
+        cout << InitLWorkersDouble[1] <<" InitLWorkersDouble[1]   " << endl;
+        cout << wf <<"   wf " << endl;
+        cout << wi <<"  wi  " << endl;
+        cout << Tthetaw[it] << " Tthetaw[it] "<< endl;
+        cout << it << " it "<< endl;
+        cout << SolWorker[0] << " SolWorker[0]"<< endl;
+        cout << SolWorker[1] << " SolWorker[1]"<< endl;
+        cout << SolWorker[0]/(SolWorker[0]+SolWorker[1]) << " SolWorker[0]/(SolWorker[0]+SolWorker[1])"<< endl;
+        InformalLaborSupplyProp[it]=SolWorker[0]/max((SolWorker[0]+SolWorker[1]),0.0001);
         
+        cout << InformalLaborSupplyProp[it] << " InformalLaborSupplyProp[it]"<< endl;
+        cout << TotalLaborSupply[it] << " TotalLaborSupply!!!!!!"<< endl;
         //3. Total Labor Supply
         TotalLaborSupply[it]=SolWorker[0]+SolWorker[1];
-        cout << " ------"<< endl;
-        cout << InitLWorkersDouble[0] << " InitLWorkersDouble[0]"<< endl;
-        cout << InitLWorkersDouble[1] << " InitLWorkersDouble[1]"<< endl;
-        cout << wf << " wf "<< endl;
-        cout << wi << " wi "<< endl;
-        cout << kkappa << " kkappa "<< endl;
-        cout << rrho << " rrho"<< endl;
-        cout << psi << " psi "<< endl;
-        cout << chi << " chi"<< endl;
-        cout << Tthetaw[it] << " Tthetaw[it]"<< endl;
-        cout << it << " it "<< endl;
-        cout << SolWorker[0] <<" SolWorker[0] "<< endl;
-        cout << SolWorker[1] <<" SolWorker[1] "<< endl;
-
-
+        
+        
         
     }
     
@@ -1453,6 +1463,9 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
     vector<double> LaborSupplyProportion(9);
     for(int it=0;it<9;it++){
         LaborSupplyProportion[it]=TotalLaborSupply[it]/TotalLaborSupply[4];
+        if(TotalLaborSupply[4]==0){
+            LaborSupplyProportion[it]=1000;
+        }
     }
     
     
@@ -1462,16 +1475,13 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
     //3. Taxes payed TaxesProportionally[it]
     //4. Workers employed WorkersTotalDemanded[it]
     //5. Proportioninformaldemanded PropInformalDemanded[it]
-
+    
     //6. TotalIncome  TotalIncome[it]
     //7. Informal labor supply proportion InformalLaborSupplyProp[it]
     //8. Total Labor Supply TotalLaborSupply[it]
     
     
-    vector<vector<double> > answer(10);
-    for(int it=0; it<10; it++){
-        answer[it].resize(10);
-    }
+    
     //Need to transform into double.
     double doubNumberEntrep=NumberEntrep;
     double doubNumberWorkers=NumberWorkers;
@@ -1498,39 +1508,49 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         cout << NumberEntrep+NumberWorkers << "workers+entre"<< endl;
         cout << doubNumberEntrep/(doubNumberEntrep+doubNumberWorkers)<< " proportion manually"<< endl;
     }
+    }//End if number of entrepreneurs !=0
     
     
-    if(NumberOriginalEntrep==0){
-        answer[0][0]=666;
-        answer[0][1]=666;
-        answer[0][2]=666;
-        answer[0][3]=666;
-        answer[0][4]=666;
-        answer[0][5]=666;
+    //IF number of entrepreneurs is ==0, then:
+    if(NumberEntrep==0 & NumberWorkers==0){
+        
+        cout << " numberentrep==0"<< endl;
+        for(int it=0; it<9; it++){
+            answer[it][0]=666;
+            answer[it][1]=666;
+            answer[it][2]=666;
+            answer[it][3]=666;
+            answer[it][4]=666;
+            answer[it][5]=666;
+            answer[it][6]=666;
+            answer[it][7]=666;
+        }
+        
     }
-    
     return(answer);
 }
-    
-    
+
+
 
 //Now combining moments and equilibrium wages finder
 vector<vector<double> > EquilibriumMoments(arma::vec Others, arma::vec WagesInit,
-                             arma::vec armaInitLWorkers,arma::vec armaInitProf){
-
+                                           arma::vec armaInitLWorkers,arma::vec armaInitProf){
     
+    cout << " finding equilibrium moments"<< endl;
     //1. Find the equilibrium wages
     //Testing the moment generating function
     arma::vec WagesEquilibrium=EqWagesNumericVector(Others, WagesInit);
     cout << WagesEquilibrium[0]<< " wi "<< endl;
     cout << WagesEquilibrium[1]<< " wf "<< endl;
     //2. Once we find the equilibrium wages, obtain the moments.
-    vector<vector<double> >answ(9);
+    vector<vector<double> >answ(10);
     for(int it=0;it<9;it++){
-        answ[it].resize(9);
+        answ[it].resize(10);
     }
+    cout << " just about to run theomoments"<< endl;
     answ=TheoMoments(Others, WagesEquilibrium,
-                armaInitLWorkers,armaInitProf);
+                     armaInitLWorkers,armaInitProf);
+    cout << " finished running theomoments"<< endl;
     return(answ);
 }
 
@@ -1548,6 +1568,9 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
                          arma::vec armaInitLWorkers,arma::vec armaInitProf){
     
     
+    cout << " running distance estimator "<< endl;
+    
+
     
     
     
@@ -1558,8 +1581,9 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     for(int it=0;it<10;it++){
         Theomoments[it].resize(10);
     }
+    cout << " finding theoretical moments"<< endl;
     Theomoments=EquilibriumMoments(Others, WagesInit,
-                            armaInitLWorkers,armaInitProf);
+                                   armaInitLWorkers,armaInitProf);
     
     //Computing the distances
     //answer[0]=Production[it];
@@ -1607,6 +1631,8 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     //Taxes
     vector<double> Taxes(10);
+  
+    
     
     Taxes[0]=0.002457482;
     Taxes[1]=0.006255534;
@@ -1646,38 +1672,38 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     double test=0;
     
     //Open file where moments will be stored
-   
+    
     
     //Computing the final distance
     for(int it=0; it<9; it++){
         if(test==1){
-        cout << " ------ Moments inside distance "<< endl;
-        cout << it << " it "<< endl;
-        cout << Production[it] << " Production[it] " << endl; //checked
-        cout << Theomoments[it][0] << " Theomoments[it][0] " << endl; //checked
-        cout << Taxes[it] << " Taxes[it] " << endl; //Checked
-        cout << Theomoments[it][1] << " Theomoments[it][1] " << endl;
-        cout << IncomeEmpirical[it] << " IncomeEmpirical[it] " << endl; // Checked
-        cout << Theomoments[it][3] << " Theomoments[it][3] demand informal prop" << endl;
-        cout << Theomoments[it][4] << " Theomoments[it][4] " << endl; //Checked
-        cout << InformalSupplyProportion[it] << " InformalSupplyProportion[it] " << endl; //Checked
-        cout << Theomoments[it][5] << " Theomoments[it][5] " << endl;//Checked
-        cout << TotalLaborSupply[it] << " TotalLaborSupply[it] " << endl; //Checked
-        cout << Theomoments[it][6] << " Theomoments[it][6],2 " << endl; //Labor supply theoretical with respect to median
-        cout << PropEntrepEmpirical[it] << " PropEntrepEmpirical[it] " << endl;
-        cout << Theomoments[it][7] << " Theomoments[it][7] " << endl; //Proportion entrepreneurs
+            cout << " ------ Moments inside distance "<< endl;
+            cout << it << " it "<< endl;
+            cout << Production[it] << " Production[it] " << endl; //checked
+            cout << Theomoments[it][0] << " Theomoments[it][0] " << endl; //checked
+            cout << Taxes[it] << " Taxes[it] " << endl; //Checked
+            cout << Theomoments[it][1] << " Theomoments[it][1] " << endl;
+            cout << IncomeEmpirical[it] << " IncomeEmpirical[it] " << endl; // Checked
+            cout << Theomoments[it][3] << " Theomoments[it][3] demand informal prop" << endl;
+            cout << Theomoments[it][4] << " Theomoments[it][4] " << endl; //Checked
+            cout << InformalSupplyProportion[it] << " InformalSupplyProportion[it] " << endl; //Checked
+            cout << Theomoments[it][5] << " Theomoments[it][5] " << endl;//Checked
+            cout << TotalLaborSupply[it] << " TotalLaborSupply[it] " << endl; //Checked
+            cout << Theomoments[it][6] << " Theomoments[it][6],2 " << endl; //Labor supply theoretical with respect to median
+            cout << PropEntrepEmpirical[it] << " PropEntrepEmpirical[it] " << endl;
+            cout << Theomoments[it][7] << " Theomoments[it][7] " << endl; //Proportion entrepreneurs
             
             
             
         }
-
+        
         distance+=pow((Production[it]-Theomoments[it][0])/(max(0.0001,Production[it])),2);
         distance+=pow((Taxes[it]-Theomoments[it][1])/(max(0.0001,Taxes[it])),2);
         distance+=pow((IncomeEmpirical[it]-Theomoments[it][4])/(max(0.0001,IncomeEmpirical[it])),2);
         distance+=pow((InformalSupplyProportion[it]-Theomoments[it][5])/(max(0.0001,InformalSupplyProportion[it])),2);
         distance+=pow((TotalLaborSupply[it]-Theomoments[it][6])/(max(0.0001,TotalLaborSupply[it])),2);
         distance+=pow((PropEntrepEmpirical[it]-Theomoments[it][7])/(max(0.0001,PropEntrepEmpirical[it])),2);
-
+        
         
     }
     
@@ -1699,14 +1725,15 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     
     //Writing the csv file of the moments
-    ThMoments0CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments0CSV.csv", ios::out | ios::app);
-    ThMoments1CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments1CSV.csv", ios::out | ios::app);
-    ThMoments2CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments2CSV.csv", ios::out | ios::app);
-    ThMoments3CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments3CSV.csv", ios::out | ios::app);
-    ThMoments4CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments4CSV.csv", ios::out | ios::app);
-    ThMoments5CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments5CSV.csv", ios::out | ios::app);
-    ThMoments6CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments6CSV.csv", ios::out | ios::app);
-    ThMoments7CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments7CSV.csv", ios::out | ios::app);
+    ThMoments0CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments0CSV.csv", ios::out | ios::app);
+    ThMoments1CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments1CSV.csv", ios::out | ios::app);
+    ThMoments2CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments2CSV.csv", ios::out | ios::app);
+    ThMoments3CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments3CSV.csv", ios::out | ios::app);
+    ThMoments4CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments4CSV.csv", ios::out | ios::app);
+    ThMoments5CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments5CSV.csv", ios::out | ios::app);
+    ThMoments6CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments6CSV.csv", ios::out | ios::app);
+    ThMoments7CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments7CSV.csv", ios::out | ios::app);
+    
     for(int it=0; it<9; it++){
         ThMoments0CSV<<Theomoments[it][0] << " , " ;
         ThMoments1CSV<<Theomoments[it][1] << " , " ;
@@ -1727,7 +1754,7 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     ThMoments2CSV << endl;
     ThMoments2CSV.close();
-
+    
     ThMoments3CSV << endl;
     ThMoments3CSV.close();
     
@@ -1758,7 +1785,7 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     
     
-    ParametersCSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ParametersCSV.csv", ios::out | ios::app);
+    ParametersCSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ParametersCSV.csv", ios::out | ios::app);
     cout << " loading parameters in the csv file0"<< endl;
     //Printing the parameters
     for(int it=0; it<14; it++){
@@ -1773,9 +1800,9 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     
     
- 
     
-    DistanceMoments.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/DistanceMoments.csv", ios::out | ios::app);
+    
+    DistanceMoments.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/DistanceMoments.csv", ios::out | ios::app);
     
     DistanceMoments<<distance << " , " ;
     DistanceMoments << endl;
@@ -1850,14 +1877,12 @@ double StandardizedDistanceEstimator(const double *Parameters, double Additional
     
     
     
-
+    
     
     double distance=DistanceEstimator(Others,WagesVector,InitLWorkers,InitProf);
     cout << distance << " distance standardized 1!!"<< endl;
     return(distance);
 }
-
-
 
 
 
@@ -1878,10 +1903,6 @@ double MinimizeDistanceTranslate(unsigned n, const double *x, double *grad, void
     //printf("Iteration=(%d); Feval=%0.10g\n", iteratMinimizeDistance, result);
     return(result);
 }
-
-
-
-
 
 
 //Finally, function such that running it will simply minimize the situation
@@ -1991,12 +2012,55 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     
     //And loading the distance
     Parfinal[13]=distanceValue;
-
+    
     
     
     
     return(Parfinal);
 }
+
+
+
+double DistanceNonVectorized(double vec1, double vec2, double vec3, double vec4,double vec5, double vec6, double vec7, double vec8,double vec9, double vec10, double vec11, double vec12,double vec13, double vec14, arma::vec WagesVectorIn,
+                             arma::vec InitLWorkersDecision,
+                             arma::vec InitProfDecision){
+    //DistanceEstimator(VectorOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
+    
+    
+    cout << InitProfDecision[0] << "initprofdecission0 in distancenonvectorized"<< endl;
+    cout << InitProfDecision[1] << "initprofdecission1 in distancenonvectorized"<< endl;
+    cout << InitProfDecision[2] << "initprofdecission2 in distancenonvectorized"<< endl;
+    cout << InitLWorkersDecision[0] << "InitLWorkersDecision in distancenonvectorized"<< endl;
+    cout << InitLWorkersDecision[1] << "InitLWorkersDecision in distancenonvectorized"<< endl;
+    vector<double> VectorOthers(19);
+    VectorOthers[0]=vec1;
+    VectorOthers[1]=vec2;
+    VectorOthers[2]=vec3;
+    VectorOthers[3]=vec4;
+    VectorOthers[4]=vec5;
+    VectorOthers[5]=vec6;
+    VectorOthers[6]=vec7;
+    VectorOthers[7]=vec8;
+    VectorOthers[8]=vec9;
+    VectorOthers[9]=vec10;
+    VectorOthers[10]=vec11;
+    VectorOthers[11]=vec12;
+    VectorOthers[12]=vec13;
+    VectorOthers[13]=vec14;
+    
+    
+    VectorOthers[14]=InitLWorkersDecision[0];
+    VectorOthers[15]=InitLWorkersDecision[1];
+    VectorOthers[16]=InitProfDecision[0];
+    VectorOthers[17]=InitProfDecision[1];
+    VectorOthers[18]=InitProfDecision[2];
+    
+    
+    cout << " about to run distance estimator"<< endl;
+    return(DistanceEstimator(VectorOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision));
+}
+
+
 
 
 void SobolRun(arma::vec WagesVectorIn,
@@ -2005,9 +2069,9 @@ void SobolRun(arma::vec WagesVectorIn,
     double a=2;
     cout << a << " a "<< endl;
     
-    std::ifstream theFile ("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolDim14.csv");
+    std::ifstream theFile ("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolDim14.csv");
     
-    int SIZEOBS=10000;
+    int SIZEOBS=8192;
     int NVAR=14;
     double MYARRAY[SIZEOBS][NVAR];
     // ...
@@ -2030,7 +2094,7 @@ void SobolRun(arma::vec WagesVectorIn,
         {
             line_values.push_back(line_value);
             MYARRAY[it][it2] = ::atof(line_value.c_str());
-            cout << MYARRAY[it][it2]<< " hahaha"<< endl;
+            //cout << MYARRAY[it][it2]<< " hahaha"<< endl;
             //MYARRAY[it][it2]=std::stod (line_value); only for c++11 compi
             it2=it2+1;
             if (it2==NVAR){ //later change 4 for
@@ -2054,7 +2118,7 @@ void SobolRun(arma::vec WagesVectorIn,
     
     
     
-
+    
     vector<double> VectorOthers(20);
     VectorOthers[14]=InitLWorkersDecision[0];
     VectorOthers[15]=InitLWorkersDecision[1];
@@ -2062,33 +2126,82 @@ void SobolRun(arma::vec WagesVectorIn,
     VectorOthers[17]=InitProfDecision[1];
     VectorOthers[18]=InitProfDecision[2];
     
+    cout << " 00000 in distance 00"<< endl;
+    cout <<VectorOthers[14] << " VectorOthers[14]"<< endl;
+    cout <<VectorOthers[15] << " VectorOthers[15]"<< endl;
+    cout <<VectorOthers[16] << " VectorOthers[16]"<< endl;
+    cout <<VectorOthers[17] << " VectorOthers[17]"<< endl;
+    
     cout << " loading the situation"<< endl;
-    vector<double>PARLOAD(15);
-    #pragma omp parallel for shared(WagesVectorIn, InitLWorkersDecision,InitProfDecision,VectorOthers) private(PARLOAD)
-    for(int it=0; it<10000; it++){
-        cout << " testing the loading sobol "<< endl;
-        for(int par=0; par<14;par++){
-            PARLOAD[par]=MYARRAY[it][par];
-        }
-        
-        for(int it=0; it<14; it++){
-            VectorOthers[it]=PARLOAD[it];
-        }
-        
-        DistanceEstimator(VectorOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
-    }
+    //#pragma omp
+    //#pragma omp parallel for shared(WagesVectorIn, InitLWorkersDecision,InitProfDecision) private(VectorOthers)
+    double var1;
+    double var2;
+    double var3;
+    double var4;
+    double var5;
+    double var6;
+    double var7;
+    double var8;
+    double var9;
+    double var10;
+    double var11;
+    double var12;
+    double var13;
+    double var14;
+    
+    cout << MYARRAY[0][0] << " MYARRRAY00"<< endl;
+    cout << MYARRAY[1][0] << " MYARRRAY10"<< endl;
+    cout << MYARRAY[4][0] << " MYARRRAY10"<< endl;
 
+    
+    #pragma omp parallel for
+    for(int it=0; it<8192; it++){
+        cout << " testing the loading sobol "<< endl;
+        cout << it << " it parallel"<< endl;
+        var1=MYARRAY[it][0];
+        var2=MYARRAY[it][1];
+        var3=MYARRAY[it][2];
+        var4=MYARRAY[it][3];
+        var5=MYARRAY[it][4];
+        var6=MYARRAY[it][5];
+        var7=MYARRAY[it][6];
+        var8=MYARRAY[it][7];
+        var9=MYARRAY[it][8];
+        var10=MYARRAY[it][9];
+        var11=MYARRAY[it][10];
+        var12=MYARRAY[it][11];
+        var13=MYARRAY[it][12];
+        var14=MYARRAY[it][13];
+        //for(int par=0; par<14;par++){
+            //PARLOAD[par]=MYARRAY[it][par]; //This is the problem.
+            cout << var1<< "var1 inside pragmaomp"  <<endl;
+        printf("insideloop f(%g) = %g  %g %g %g %g %g %g %g %g %g %g %g", var1, var2, var3, var4, var5, var6, var7, var8, var9, var10, var11, var12, var13, var14);
+        cout << it << "loooop   " << endl;
+        //}
+        
+        //for(int it=0; it<14; it++){
+         //   VectorOthers[it]=PARLOAD[it];
+        //}
+        printf("InitLWorkersdecision[0] is %g", InitLWorkersDecision[0]);
+        printf("InitLWorkersdecision[1] is %g", InitLWorkersDecision[1]);
+        printf("InitProfDecision[0] is %g", InitProfDecision[0]);
+        printf("InitProfDecision[1] is %g", InitProfDecision[1]);
+        printf("InitProfDecision[2] is %g", InitProfDecision[2]);
+
+        cout <<InitLWorkersDecision[0]<< "InitLWorkersDecision[0]" << endl;
+        cout <<InitLWorkersDecision[1]<< "InitLWorkersDecision[1]" << endl;
+        cout <<InitProfDecision[0]<< "InitProfDecision[0]" << endl;
+        cout <<InitProfDecision[1]<< "InitProfDecision[1]" << endl;
+        cout <<InitProfDecision[2]<< "InitProfDecision[2]" << endl;
+        DistanceNonVectorized( var1,var2,var3,var4,var5,var6,var7,var8,var9,var10,var11,var12,var13,var14,WagesVectorIn,InitLWorkersDecision,InitProfDecision);
+    }
+    
 }
 
 
 
 int main(int argc, const char * argv[]) {
-    
-    
-    
-    
-    
-    
     
     vector<double> A(3);
     vector<double> V(3);
@@ -2100,7 +2213,7 @@ int main(int argc, const char * argv[]) {
     A[2]=30;
     pair <double, double> make_pair(920, 12); ;
     
-
+    
     int N=10;
     vector<pair<double, double> > myVec (N, std::make_pair(0, 0));
     myVec[0].second=-10;
@@ -2137,7 +2250,7 @@ int main(int argc, const char * argv[]) {
     
     
     int x=0;
-   
+    
     //Testing functions
     //Setting parameters to test
     double aalpha=0.8;
@@ -2145,7 +2258,7 @@ int main(int argc, const char * argv[]) {
     double tthetaw=3.873585;
     double wi=8.81;
     double wf=8.13;
-
+    
     double ni=10;
     double nf=50;
     double ggamma=0.28;
@@ -2156,9 +2269,6 @@ int main(int argc, const char * argv[]) {
     double psi=0.4;
     double chi=2.5;
     double rrho=0.9;
-    
-    
-    
     double lf=0.5;
     double li=0.5;
     double z=24;
@@ -2340,7 +2450,7 @@ int main(int argc, const char * argv[]) {
     
     
     
-
+    
     
     
     
@@ -2362,15 +2472,11 @@ int main(int argc, const char * argv[]) {
     TthetaDecision.resize(2);
     TthetaDecision[0]=tthetaw;
     TthetaDecision[1]=tthetae;
-    
-    
     vector<double> Wages;
     Wages.resize(2);
     Wages[0]=wi;
     Wages[1]=wf;
     
-    
-    cout << "-----------" << endl;
     
     //CSV files were initially open before the definition of functions. This is the moment to close them
     ParametersCSV.close();
@@ -2386,8 +2492,10 @@ int main(int argc, const char * argv[]) {
     EquilibriumValue.close();
     
     
-    
+    cout << InitLWorkersDecision[0]<< "initlworkersbeforesobol0"<< endl;
+    cout << InitLWorkersDecision[1]<< "initlworkersbeforesobol1"<< endl;
     SobolRun(Wages,InitLWorkersDecision,InitProfDecision);
+    
     
     Decision=iDecision(TthetaDecision,ParamsDecision,InitLWorkersDecision,InitProfDecision);
     
@@ -2399,6 +2507,8 @@ int main(int argc, const char * argv[]) {
     cout << Decision[0][2]<< " li "<< endl;
     cout << Decision[1][2]<< " lf "<< endl;
     cout << Decision[2][2]<< " VWorker "<< endl;
+    
+    
     
     
     
@@ -2419,6 +2529,7 @@ int main(int argc, const char * argv[]) {
     ParamsDecisionExcessDemand[11]=ssigma1;
     ParamsDecisionExcessDemand[12]=ssigma2;
     ParamsDecisionExcessDemand[13]=rho12;
+    
     
     
     
@@ -2510,7 +2621,7 @@ int main(int argc, const char * argv[]) {
     //}
     
     //Test to write a csv file
-
+    
     
     
     //Trying the Excess Demand functions at wi, wf
@@ -2649,7 +2760,7 @@ int main(int argc, const char * argv[]) {
     
     
     //StandardizedDistanceEstimator(ParStandardDistance,  AddPar);
-        
+    
     //Running the minimizing distance estimator
     arma::vec MinimizeDistanceParameters(13);
     arma::vec AdditionalVAriables(8);
@@ -2670,7 +2781,7 @@ int main(int argc, const char * argv[]) {
     cout << " minimizing the distance!!!!!!!!! finally"<< endl;
     
     MinimizingDistance(MinimizeDistanceParameters,AdditionalVAriables);
-        
+    
     
     
     
@@ -2710,3 +2821,4 @@ int main(int argc, const char * argv[]) {
     cout << "Hello, World!\n";
     return 0;
 }
+
