@@ -126,18 +126,40 @@ print(xtable(M3, digits =c(0,0,0,3,3,3,0)), include.rownames=F)
 # MOMENTO 4 ---------------------------------------------------------------
 # Proporcion de trabajadores empleados e independientes en la ENAHO
 
+#Clasificacion general (Empleados/Independientes/Otros)
 ENAHO$clasificacion<-NA   
 ENAHO$clasificacion[ENAHO$categopri_ci=="Empleado"]<-1
 ENAHO$clasificacion[ENAHO$categopri_ci=="Cuenta propia"|ENAHO$categopri_ci=="Patron"]<-2
 ENAHO$clasificacion[ENAHO$categopri_ci=="Otro"|ENAHO$categopri_ci=="No_remunerado"]<-3
 obsENAHO<-sum(ENAHO$clasificacion==1|ENAHO$clasificacion==2|ENAHO$clasificacion==3, na.rm = T)
+
 ENAHO$clasificacion<-factor(ENAHO$clasificacion, levels = c(1,2,3), labels = c("Empleados","Independientes","Otros + No remunerados"))
+
+#Clasificación independientes (Empleadores/Cuenta propia)
+ENAHO$emprendedores<-NA
+ENAHO$emprendedores[ENAHO$categopri_ci=="Cuenta propia"]<-1
+ENAHO$emprendedores[ENAHO$categopri_ci=="Patron"]<-2
+ENAHO$emprendedores<-factor(ENAHO$emprendedores, levels = c(1,2), labels = c("Cuenta propia","Patron"))
+
+
+#Original (solo incluye la clasificacion general)
 
 M4<-cbind(t(table(ENAHO$clasificacion)),obsENAHO)
 `%`<-c(M4[1,1]/M4[1,4]*100,M4[1,2]/M4[1,4]*100,M4[1,3]/M4[1,4]*100,M4[1,4]/M4[1,4]*100)
 M4<-rbind(M4,`%`)
 
 print(xtable(M4, digits = matrix(c(rep(0,6),rep(2,3),0),ncol=5, byrow = T)))
+
+#Version 2: Incluye distinción en la categoria de independientes
+
+M4.2<-cbind(t(table(ENAHO$clasificacion)),t(table(ENAHO$emprendedores)),obsENAHO)
+M4.2<-t(M4.2[,c(1,4,5,2,3,6)])
+`%`<-c(M4.2[1,1]/M4.2[1,6]*100,M4.2[1,2]/M4.2[1,6]*100,M4.2[1,3]/M4.2[1,6]*100,M4.2[1,4]/M4.2[1,6]*100,M4.2[1,5]/M4.2[1,6]*100,M4.2[1,6]/M4.2[1,6]*100)
+M4.2<-rbind(M4.2,`%`)
+
+print(xtable(M4.2, digits = matrix(c(rep(0,8),rep(2,5),0),ncol=7, byrow = T)))
+
+#Distribucion de los salarios por categoria de independientes (GRAFICA 21) 
 
 # MOMENTO 5 ---------------------------------------------------------------
 # Distribucion de los salarios (ENAHO)
@@ -772,4 +794,60 @@ G20<-ggplot(data=T20,aes(x=Percentil,y=Participacion))+
 dev.set()
 png(file="ParticipationLaborMarket.png",width=1600,height=850)
 G20
+dev.off()
+
+# GRAFICA 21 --------------------------------------------------------------
+
+#Estadisticas descriptivas
+
+M21.A<-distribuciones(ENAHO$salarioUSD[ENAHO$emprendedores=="Patron"|ENAHO$emprendedores=="Cuenta propia"])
+M21.B<-distribuciones(ENAHO$salarioUSD[ENAHO$emprendedores=="Cuenta propia"])
+M21.C<-distribuciones(ENAHO$salarioUSD[ENAHO$emprendedores=="Patron"])
+
+M21<-rbind(c("","Todos","Self-employees","Employers"),cbind(M21.A,M21.B[,2],M21.C[,2])) 
+print(xtable(M21),include.rownames=F, include.colnames = F)
+
+#Graficas
+
+ENAHOEMP<-ENAHO[which(ENAHO$clasificacion=="Independientes"),]
+
+mine<-min(ENAHO$salarioUSD[which(ENAHO$clasificacion=="Independientes")])
+maxe<-max(ENAHO$salarioUSD[which(ENAHO$clasificacion=="Independientes")])
+ENAHOEMP$salarionorm<-(ENAHOEMP$salarioUSD - mine)/(maxe-mine)
+
+
+G21A<-ggplot(ENAHOEMP,aes(x=salarionorm))+
+  geom_histogram(aes(y=..ncount..))+
+  geom_density(aes(y=..scaled..))+
+  labs(x="Wage", y="Density")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+dev.set()
+png(file="Wages_entrepreneurs.png",width=1600,height=850)
+G21A
+dev.off()
+
+G21B<-ggplot(ENAHOEMP[which(ENAHOEMP$emprendedores=="Cuenta propia"),],aes(x=salarionorm))+
+  geom_histogram(aes(y=..ncount..))+
+  geom_density(aes(y=..scaled..))+
+  labs(x="Wage (Self-employees)", y="Density")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+dev.set()
+png(file="Wages_self_employees.png",width=1600,height=850)
+G21B
+dev.off()
+
+G21C<-ggplot(ENAHOEMP[which(ENAHOEMP$emprendedores=="Patron"),],aes(x=salarionorm))+
+  geom_histogram(aes(y=..ncount..))+
+  geom_density(aes(y=..scaled..))+
+  labs(x="Wage (Employers)", y="Density")+
+  theme(axis.text=element_text(size=24),
+        axis.title=element_text(size=24,face="bold"))
+
+dev.set()
+png(file="Wages_employers.png",width=1600,height=850)
+G21C
 dev.off()
