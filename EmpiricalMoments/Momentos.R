@@ -804,7 +804,7 @@ M21.A<-distribuciones(ENAHO$salarioUSD[ENAHO$emprendedores=="Patron"|ENAHO$empre
 M21.B<-distribuciones(ENAHO$salarioUSD[ENAHO$emprendedores=="Cuenta propia"])
 M21.C<-distribuciones(ENAHO$salarioUSD[ENAHO$emprendedores=="Patron"])
 
-M21<-rbind(c("","Todos","Self-employees","Employers"),cbind(M21.A,M21.B[,2],M21.C[,2])) 
+M21<-rbind(c("","Todos","Self-employed","Employers"),cbind(M21.A,M21.B[,2],M21.C[,2])) 
 print(xtable(M21),include.rownames=F, include.colnames = F)
 
 #Graficas
@@ -831,12 +831,12 @@ dev.off()
 G21B<-ggplot(ENAHOEMP[which(ENAHOEMP$emprendedores=="Cuenta propia"),],aes(x=salarionorm))+
   geom_histogram(aes(y=..ncount..))+
   geom_density(aes(y=..scaled..))+
-  labs(x="Wage (Self-employees)", y="Density")+
+  labs(x="Wage (Self-employed)", y="Density")+
   theme(axis.text=element_text(size=24),
         axis.title=element_text(size=24,face="bold"))
 
 dev.set()
-png(file="Wages_self_employees.png",width=1600,height=850)
+png(file="Wages_self_employed.png",width=1600,height=850)
 G21B
 dev.off()
 
