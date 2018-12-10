@@ -727,15 +727,200 @@ G18.2
 dev.off()
 
 # MOMENTO 19 --------------------------------------------------------------
-#Horas promedio (semanales) de participación en el mercado laboral por decil de ingresos
-#Version 1 (Trabajadores)
-T19<-ENAHOT[which(ENAHOT$horastot_ci>0),]%>%
+
+#Version 1A: Trabajadores/Horas totales
+H1.A<-ENAHOT%>%
   group_by(percentiling)%>%
   summarise(horas=mean(horastot_ci,na.rm = T))
 
-T19$Percentil<-c(seq(1/nq,1,1/nq))
+sum(is.na(ENAHOT$horaspri_ci))
 
-G19<-ggplot(data=T19,aes(x=Percentil,y=horas))+
+MOMENTO19<-H1.A[,c(1,3,4)]
+MOMENTO19$Percentil<-c(seq(1/nq,1,1/nq))
+
+MOMENTO19$`Version 1A`<-H1.A$horas/H1.A$horas[5]
+
+
+#Version 1B: Trabajadores/Horas actividad principal
+
+H1.B<-ENAHOT%>%
+  group_by(percentiling)%>%
+  summarise(horas=mean(horaspri_ci,na.rm = T))
+
+MOMENTO19$`Version 1B`<-H1.B$horas/H1.B$horas[5]
+
+#Version 2A: Trabajadores(Mayor a 0)/Horas totales 
+
+H2.A<-ENAHOT[which(ENAHOT$horastot_ci>0),]%>%
+  group_by(percentiling)%>%
+  summarise(horas=mean(horastot_ci,na.rm = T))
+
+MOMENTO19$`Version 2A`<-H2.A$horas/H2.A$horas[5]
+
+#Version 2B: Trabajadores(Mayor a 0)/Horas actividad principal 
+
+H2.B<-ENAHOT[which(ENAHOT$horaspri_ci>0),]%>%
+  group_by(percentiling)%>%
+  summarise(horas=mean(horaspri_ci,na.rm = T))
+
+MOMENTO19$`Version 2B`<-H2.B$horas/H2.B$horas[5]
+
+
+# MUESTRA: PEA ------------------------------------------------------------
+ENAHO$ing_ch<- ENAHO$ylm_ch + ENAHO$ylnm_ch
+ENAHO$ing_ch_pc<-ENAHO$ing_ch/ENAHO$nmiembros_ch
+
+ENAHO$horas_trab<- ENAHO$horastot_ci
+ENAHO$horas_trab[is.na(ENAHO$horas_trab)]<-0
+
+ENAHO$horas_trab_pri<- ENAHO$horaspri_ci
+ENAHO$horas_trab_pri[is.na(ENAHO$horas_trab_pri)]<-0
+
+
+#Version 3A (PEA (incluye a quienes no trabajan) // Nivel de ingresos del hogar)- Horas totales
+ENAHOPEA<-ENAHO[which(ENAHO$condocup_ci=="Ocupado"|ENAHO$condocup_ci=="Desocupado"),]
+ENAHOPEA$percentil_hogar<-ntile(ENAHOPEA$ing_ch_pc,nq)
+
+H3A<-ENAHOPEA[!is.na(ENAHOPEA$ing_ch_pc),]%>%
+  group_by(percentil_hogar)%>%
+  summarise(horas=mean(horas_trab,na.rm = T))
+
+MOMENTO19$`Version 3A`<-H3A$horas/H3A$horas[5]
+
+
+#Version 3B (PEA (incluye a quienes no trabajan) // Nivel de ingresos del hogar)- Horas actividad principal
+
+H3B<-ENAHOPEA[!is.na(ENAHOPEA$ing_ch_pc),]%>%
+  group_by(percentil_hogar)%>%
+  summarise(horas=mean(horas_trab_pri,na.rm = T))
+
+MOMENTO19$`Version 3B`<-H3B$horas/H3B$horas[5]
+
+# MUESTRA: PEA (excluye independientes)  ----------------------------------
+
+#Version 4A PEA (sin independientes) // Nivel de ingresos del hogar): Horas de trabajo totales
+ENAHOPEA4<-ENAHO[which((ENAHO$condocup_ci=="Ocupado"|ENAHO$condocup_ci=="Desocupado") & !(ENAHO$categopri_ci=="Cuenta propia") & !(ENAHO$categopri_ci=="Patron")),]
+ENAHOPEA4$percentil_hogar<-ntile(ENAHOPEA4$ing_ch_pc,nq)
+
+sum((ENAHO$condocup_ci=="Ocupado"|ENAHO$condocup_ci=="Desocupado") & !(ENAHO$categopri_ci=="Cuenta propia") & !(ENAHO$categopri_ci=="Patron"))
+
+H4A<-ENAHOPEA4[!is.na(ENAHOPEA4$ing_ch_pc),]%>%
+  group_by(percentil_hogar)%>%
+  summarise(horas=mean(horas_trab,na.rm = T))
+
+MOMENTO19$`Version 4A`<-H4A$horas/H4A$horas[5]
+
+#Version 4B PEA (sin independientes) // Nivel de ingresos del hogar): Horas actividad principal
+
+H4B<-ENAHOPEA4[!is.na(ENAHOPEA4$ing_ch_pc),]%>%
+  group_by(percentil_hogar)%>%
+  summarise(horas=mean(horas_trab_pri,na.rm = T))
+
+MOMENTO19$`Version 4B`<-H4B$horas/H4B$horas[5]
+
+# MUESTRA: PET (excluyendo independientes) --------------------------------
+
+#Version 5A: PET(excluyendo independientes)/Horas totales de trabajo
+ENAHOPET<-ENAHO[which((ENAHO$edad_ci>=18 & ENAHO$edad_ci<=65) & !(ENAHO$categopri_ci=="Cuenta propia") & !(ENAHO$categopri_ci=="Patron")),]
+ENAHOPET$percentil_hogar<-ntile(ENAHOPET$ing_ch_pc,nq)
+
+H5A<-ENAHOPET[!is.na(ENAHOPET$ing_ch_pc),]%>%
+  group_by(percentil_hogar)%>%
+  summarise(horas=mean(horas_trab,na.rm = T))
+
+MOMENTO19$`Version 5A`<-H5A$horas/H5A$horas[5]
+
+#Version 5B: PET(excluyendo independientes)/Horas actividad principal
+
+H5B<-ENAHOPET[!is.na(ENAHOPET$ing_ch_pc),]%>%
+  group_by(percentil_hogar)%>%
+  summarise(horas=mean(horas_trab_pri,na.rm = T))
+
+MOMENTO19$`Version 5B`<-H5B$horas/H5B$horas[5]
+
+#Version 6A (Version 1 + Eliminando las 74 observaciones extrañas)- Horas totales
+ENAHOT6<-ENAHOT[which((ENAHOT$p513=="no es omisión")),]
+ENAHOT6$perc6<-ntile(ENAHOT6$salarioUSD,nq)
+
+H6.A<-ENAHOT6%>%
+  group_by(perc6)%>%
+  summarise(horas=mean(horastot_ci,na.rm = T))
+
+sum(!(ENAHOT$p513=="no es omisión"))
+
+MOMENTO19$`Version 6A`<-H6.A$horas/H6.A$horas[5]
+
+#Version 6B (Version 1 + Eliminando las 74 observaciones extrañas)- Horas actividad principal
+
+H6.B<-ENAHOT6%>%
+  group_by(perc6)%>%
+  summarise(horas=mean(horaspri_ci,na.rm = T))
+
+sum(!(ENAHOT$p513=="no es omisión"))
+
+MOMENTO19$`Version 6B`<-H6.B$horas/H6.B$horas[5]
+
+
+#Version 7A (Version 4 + Eliminando las 74 observaciones extrañas)- Horas totales
+
+ENAHOPEA7<-subset(ENAHOPEA4, (ENAHOPEA4$condocup_ci=="Desocupado") | (ENAHOPEA4$condocup_ci=="Ocupado" & ENAHOPEA4$p513=="no es omisión"))
+ENAHOPEA7$perc7<-ntile(ENAHOPEA7$salarioUSD,nq)
+
+H7.A<-ENAHOPEA7%>%
+  group_by(perc7)%>%
+  summarise(horas=mean(horastot_ci,na.rm = T))
+
+sum(!(ENAHOT$p513=="no es omisión"))
+
+MOMENTO19$`Version 7A`<-H7.A$horas/H7.A$horas[5]
+
+#Version 7B (Version 4 + Eliminando las 74 observaciones extrañas)- Horas actividad principal
+
+H7.B<-ENAHOPEA7%>%
+  group_by(perc7)%>%
+  summarise(horas=mean(horaspri_ci,na.rm = T))
+
+sum(!(ENAHOT$p513=="no es omisión"))
+
+MOMENTO19$`Version 7B`<-H7.B$horas/H7.B$horas[5]
+
+#Version 8A: Trabajadores entre 18 y 65 años- Horas totales
+ENAHOT8<-ENAHOT[which(ENAHOT$edad_ci>=18 & ENAHOT$edad_ci<=65),]
+ENAHOT8$perc8<-ntile(ENAHOT8$salarioUSD,nq)
+
+H8.B<-ENAHOT8%>%
+  group_by(perc8)%>%
+  summarise(horas=mean(horastot_ci,na.rm = T))
+
+MOMENTO19$`Version 8A`<-H8.A$horas/H8.A$horas[5]
+
+#Version 8B: Trabajadores entre 18 y 65 años- Horas actividad principal
+
+H8.B<-ENAHOT8%>%
+  group_by(perc8)%>%
+  summarise(horas=mean(horaspri_ci,na.rm = T))
+
+MOMENTO19$`Version 8B`<-H8.B$horas/H8.B$horas[5]
+
+#Version 9A: PEA (exluyendo emprendedores) entre 18 y 65 años- Horas totales
+ENAHOPEA9<-ENAHOPEA4[which(ENAHOPEA4$edad_ci>=18 & ENAHOPEA4$edad_ci<=65),]
+ENAHOPEA9$perc9<-ntile(ENAHOPEA9$salarioUSD,nq)
+
+H9.A<-ENAHOPEA9%>%
+  group_by(perc9)%>%
+  summarise(horas=mean(horastot_ci,na.rm = T))
+
+MOMENTO19$`Version 9A`<-H9.A$horas/H9.A$horas[5]
+
+#Version 9B: PEA (exluyendo emprendedores) entre 18 y 65 años- Horas actividad principal
+
+H9.B<-ENAHOPEA9%>%
+  group_by(perc9)%>%
+  summarise(horas=mean(horaspri_ci,na.rm = T))
+
+MOMENTO19$`Version 9B`<-H9.B$horas/H9.B$horas[5]
+
+G19<-ggplot(data=T19,aes(x=Percentil,y=`Version 1A`))+
   geom_line()+
   labs(x=expression(theta~w),y="Number of hours worked per week")+
   theme(axis.text=element_text(size=24),
@@ -744,32 +929,6 @@ G19<-ggplot(data=T19,aes(x=Percentil,y=horas))+
 dev.set()
 png(file="HoursWorked.png",width=1600,height=850)
 G19
-dev.off()
-
-#Versión 2 (PEA (incluye a quienes no trabajan) // Nivel de ingresos del hogar)
-ENAHO$ing_ch<- ENAHO$ylm_ch + ENAHO$ylnm_ch
-ENAHO$ing_ch_pc<-ENAHO$ing_ch/ENAHO$nmiembros_ch
-
-ENAHO$horas_trab<- ENAHO$horastot_ci
-ENAHO$horas_trab[is.na(ENAHO$horas_trab)]<-0
-
-ENAHOPEA<-ENAHO[which(ENAHO$condocup_ci=="Ocupado"|ENAHO$condocup_ci=="Desocupado"),]
-ENAHOPEA$percentil_hogar<-ntile(ENAHOPEA$ing_ch_pc,nq)
-T19.2<-ENAHOPEA[!is.na(ENAHOPEA$ing_ch_pc),]%>%
-  group_by(percentil_hogar)%>%
-  summarise(horas=mean(horas_trab,na.rm = T))
-
-T19.2$Percentil<-c(seq(1/nq,1,1/nq))
-
-G19.2<-ggplot(data=T19.2,aes(x=Percentil,y=horas))+
-  geom_line()+
-  labs(x=expression(theta~w),y="Number of hours worked per week")+
-  theme(axis.text=element_text(size=24),
-        axis.title=element_text(size=24,face="bold"))
-
-dev.set()
-png(file="HoursWorkedPEA.png",width=1600,height=850)
-G19.2
 dev.off()
 
 # MOMENTO 20 --------------------------------------------------------------
