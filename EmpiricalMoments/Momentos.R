@@ -975,6 +975,70 @@ H12.B<-ENAHOPET12%>%
 MOMENTO19$`Version 12B`<-H12.B$horas/H12.B$horas[5]
 
 
+#Version 13A: V9 PEA (excluyendo emprendedores) entre 18 y 65 años- Horas totales / Imputando 0 a missing values
+H13.A<-ENAHOPEA9%>%
+  group_by(perc9)%>%
+  summarise(horas=mean(horas_trab,na.rm = T))
+
+MOMENTO19$`Version 13A`<-H13.A$horas/H13.A$horas[5]
+
+#Version 13B: v9 PEA (excluyendo emprendedores) entre 18 y 65 años- Horas actividad principal / Imputando 0 a missing values
+
+H13.B<-ENAHOPEA9%>%
+  group_by(perc9)%>%
+  summarise(horas=mean(horas_trab_pri,na.rm = T))
+
+MOMENTO13$`Version 13B`<-H13.B$horas/H13.B$horas[5]
+
+#Version 14A: v10 PET (excluyendo emprendedores) entre 18 y 55 años- Horas totales /Imputando 0 a missing values
+H14.A<-ENAHOPET10%>%
+  group_by(perc10)%>%
+  summarise(horas=mean(horas_trab,na.rm = T))
+
+MOMENTO19$`Version 14A`<-H14.A$horas/H14.A$horas[5]
+
+#Version 14B: V10 PET (excluyendo emprendedores) entre 18 y 55 años- Horas actividad principal /Imputando 0 a missing values
+
+H14.B<-ENAHOPET10%>%
+  group_by(perc10)%>%
+  summarise(horas=mean(horas_trab_pri,na.rm = T))
+
+MOMENTO19$`Version 14B`<-H14.B$horas/H14.B$horas[5]
+
+#Version 15A: V11 PET (excluyendo emprendedores) hasta 55 años- Horas totales / Imputando 0 a missing values
+H15.A<-ENAHOPET11%>%
+  group_by(perc11)%>%
+  summarise(horas=mean(horas_trab,na.rm = T))
+
+MOMENTO19$`Version 15A`<-H15.A$horas/H15.A$horas[5]
+
+#Version 11B: V11 PET (excluyendo emprendedores) hasta 55 años- Horas actividad principal / Imputando 0 a missing values
+
+H15.B<-ENAHOPET11%>%
+  group_by(perc11)%>%
+  summarise(horas=mean(horas_trab_pri,na.rm = T))
+
+MOMENTO19$`Version 15B`<-H15.B$horas/H15.B$horas[5]
+
+#Version 16A: V12 PET (excluyendo emprendedores y observaciones extrañas) entre 18 y 55 años- Horas totales / Imputando 0 a missing values
+
+H16.A<-ENAHOPET12%>%
+  group_by(perc12)%>%
+  summarise(horas=mean(horas_trab,na.rm = T))
+
+MOMENTO19$`Version 16A`<-H16.A$horas/H16.A$horas[5]
+
+#Version 16B: V12 PET (excluyendo emprendedores y observaciones extrañas) entre 18 y 55 años- Horas actividad principal / Imputando 0 a missing values values
+
+H16.B<-ENAHOPET12%>%
+  group_by(perc12)%>%
+  summarise(horas=mean(horas_trab_pri,na.rm = T))
+
+MOMENTO19$`Version 16B`<-H16.B$horas/H16.B$horas[5]
+
+
+
+
 G19<-ggplot(data=T19,aes(x=Percentil,y=`Version 1A`))+
   geom_line()+
   labs(x=expression(theta~w),y="Number of hours worked per week")+
