@@ -902,7 +902,7 @@ H8.B<-ENAHOT8%>%
 
 MOMENTO19$`Version 8B`<-H8.B$horas/H8.B$horas[5]
 
-#Version 9A: PEA (exluyendo emprendedores) entre 18 y 65 años- Horas totales
+#Version 9A: PEA (excluyendo emprendedores) entre 18 y 65 años- Horas totales / Sin imputar 0 a missing values
 ENAHOPEA9<-ENAHOPEA4[which(ENAHOPEA4$edad_ci>=18 & ENAHOPEA4$edad_ci<=65),]
 ENAHOPEA9$perc9<-ntile(ENAHOPEA9$salarioUSD,nq)
 
@@ -912,13 +912,68 @@ H9.A<-ENAHOPEA9%>%
 
 MOMENTO19$`Version 9A`<-H9.A$horas/H9.A$horas[5]
 
-#Version 9B: PEA (exluyendo emprendedores) entre 18 y 65 años- Horas actividad principal
+#Version 9B: PEA (excluyendo emprendedores) entre 18 y 65 años- Horas actividad principal / Sin imputar 0 a missing values
 
 H9.B<-ENAHOPEA9%>%
   group_by(perc9)%>%
   summarise(horas=mean(horaspri_ci,na.rm = T))
 
 MOMENTO19$`Version 9B`<-H9.B$horas/H9.B$horas[5]
+
+#Version 10A: PET (excluyendo emprendedores) entre 18 y 55 años- Horas totales /Sin imputar 0 a missing values
+ENAHOPET10<-ENAHO[which((ENAHO$edad_ci>=18 & ENAHO$edad_ci<=55) & !(ENAHO$categopri_ci=="Cuenta propia") & !(ENAHO$categopri_ci=="Patron")),]
+ENAHOPET10$perc10<-ntile(ENAHOPET10$salarioUSD,nq)
+
+H10.A<-ENAHOPET10%>%
+  group_by(perc10)%>%
+  summarise(horas=mean(horastot_ci,na.rm = T))
+
+MOMENTO19$`Version 10A`<-H10.A$horas/H10.A$horas[5]
+
+#Version 10B: PET (excluyendo emprendedores) entre 18 y 55 años- Horas actividad principal /Sin imputar 0 a missing values
+
+H10.B<-ENAHOPET10%>%
+  group_by(perc10)%>%
+  summarise(horas=mean(horaspri_ci,na.rm = T))
+
+MOMENTO19$`Version 10B`<-H10.B$horas/H10.B$horas[5]
+
+#Version 11A: PET (excluyendo emprendedores) hasta 55 años- Horas totales / Sin imputar 0 a missing values
+ENAHOPET11<-ENAHO[which( (ENAHO$edad_ci<=55) & !(ENAHO$categopri_ci=="Cuenta propia") & !(ENAHO$categopri_ci=="Patron")),]
+ENAHOPET11$perc11<-ntile(ENAHOPET11$salarioUSD,nq)
+
+H11.A<-ENAHOPET11%>%
+  group_by(perc11)%>%
+  summarise(horas=mean(horastot_ci,na.rm = T))
+
+MOMENTO19$`Version 11A`<-H11.A$horas/H11.A$horas[5]
+
+#Version 11B: PET (excluyendo emprendedores) hasta 55 años- Horas actividad principal / Sin imputar 0 a missing values
+
+H11.B<-ENAHOPET11%>%
+  group_by(perc11)%>%
+  summarise(horas=mean(horaspri_ci,na.rm = T))
+
+MOMENTO19$`Version 11B`<-H11.B$horas/H11.B$horas[5]
+
+#Version 12A: PET (excluyendo emprendedores y observaciones extrañas) entre 18 y 55 años- Horas totales / Sin imputar 0 a missing values
+ENAHOPET12<-subset(ENAHOPET10, (ENAHOPET10$condocup_ci=="Desocupado")|(ENAHOPET10$condocup_ci=="Inactivo") | (ENAHOPET10$condocup_ci=="Ocupado" & ENAHOPET10$p513=="no es omisión"))
+ENAHOPET12$perc12<-ntile(ENAHOPET12$salarioUSD,nq)
+
+H12.A<-ENAHOPET12%>%
+  group_by(perc12)%>%
+  summarise(horas=mean(horastot_ci,na.rm = T))
+
+MOMENTO19$`Version 12A`<-H12.A$horas/H12.A$horas[5]
+
+#Version 12B: PET (excluyendo emprendedores y observaciones extrañas) entre 18 y 55 años- Horas actividad principal / Sin imputar 0 a missing values
+
+H12.B<-ENAHOPET12%>%
+  group_by(perc12)%>%
+  summarise(horas=mean(horaspri_ci,na.rm = T))
+
+MOMENTO19$`Version 12B`<-H12.B$horas/H12.B$horas[5]
+
 
 G19<-ggplot(data=T19,aes(x=Percentil,y=`Version 1A`))+
   geom_line()+
