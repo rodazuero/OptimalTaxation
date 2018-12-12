@@ -732,9 +732,9 @@ dev.off()
 #Las versiones (modificando la muestra y la definicion de horas de trabajo) que se calculan son:
 #1.Trabajadores
 #2.Trabajadores que reportan horas de trabajo superiores a 0
-#3.PEA 
-#4.PEA (excluyendo emprendedores)
-#5.PET (18-65 años, excluyendo emprendedores)
+#3.PEA ,imputando 0 a missing values
+#4.PEA (excluyendo emprendedores),imputando 0 a missing values
+#5.PET (18-65 años, excluyendo emprendedores, imputando 0 a missing values)
 #6.Versión 1, sin observaciones extrañas
 #7.Versión 4, sin observaciones extrañas
 #8.Trabajadores (18-65 años)
@@ -755,11 +755,13 @@ H1.A<-ENAHOT%>%
 
 sum(is.na(ENAHOT$horaspri_ci))
 
+H1.A$Percentil<-c(seq(1/nq,1,1/nq))
+H1.A$`Version 1A`<-H1.A$horas/H1.A$horas[5]
+
 MOMENTO19<-H1.A[,c(1,3,4)]
 MOMENTO19$Percentil<-c(seq(1/nq,1,1/nq))
 
 MOMENTO19$`Version 1A`<-H1.A$horas/H1.A$horas[5]
-
 
 #Version 1B: Trabajadores/Horas actividad principal
 
@@ -908,7 +910,7 @@ MOMENTO19$`Version 7B`<-H7.B$horas/H7.B$horas[5]
 ENAHOT8<-ENAHOT[which(ENAHOT$edad_ci>=18 & ENAHOT$edad_ci<=65),]
 ENAHOT8$perc8<-ntile(ENAHOT8$salarioUSD,nq)
 
-H8.B<-ENAHOT8%>%
+H8.A<-ENAHOT8%>%
   group_by(perc8)%>%
   summarise(horas=mean(horastot_ci,na.rm = T))
 
@@ -1008,7 +1010,7 @@ H13.B<-ENAHOPEA9%>%
   group_by(perc9)%>%
   summarise(horas=mean(horas_trab_pri,na.rm = T))
 
-MOMENTO13$`Version 13B`<-H13.B$horas/H13.B$horas[5]
+MOMENTO19$`Version 13B`<-H13.B$horas/H13.B$horas[5]
 
 #Version 14A: v10 PET (excluyendo emprendedores) entre 18 y 55 años- Horas totales /Imputando 0 a missing values
 H14.A<-ENAHOPET10%>%
