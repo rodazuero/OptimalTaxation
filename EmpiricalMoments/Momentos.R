@@ -727,6 +727,26 @@ G18.2
 dev.off()
 
 # MOMENTO 19 --------------------------------------------------------------
+#Labor supply: Número de horas de trabajo semanal por deciles de ingreso 
+
+#Las versiones (modificando la muestra y la definicion de horas de trabajo) que se calculan son:
+#1.Trabajadores
+#2.Trabajadores que reportan horas de trabajo superiores a 0
+#3.PEA 
+#4.PEA (excluyendo emprendedores)
+#5.PET (18-65 años, excluyendo emprendedores)
+#6.Versión 1, sin observaciones extrañas
+#7.Versión 4, sin observaciones extrañas
+#8.Trabajadores (18-65 años)
+#9.PEA (18-65 años, excluyendo emprendedores, sin imputar 0 a missing values)
+#10.PET(18-55 años, excluyendo emprendedores, sin imputar 0 a missing values)
+#11.PET(hasta 55 años, excluyendo emprendedores, sin imputar 0 a missing values)
+#12.PET(18-55 años, excluyendo emprendedores y observaciones extrañas, sin imputar 0 a missing values)
+#13.Versión 9, imputando 0 a missing values
+#14.Versión 10, imputando 0 a missing values
+#15.Versión 11, imputando 0 a missing values
+#16.Versión 12, imputando 0 a missing values
+
 
 #Version 1A: Trabajadores/Horas totales
 H1.A<-ENAHOT%>%
