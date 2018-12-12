@@ -1,5 +1,45 @@
+###########################################################################
+#                          EMPIRICAL MOMENTS                              #
+###########################################################################
+#SECCIONES:
+#A. IMPORTAR DATOS 
+
+#B. TRIMMING CENSO: Selecciona la variable con la cual se filtran y organizan los datos del Censo.
+
+#C. MOMENTOS Y GRAFICAS:
+##M1:Informalidad y numero de trabajadores por tamaño de la empresa (ENAHO).
+##M2:Numero de trabajadores por decil de ventas (CENSO).
+##M3:Informalidad, numero de firmas y de trabajadores por tamaño de la empresa (CENSO+ENAHO).
+##M4:Proporcion de trabajadores empleados e independientes en la ENAHO.
+##M5:Distribucion de los salarios (ENAHO)
+##M6:Distribución de la produccion de las firmas (CENSO)
+##M7:Pago de impuestos y nivel de producción de la firma (CENSO)
+##M8:Nivel de ingresos e informalidad para trabajadores de la ENAHO
+##I:Información por deciles de ventas y de beneficios (para hacer las graficas)
+##G1:Proporción de trabajadores informales por deciles de ventas de las firmas
+##G2:Proporción de trabajadores formales por deciles de ventas de las firmas
+##G3:Número de trabajadores totales (formales e informales) por deciles de ventas de las firmas
+##G4:Niveles de beneficios antes de impuestos por deciles de ventas.
+##G5:Niveles de beneficios después de impuestos por deciles de ventas.
+##G6:Niveles de venta (valor) en cada decil de ventas.
+##G7:Valor de pago de impuesto en cada decil de ventas.
+##G8:Valor de pago de impuesto como proporción de ventas, en cada decil de ventas.
+##G9:Valor de pago de impuesto como proporción de los beneficios, en cada decil de ventas.
+##G10:Distribución de ingresos de los trabajadores formales.
+##G11:Distribución de ingresos de los trabajadores informales.
+##G12:Distribución de ingresos de los trabajadores (formales e informales).
+##G13:Distribución de trabajadores informales como proporción de todos los trabajadores organizados por deciles de ingresos.
+##G14:Proporción de informales por tamaño de firma.
+##G15:Informalidad por percentiles de tamaño de la firma.
+##G16:Niveles de beneficios (valor) en cada decil de beneficios.
+##G17:Valor de pago de impuesto como proporción de ventas, en cada decil de beneficios.
+##G18:Valor de pago de impuesto como proporción de los beneficios, en cada decil de beneficios.
+##M19:Labor supply: Número de horas de trabajo semanal por deciles de ingreso.
+##M20:Participación en el mercado laboral por decil de ingresos.
+##G21:Distribución de salarios de independientes (employers y self-employed)
+
 rm(list=ls(all=TRUE))
-# IMPORTAR DATOS ----------------------------------------------------------
+###### A. IMPORTAR DATOS ----------------------------------------------------------
 library(dplyr)
 library(StatMeasures)
 library(xtable)
@@ -10,7 +50,8 @@ setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
 ENAHO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/ENAHO/ENAHOARM/OptimaltaxationSubSampleENAHO.csv", header = T, sep=",")
 CENSO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/Census/Modified/OptimaltaxationSubSampleCenso.csv", header = T, sep=",")
 graphdirectory<-"/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/EmpiricalMoments/Graphs"
-# TRIMMING ----------------------------------------------------------------
+###### B. TRIMMING ----------------------------------------------------------------
+
 #A)Variable de interes (CENSO)
 #Ventas (Ventas netas + prestacion de servicios)
 CENSO$VENTAST<-CENSO$CAP5MONTO1+CENSO$CAP5MONTO5
@@ -36,11 +77,12 @@ CENSO<-CENSO[which(!(CENSO$VENTAST>quantile(CENSO$VENTAST,0.99)|CENSO$CITAX>quan
 #Se define el numero de grupos
 nq<-10
 
+
 # MOMENTO 1 ---------------------------------------------------------------
 # Informalidad y numero de trabajadores por tamaño de la empresa (ENAHO).
 
 #Se agrupan las empresas con mas de 50 trabajadores en una misma categoria,
-#si se quiere la informacion sin restringir el tamaÃ±o de la empresa se debe 
+#si se quiere la informacion sin restringir el tamaño de la empresa se debe 
 #usar la variable "numero_trabajadores" en el group by.
 
 ENAHO$informal_empleado<-1-ENAHO$formal_empleado
@@ -84,7 +126,7 @@ print(xtable(M2), include.rownames=F)
 #(CENSO+ENAHO)
 
 #Se agrupan las empresas con mas de 50 trabajadores en una misma categoria,
-#si se quiere la informacion sin restringir el tamaÃ±o de la empresa se debe 
+#si se quiere la informacion sin restringir el tamaño de la empresa se debe 
 #usar la variable "TOTALTRAB" en el group by.
 
 CENSO$nn<-1
@@ -313,7 +355,8 @@ print(xtable(MOMENTO8,digits=c(0,0,2,0)),include.rownames=F)
 
 #MOMENTO8$`Informalidad (%)`-> Proporcion de trabajadores informales en el decil de ingresos
 
-# INFORMACIÓN POR DECILES DE VENTAS-----------------------------------------
+# I: INFORMACIÓN ----------------------------------------------------
+# INFORMACIÓN POR DECILES DE VENTAS
 
 CENSO$TOTALTRAB<-CENSO$NTRABAJADORES8+CENSO$NTRABAJADORES9+CENSO$NTRABAJADORES10
 CENSO$NUMTRAB<-CENSO$TOTALTRAB
@@ -340,7 +383,7 @@ DECILES_VENTAS$TAX2_BENEFICIOS<-DECILES_VENTAS$Impuestos2/DECILES_VENTAS$Benefic
 
 DECILES_VENTAS$Ventas_decil<-quantile(CENSO$VENTASTUSD, c(seq(1/nq,1,1/nq)))
 
-# INFORMACION POR DECILES DE BENEFICIOS -----------------------------------
+# INFORMACION POR DECILES DE BENEFICIOS 
 
 CENSO$decilesbeneficios<-ntile(CENSO$PROFITSBEFOREUSD,nq)
 
@@ -747,6 +790,8 @@ dev.off()
 #15.Versión 11, imputando 0 a missing values
 #16.Versión 12, imputando 0 a missing values
 
+#*Observaciones extrañas: Dentro de la muestra de trabajadores, todos reportan el numero de horas trabajadas (aunque sea 0),
+# a excepción de 74 individuos que curiosamente pertenecen a los deciles mas altos de ingresos.
 
 #Version 1A: Trabajadores/Horas totales
 H1.A<-ENAHOT%>%
