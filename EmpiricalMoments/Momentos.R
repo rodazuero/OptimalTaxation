@@ -791,7 +791,8 @@ dev.off()
 #16.Versión 12, imputando 0 a missing values
 
 #*Observaciones extrañas: Dentro de la muestra de trabajadores, todos reportan el numero de horas trabajadas (aunque sea 0),
-# a excepción de 74 individuos que curiosamente pertenecen a los deciles mas altos de ingresos.
+# a excepción de 74 individuos que curiosamente pertenecen a los deciles mas altos de ingresos (deciles calculados para toda
+# la muestra de la ENAHO, sobre los ingresos del hogar).
 
 #Version 1A: Trabajadores/Horas totales
 H1.A<-ENAHOT%>%
