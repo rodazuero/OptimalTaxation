@@ -131,13 +131,20 @@ names(MOMENTO2)<-c("Decil de ventas","Numero de trabajadores")
 M2<-as.matrix.data.frame(MOMENTO2,rownames.force = F)
 print(xtable(M2), include.rownames=F)
 
+#MOMENTO2$`Decil de ventas`<- Decil de ventas 
+#MOMENTO2$`Numero de trabajadores`<- Numero total de trabajadores en empresas del decil x
+
 # MOMENTO 3 ---------------------------------------------------------------
 #Informalidad, numero de firmas y de trabajadores por tamaño de la empresa
 #(CENSO+ENAHO)
 
+#Este momento conecta la información calculada en el Momento 1, con la informacion que 
+#contiene el Censo referente al tamaño de las empresas.
 #Se agrupan las empresas con mas de 50 trabajadores en una misma categoria,
 #si se quiere la informacion sin restringir el tamaño de la empresa se debe 
 #usar la variable "TOTALTRAB" en el group by.
+#Del Censo se obtiene el numero de firmas en cada categoria de tamaño de la empresa y 
+#la proporción que representan del total de las firmas.
 
 CENSO$nn<-1
 CENSO$NUMTRAB<-CENSO$TOTALTRAB
@@ -174,9 +181,12 @@ print(xtable(M3, digits =c(0,0,0,3,3,3,0)), include.rownames=F)
 #MOMENTO3$`Numero de trabajadores`<- Número de trabajadores que reportan trabajar en una firma de tamaño x (ENAHO)
 
 
-
 # MOMENTO 4 ---------------------------------------------------------------
 # Proporcion de trabajadores empleados e independientes en la ENAHO
+
+#Se calcula la proporción de trabajadores e independientes dentro de los ocupados.
+#La versión original solo hace la distinción entre trabajadores e independientes.
+#La segunda versión desagrega los independientes entre cuenta propia y empleadores.
 
 #Clasificacion general (Empleados/Independientes/Otros)
 ENAHO$clasificacion<-NA   
@@ -216,6 +226,10 @@ print(xtable(M4.2, digits = matrix(c(rep(0,8),rep(2,5),0),ncol=7, byrow = T)))
 # MOMENTO 5 ---------------------------------------------------------------
 # Distribucion de los salarios (ENAHO)
 
+#En este momento se obtienen estadisticas descriptivas de la distribución de los salarios.
+#Se realiza para la muestra total de los trabajadores, para los trabajadores con un salario superior a 0,
+#para los empleados (todos, formales e informales).
+
 #Se define una funcion que arroja el promedio, desviacion estandar y deciles de cualquier
 #variable
 distribuciones<-function(x){
@@ -254,6 +268,8 @@ print(xtable(M5.3),include.rownames=F, include.colnames = F)
 # MOMENTO 6 ---------------------------------------------------------------
 #Distribución de la produccion de las firmas (CENSO)
 
+#Se obtienen estadisticas descriptivas de la distribucion de la producción de las firmas (en dolares).
+
 CENSO$PRODUCCIONUSD<-CENSO$CAP5MONTO9*0.315
 
 M6<-distribuciones(CENSO$PRODUCCIONUSD)
@@ -262,6 +278,11 @@ print(xtable(M6),include.rownames=F)
 
 # MOMENTO 7 ---------------------------------------------------------------
 #Pago de impuestos y nivel de producción de la firma (CENSO)
+
+#Se organizan a las firmas por decil de producción y se obtiene el nivel de producción,
+#beneficios, pago de impuestos y algunas relaciones entre estos.
+#En este momento se consideran dos indicadores de la carga impositiva:
+#El impuesto a la renta (CITAX), y una agregación del impuesto a la renta (CITAX) y las tranferencias a los trabajadores.
 
 CENSO$PROFITSUSD<-CENSO$CAP5MONTO34*0.315
 
@@ -353,6 +374,8 @@ print(xtable(MOMENTO7B),include.rownames=F)
 # MOMENTO 8 ---------------------------------------------------------------
 #Nivel de ingresos e informalidad para trabajadores de la ENAHO
 
+#Se organizan los trabajadores por decil de ingresos y se calcula la proporcion de trabajadores que son informales en el decil.
+
 ENAHOT$decilesing<-decile(ENAHOT$salarioUSD)
 
 MOMENTO8<-ENAHOT%>%
@@ -363,9 +386,15 @@ names(MOMENTO8)<-c("Decil de ingresos" ,"Informalidad (%)", "Observaciones")
 
 print(xtable(MOMENTO8,digits=c(0,0,2,0)),include.rownames=F)
 
-#MOMENTO8$`Informalidad (%)`-> Proporcion de trabajadores informales en el decil de ingresos
+#MOMENTO8$`Decil de ingresos`
+#MOMENTO8$`Informalidad (%)`<-Proporción de trabajadores que son informales en el decil de ingresos
+#MOMENTO8$Observaciones<- Numero de trabajadores en el decil de ingresos x 
 
 # I: INFORMACIÓN ----------------------------------------------------
+
+#En esta sección se organizan las firmas por deciles de ventas y beneficios, y se obtiene
+#información referentea beneficios, ventas, impuestos. Esta informacion se utiliza posteriormente para las graficas. 
+
 # INFORMACIÓN POR DECILES DE VENTAS
 
 CENSO$TOTALTRAB<-CENSO$NTRABAJADORES8+CENSO$NTRABAJADORES9+CENSO$NTRABAJADORES10
@@ -413,16 +442,28 @@ DECILES_BENEFICIOS$Beneficios_decil<-quantile(CENSO$PROFITSBEFOREUSD, c(seq(1/nq
 #Proporción de trabajadores informales por deciles de ventas de las firmas
 #“InformalProportionDemandPercentile”
 
+#En principio se organizan las firmas del CENSO por tamaño (número de trabajadores) y se obtiene el nivel de
+#ventas promedio en cada tamaño de empresa. 
 TS<-CENSO%>%
   group_by(NUMTRAB)%>%
   summarise(firmas=sum(nn), ventas=mean(VENTASTUSD, na.rm = T))
+
+#Sobre esta clasificación se calculan los deciles de ventas. 
 TS$decil<- ntile(TS$ventas,nq)
 
+#Se junta la información obtenida con la información (proporcion) de informalidad de la ENAHO (Momento 1).
 TS<-left_join(TS,MOMENTO1,by=c("NUMTRAB"="Tamano de la empresa"))
+
+#Se aproxima el total de trabajadores en cada tamaño de empresa, multiplicando el número de firmas en cada
+#tamaño por el numero de trabajadores que reportan. Partiendo de esta aproximacion del numero de trabajadores
+#se calcula cuantos son formales e informales, con la informacion de la ENAHO.
+
 TS$`Numero de trabajadores`<- TS$firmas*TS$NUMTRAB
 TS$Informales<-TS$firmas*TS$NUMTRAB*TS$Informalidad/100
 TS$Formales<-TS$`Numero de trabajadores`-TS$Informales
 
+#Finalmente, se agrupan los datos obtenidos de acuerdo al decil de ventas de la empresa y se obtiene el nivel de 
+#informalidad por decil. 
 INF<-TS%>%
   group_by(decil)%>%
   summarise(Total=sum(`Numero de trabajadores`), Informales=sum(Informales,na.rm = T), Formales=sum(Formales, na.rm = T))
@@ -465,6 +506,9 @@ dev.off()
 #Número de trabajadores totales (formales e informales) por deciles de ventas de las firmas
 #"TotalLaborDemandPercentile"
 
+#Se organizan las firmas por deciles de ventas y se obtiene, en promedio, cuantos trabajadores 
+#laboran en una firma del decil x.
+
 T3<-CENSO%>%
   group_by(decilesventast)%>%
   summarise(trabajadores=mean(TOTALTRAB))
@@ -481,8 +525,6 @@ dev.set()
 png(file="TotalLaborDemandE.png",width=1600,height=850)
 G3
 dev.off()
-
-
 
 # GRAFICA 4 ---------------------------------------------------------------
 #Niveles de beneficios antes de impuestos por deciles de ventas.
@@ -615,6 +657,7 @@ dev.off()
 # GRAFICA 10 --------------------------------------------------------------
 #Distribución de ingresos de los trabajadores formales
 
+#Se re-escalan el salario entre 0 y 1 
 mins<-min(ENAHOT$salarioUSD)
 maxs<-max(ENAHOT$salarioUSD)
 ENAHOT$salarionorm<-(ENAHOT$salarioUSD-mins)/(maxs-mins)
@@ -667,6 +710,9 @@ dev.off()
 
 ENAHOT$percentiling<-ntile(ENAHOT$salarioUSD,nq)
 
+#Informalidad por decil de ingresos: Se organizan los trabajadores por nivel de ingresos y se calcula que proporción de
+#estos son informales al interior del decil.
+
 T13<-ENAHOT%>%
   group_by(percentiling)%>%
   summarise(informalidad=mean(informal_empleado,na.rm = T)*100, trabajadores=sum(nn))
@@ -714,7 +760,6 @@ dev.off()
 
 # GRAFICA 16 --------------------------------------------------------------
 #Niveles de beneficios (valor) en cada decil de beneficios.
-
 
 DECILES_BENEFICIOS$Percentil<-c(seq(1/nq,1,1/nq))
 DECILES_BENEFICIOS$BM<-DECILES_BENEFICIOS$Beneficios_decil/1000
@@ -781,6 +826,10 @@ dev.off()
 
 # MOMENTO 19 --------------------------------------------------------------
 #Labor supply: Número de horas de trabajo semanal por deciles de ingreso 
+
+#Para cada decil de ingresos, se calcula el numero de horas que labora en la semana, en promedio. 
+#Tras calcular el numero de horas promedio, se "nomaliza" respecto a la mediana (p50). 
+#Es decir, los datos obtenidos corresponden a #horas en el decil/mediana del # de horas. 
 
 #Las versiones (modificando la muestra y la definicion de horas de trabajo) que se calculan son:
 #1.Trabajadores
@@ -1130,6 +1179,9 @@ dev.off()
 
 # MOMENTO 20 --------------------------------------------------------------
 #Participación en el mercado laboral por decil de ingresos
+
+#Se organizan los individuos por nivel de ingresos y se calcula cuantos de estos son 
+#ocupados y desocupados. Posteriormente se calcula la proporción de ocupados en el decil.
 
 ENAHO$ingreso_totUSD<-ENAHO$salarioUSD+(ENAHO$ynlm_ci+ENAHO$ynlnm_ci)*0.315
 ENAHO$perc_ingt<-ntile(ENAHO$ingreso_totUSD,nq) 
