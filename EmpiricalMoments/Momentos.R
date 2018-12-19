@@ -1205,9 +1205,10 @@ G20
 dev.off()
 
 # GRAFICA 21 --------------------------------------------------------------
+#Distribucion de los salarios de los independientes
 
 #Estadisticas descriptivas
-
+#Distribucion de los salarios de los independientes (todos, cuenta propia y empleadores)
 M21.A<-distribuciones(ENAHO$salarioUSD[ENAHO$emprendedores=="Patron"|ENAHO$emprendedores=="Cuenta propia"])
 M21.B<-distribuciones(ENAHO$salarioUSD[ENAHO$emprendedores=="Cuenta propia"])
 M21.C<-distribuciones(ENAHO$salarioUSD[ENAHO$emprendedores=="Patron"])
@@ -1216,9 +1217,11 @@ M21<-rbind(c("","Todos","Self-employed","Employers"),cbind(M21.A,M21.B[,2],M21.C
 print(xtable(M21),include.rownames=F, include.colnames = F)
 
 #Graficas
-
+#Se grafica la distribucion de los salarios de los independientes, desagregando por categoria
+#(cuenta propia o empleadores).
 ENAHOEMP<-ENAHO[which(ENAHO$clasificacion=="Independientes"),]
 
+#De nuevo, se re-escala la variable de salario dentro de la muestra de los independientes. 
 mine<-min(ENAHO$salarioUSD[which(ENAHO$clasificacion=="Independientes")])
 maxe<-max(ENAHO$salarioUSD[which(ENAHO$clasificacion=="Independientes")])
 ENAHOEMP$salarionorm<-(ENAHOEMP$salarioUSD - mine)/(maxe-mine)
