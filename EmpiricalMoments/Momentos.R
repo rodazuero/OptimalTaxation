@@ -7,6 +7,9 @@
 #B. TRIMMING CENSO: Selecciona la variable con la cual se filtran y organizan los datos del Censo.
 
 #C. MOMENTOS Y GRAFICAS:
+#Cada momento inicia con una breve descripción del calculo correspondiente. 
+#Al finalizar el momento se encuentra un pequeño diccionario de las variables del data frame o tabla.
+
 ##M1:Informalidad y numero de trabajadores por tamaño de la empresa (ENAHO).
 ##M2:Numero de trabajadores por decil de ventas (CENSO).
 ##M3:Informalidad, numero de firmas y de trabajadores por tamaño de la empresa (CENSO+ENAHO).
@@ -81,9 +84,12 @@ nq<-10
 # MOMENTO 1 ---------------------------------------------------------------
 # Informalidad y numero de trabajadores por tamaño de la empresa (ENAHO).
 
+#Se parte del reporte que hacen los empleados sobre el número de trabajadores 
+#que hay en la empresa en que laboran (variable: numero_trabajadores o p512).
 #Se agrupan las empresas con mas de 50 trabajadores en una misma categoria,
 #si se quiere la informacion sin restringir el tamaño de la empresa se debe 
 #usar la variable "numero_trabajadores" en el group by.
+#Para cada tamaño de empresa se calcula la proporcion de trabajadores informales.
 
 ENAHO$informal_empleado<-1-ENAHO$formal_empleado
 ENAHO$nn<-1
@@ -110,6 +116,10 @@ print(xtable(M1,digits = c(0,0,3,0)), include.rownames=F)
 
 # MOMENTO 2  --------------------------------------------------------------
 #Numero de trabajadores por decil de ventas (CENSO)
+
+#Se restringe el analisis a las firmas que reportan ventas superiores a 0.
+#Se agrupan las firmas por decil de ventas y se calcula el número de trabajadores
+#que laboran en cada uno de los deciles.
 
 CENSO$TOTALTRAB<-CENSO$NTRABAJADORES8+CENSO$NTRABAJADORES9+CENSO$NTRABAJADORES10
 sub<-subset(CENSO, CAP5MONTO1>0)
