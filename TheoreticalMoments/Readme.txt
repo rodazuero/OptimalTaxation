@@ -263,3 +263,279 @@ double wi=6.81;
 Problem keeps being the small number of entrepreneurs. Probably increasing chi or other stuff might help
 
 
+//Running the optimizer of distance estimator in the C++ file. It is necessary to readjust it so that it can compile in R. The difference is due to the function called to sort vectors. 
+
+//It is necessary to compute theoretically the aggregate sum of taxes for each decile and compare that with the corresponding empirical part. 
+
+Modified increasing 100+nf+ni to increase entrepreneurs!
+
+
+//Tesla: remove everything from RCPP. 
+Necesario poner #include <armadillo> y tambi;en en las librerias a buscar incluir el directorio -I/usr/lib64/R/library/RcppArmadillo/include/ que va a encontrar el archivo armadillo.h. 
+También, #include <iterator>.
+Change std::begin and std::end to nothing! std::begin(algo)-> algo
+
+
+
+
+g++ mainTesla.cpp -std=c++0x -I/usr/include/c++/3.4.6/backward/  -I/usr/lib64/R/library/BH/include/  -I/home/razu/install/include/ -I/usr/lib64/R/library/RcppArmadillo/include/ -I/home/razu/boost_1_61_0/ -L/home/razu/install/lib/ -lnlopt   -fopenmp -Wall   -lgsl -lgslcblas  -o main
+
+g++ testTesla.cpp -std=c++0x -I/usr/include/c++/3.4.6/backward/  -I/usr/lib64/R/library/BH/include/  -I/home/razu/install/include/ -I/usr/lib64/R/library/RcppArmadillo/include/ -I/home/razu/boost_1_61_0/ -L/home/razu/install/lib/ -lnlopt   -fopenmp -Wall   -lgsl -lgslcblas  -o main
+
+*Code to run in parallel:
+
+g++ mainTesla.cpp  -I/usr/include/c++/3.4.6/backward/  -I/usr/lib64/R/library/BH/include/  -I/home/razu/install/include/ -I/usr/lib64/R/library/RcppArmadillo/include/ -I/home/razu/boost_1_61_0/ -L/home/razu/install/lib/ -lnlopt   -fopenmp -Wall   -lgsl -lgslcblas  -o main
+
+g++ mainTesla.cpp -std=c++0x -I/usr/include/c++/3.4.6/backward/  -I/usr/lib64/R/library/BH/include/  -I/home/razu/install/include/ -I/usr/lib64/R/library/RcppArmadillo/include/ -I/home/razu/boost_1_61_0/ -L/home/razu/install/lib/ -lnlopt   -fopenmp -Wall   -lgsl -lgslcblas  -o main
+
+
+
+g++ mainTesla.cpp -std=gnu++0x -I/usr/include/c++/3.4.6/backward/  -I/usr/lib64/R/library/BH/include/  -I/home/razu/install/include/ -I/usr/lib64/R/library/RcppArmadillo/include/ -I/home/razu/boost_1_61_0/ -L/home/razu/install/lib/ -lnlopt   -fopenmp -Wall   -lgsl -lgslcblas  -o main
+
+
+g++ mainTesla.cpp  -I/usr/include/c++/3.4.6/backward/  -I/usr/lib64/R/library/BH/include/  -I/home/razu/install/include/  -I/home/razu/boost_1_61_0/ -L/home/razu/install/lib/ -lnlopt   -fopenmp -Wall   -lgsl -lgslcblas  -o paralleloutput
+
+#Remember to change the size of MYVAR and the limits of the pragma omp for loop when the size of the sobol calibration is changed
+
+#Initial labor supply answers increased to 24.1. 
+#I will also increase the initial wages guess because it is not throwing much equilibria from around 8 to something higher////
+
+#When expanding the range of parameters very few equilibria are found with the sobol. need to be careful with this. 
+
+To not see the output: nohup ./main > nohupNLOPT.out&
+
+
+
+
+
+#Sobol description. 
+#The first attempt was to generate a quite wide range of parameters. 
+
+#Problem with lack of equilibria found iseems to be related to initial conditions found. 
+
+Initially, we had:
+li=24
+lf=24
+ni=2.3
+nf=0.53*8
+z=24. 
+
+New first initial conditions:
+li=0.5
+lf=0.5
+ni=10
+nf=50
+z=24.
+
+*Once we run the sobol, we find that there is a problem still with the number of entrepreneurs and workers. We need to work on it as the closest numbers are always very far from the situation optimal. Tests for which can be actually close to the real number of entrepreneurs. The ones with high levels of entrepreneurs:
+
+
+Analysis of other variables and the Proportion of informality. Some bounds on the moments that we obtain. 
+
+The problem is that ddelta goes from 0 to 600 and for a large number of values (up until 50-600) there is no informality. For this reason, it is probably a good idea to re-run everything bounding ddelta to be under 50. 
+
+1. Need to have an upper bound on ddelta at around 50. Values larger than that will have zero informality. Before that, it was up until 600. 
+
+#The best combination found was:
+aalpha=0.8;
+    ggamma=0.198503;
+    ddelta=0.180862;
+    bbeta=0.247681;
+    ssigma=0.468333;
+    kkappa=0.0689548;
+    psi=2.19302;
+    chi=1.09956;
+    rrho=2.74542;
+    mmu1=0.240092;
+    mmu2=1.50935;
+    ssigma1=0.113429;
+    ssigma2=1.16547;
+    rho12=0.10219;
+
+#Is there anything we can do to increase the number of entrepreneurs with these parameters with slight modifications? I will try the following:
+
+1. lowering aalpha from 0.8 to 0.7. doesn't work. 
+to 0.5-> it increases but only to 2% from 0.7%. 
+to 0.3->  no longer works. 
+
+2. increasing mmu2:
+from 1.50935 to 3-> Doesn't work. 
+From 1.50935 to 2-> Doesn't work
+
+3. Increasing mmu1 
+0.240092 to 0.5-> Doesn't work
+0.240092 to 0.75-> Doesn't work
+0.240092 to 1-> Doesn't work
+0.240092 to 1.5-> Doesn't work
+0.240092 to 5.1-> Doesn't work
+
+4. Lowering ssigma2:
+1.16547 to 0.7-> Doesn't work
+1.16547 to 0.5-> ligeramente a 1%. 
+1.16547 to 0.2-> ligeramente a 1%. 
+
+5. Lowering cchi:
+1.09956 to 0.7-> Doesn't work. 
+1.09956 to 0.5-> Doesn't work. 
+1.09956 to 0.2-> Doesn't work. 
+1.09956 to 2.0-> Doesn't work. 
+
+6. Increasing psi 
+2.1930 to 10.19302->doesn't work
+2.1930 to 20.19302->doesn't work
+2.1930 to 1.19302->doesn't work
+
+
+#Now I will try to give for free some work for the entrepreneurs such that
+we count them as self-employed and they don't need to hire someone or else. 
+
+Doing
+double profm=tthetae*pow((10+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
+
+It does increase the number of entrepreneurs but breaks all actually. 
+
+Parece que sí va a tener que ser por este lado. 
+
+50-> leads to entrepreneurs of approximately 14%. 
+
+100-> 29%. 
+
+
+#Increasing to have parameter “c” in the production function so that 
+#we have more entrepreneurs implies:
+
+#1. Having more parameters in all production functions. 
+#2. Final Profits should have parameter paramvec of size 9. Following modifications:
+	a. FinProfits: c=paramvec[8];
+	b. profitsFinMaxim: Params[8]=c;
+	c. iDecision: c=Params[11];
+	d. ExcessDemandFunctions. Increase one variable in parameters:
+		ParamsDecision[11]=Params[9];. All variables from 9 to 13 should then
+		be increased by one. 
+		double mmu1=Params[10];
+    		double mmu2=Params[11];
+    		double ssigma1=Params[12];
+    		double ssigma2=Params[13];
+    		double rho12=Params[14];
+
+	e. StandardizedExcessDemands: Vector Others[20] increased to Others[21]
+	f. EqWages DOthers[20] increased to [21]
+	g. EqWagesNumericVector [19] to [20] in DOthers. 
+	h. TheoMoments: 19 to 20. Others
+			ParamsDecision expand to 12 and 11->9. 
+			In DOthers squeeze to allow c=DOthers[9];
+	i. StandardizedDistanceEstimator-> c=parameters[13]. Others[9] is C 
+		and displace the rest. 
+	j. MinimizingDistance-> c is PArameters[13];
+	k. SobolRun. VecOthers to 21 and VecOthers increased one (15)
+	
+
+#Passing parameters:
+FinProfits<-
+double wi=paramvec[0];
+    double wf=paramvec[1];
+    double aalpha=paramvec[2];
+    double ddelta=paramvec[3];
+    double ggamma=paramvec[4];
+    double bbeta=paramvec[5];
+    double ssigma=paramvec[6];
+    double tthetae=paramvec[7];
+    double c=paramvec[8];//ADDED
+
+
+profitsFinMaxim
+double Params[9]={};
+    Params[0]=wi;
+    Params[1]=wf;
+    Params[2]=aalpha;
+    Params[3]=ddelta;
+    Params[4]=ggamma;
+    Params[5]=bbeta;
+    Params[6]=ssigma;
+    Params[7]=tthetae;
+    Params[8]=c;
+
+iDecision
+double wi=Params[0];
+    double wf=Params[1];
+    double aalpha=Params[2];
+    double ddelta=Params[3];
+    double ggamma=Params[4];
+    double bbeta=Params[5];
+    double ssigma=Params[6];
+    double kkappa=Params[7];
+    double rrho=Params[8];
+    double psi=Params[9];
+    double chi=Params[10];
+    double c=Params[11];//ADDED
+
+
+Exces
+ParamsDecision.resize(12);
+    ParamsDecision[0]=Wages[0];
+    ParamsDecision[1]=Wages[1];
+    ParamsDecision[2]=Params[0];
+    ParamsDecision[3]=Params[1];
+    ParamsDecision[4]=Params[2];
+    ParamsDecision[5]=Params[3];
+    ParamsDecision[6]=Params[4];
+    ParamsDecision[7]=Params[5];
+    ParamsDecision[8]=Params[6];
+    ParamsDecision[9]=Params[7];
+    ParamsDecision[10]=Params[8];
+    ParamsDecision[11]=Params[14];
+
+
+StandardizedExcessDemands
+Params.resize(16);
+    for(int it=0;it<16;it++){
+        Params[it]=Others[it];
+    }
+
+
+EqWages
+double DOthers[21];
+    for(int it=0; it<21;it++){
+        DOthers[it]=Others[it];
+    }
+
+EqWagesNumericVector
+double DOthers[20];
+    for(int it=0; it<20;it++){
+        DOthers[it]=Others[it];
+        cout << DOthers[it]<< " DOthers[it] in eqwagesnumeric" << endl;
+    }
+
+TheoMoments
+double DOthers[20];
+    for(int it=0; it<20;it++){
+        DOthers[it]=Others[it];
+    }
+ParamsDecision.resize(12);
+ParamsDecision[11]=DOthers[14];
+double c=DOthers[14];
+
+
+#ANALYZING step by step:
+SobolRun(Wages,InitLWorkersDecision,InitProfDecision);
+
+SobolRun reads SobolDim.csv and loads it into VectorOthers of size 20. 
+VectorOthers is passed on to distanceEstimator. 
+
+VectorOthers[14] is inserted to be c. It is the 15th element in 14 step. 
+Then, 15, 16, are initial conditions. 
+
+
+DISTANCEESTIMATOR->OTHERS OF SIZE 20 PASSED TO EQUILIBRIUMMOMENTS. Exactly as the 
+VectorOthers input in SobolRun passed to equilibrium moments. 
+
+EQUILIBRIUMMOMENTS->OTHERS OF SIZE 20 PASSED TO EqWagesNumericVector
+
+Passed as it is to ExcessDemandTotal
+Passed to StandardizedExcessDemands. Here is the weird thing. It is passed to ExcessDemandFunctions
+
+
+
+
+
+

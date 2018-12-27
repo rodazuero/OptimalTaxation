@@ -131,7 +131,7 @@ names<-c("aalpha","ggamma","ddelta","bbeta","ssigma","kkappa","psi","chi",
          "rho","mmu1","mmu2","ssigma1","ssigma2","rho12","NA")
 colnames(Parameters)<-names
 
-Everything<-data.table(Parameters,DistanceMom,AllMmoments)
+Everything<-data.table(Parameters,DistanceMom,AllMmoments[1:10175])
 
 #----------------------------------------------------------------------#
 #We only take those where positive number of entrepreneurs where found #
@@ -984,7 +984,26 @@ i=1
 
 #Including the theoretical and empirical moments
 
+#I will do a subsample of sobols for which entrepreneurs where relevant:
+#And store the original EverythingEqDistance in other stuff
+
+#Only run it once to keep it!:
+
+#EverythingEqDistanceOriginal<-EverythingEqDistance
+#If you want to subset the equilibria analyzed this is the place to do it. 
+#Otherwise, just keep going. 
+
+#And the rest:
+#EverythingEqDistanceEntrep<-subset(EverythingEqDistanceOriginal,PropEntrepreneurs>0.19)
+#max(EverythingEqDistanceEntrep$InformalDemandProportionV4)
+#EverythingEqDistanceEntrep$InformalDemandProportionV5[i]
+#EverythingEqDistance<-EverythingEqDistanceEntrep
+
+
+
 #1. Production
+
+
 
 ProductionTheoretical<-c(EverythingEqDistance$ProductionV1[i],
               EverythingEqDistance$ProductionV2[i],
@@ -1105,14 +1124,16 @@ TotalLaborSupply<-c(EverythingEqDistance$TotalLaborSupplyV1[i],
 
 Comparing$TotalLaborSupply <-  c(TotalLaborSupply,T19$horas[1:9]/T19$horas[5] )
 
-
+Comparing$TotalLaborSupply2<-c(TotalLaborSupply,T20$Participacion[1:9]/T20$Participacion[5] )
 
 #8. Proportion of entrepreneurs
 PropEntrep<-data.table(c(EverythingEqDistance$PropEntrepreneurs[i],(M4[2,2]/(M4[2,1]+M4[2,2]))))
 PropEntrep$Sample<-c(as.factor(c(0,1)))
+print(PropEntrep)
 InformalPROPDemand
 
 
+#Subsetting the ones where entrepreneurs are more than 25%:
 
 
 
@@ -1124,22 +1145,22 @@ InformalPROPDemand
 setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Naive2/ModelFit')
 
 #Size of line
-sizeline=3
-
+sizeline=10
+sizerel=7
 #Production
 Production<-ggplot(data=Comparing,aes(x=Decile,y=Production,colour=Sample))+geom_line(size=sizeline)+geom_point()
 Production<-Production+scale_colour_discrete(labels=c("Data","Model")  )
 Production<-Production+ theme_bw()
 Production<-Production+scale_x_continuous(breaks = seq(1,9,1))
 Production<-Production + theme(
-  plot.title = element_text(hjust=0.5,size = rel(2)),
-  axis.title=element_text(size = rel(2)),
-  axis.text.x=element_text(size = rel(2)),
-  axis.text.y=element_text(size = rel(2)),
-  legend.text=element_text(size = rel(2)),
+  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+  axis.title=element_text(size = rel(sizerel)),
+  axis.text.x=element_text(size = rel(sizerel)),
+  axis.text.y=element_text(size = rel(sizerel)),
+  legend.text=element_text(size = rel(sizerel)),
   legend.title=element_text(size=rel(0)))
 
-Production<-Production+ggtitle("Production") +ylab("Thousands of S/.")
+Production<-Production+ggtitle(" ") +ylab("Thousands of S/.")
 Production
 
 dev.set()
@@ -1157,14 +1178,14 @@ Taxes<-Taxes+scale_colour_discrete(labels=c("Data","Model")  )
 Taxes<-Taxes+ theme_bw()
 Taxes<-Taxes+scale_x_continuous(breaks = seq(1,9,1))
 Taxes<-Taxes + theme(
-  plot.title = element_text(hjust=0.5,size = rel(2)),
-  axis.title=element_text(size = rel(2)),
-  axis.text.x=element_text(size = rel(2)),
-  axis.text.y=element_text(size = rel(2)),
-  legend.text=element_text(size = rel(2)),
+  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+  axis.title=element_text(size = rel(sizerel)),
+  axis.text.x=element_text(size = rel(sizerel)),
+  axis.text.y=element_text(size = rel(sizerel)),
+  legend.text=element_text(size = rel(sizerel)),
   legend.title=element_text(size=rel(0)))
 
-Taxes<-Taxes+ggtitle("Taxes payed proportionally") +ylab("%")
+Taxes<-Taxes+ggtitle(" ") +ylab("%")
 Taxes
 
 dev.set()
@@ -1181,14 +1202,14 @@ DemandWorkers<-DemandWorkers+scale_colour_discrete(labels=c("Data","Model")  )
 DemandWorkers<-DemandWorkers+ theme_bw()
 DemandWorkers<-DemandWorkers+scale_x_continuous(breaks = seq(1,9,1))
 DemandWorkers<-DemandWorkers + theme(
-  plot.title = element_text(hjust=0.5,size = rel(2)),
-  axis.title=element_text(size = rel(2)),
-  axis.text.x=element_text(size = rel(2)),
-  axis.text.y=element_text(size = rel(2)),
-  legend.text=element_text(size = rel(2)),
+  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+  axis.title=element_text(size = rel(sizerel)),
+  axis.text.x=element_text(size = rel(sizerel)),
+  axis.text.y=element_text(size = rel(sizerel)),
+  legend.text=element_text(size = rel(sizerel)),
   legend.title=element_text(size=rel(0)))
 
-DemandWorkers<-DemandWorkers+ggtitle("Demand of workers") +ylab("#")
+DemandWorkers<-DemandWorkers+ggtitle(" ") +ylab("#")
 DemandWorkers
 
 dev.set()
@@ -1203,14 +1224,14 @@ IncomeDistribution<-IncomeDistribution+scale_colour_discrete(labels=c("Data","Mo
 IncomeDistribution<-IncomeDistribution+ theme_bw()
 IncomeDistribution<-IncomeDistribution+scale_x_continuous(breaks = seq(1,9,1))
 IncomeDistribution<-IncomeDistribution + theme(
-  plot.title = element_text(hjust=0.5,size = rel(2)),
-  axis.title=element_text(size = rel(2)),
-  axis.text.x=element_text(size = rel(2)),
-  axis.text.y=element_text(size = rel(2)),
-  legend.text=element_text(size = rel(2)),
+  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+  axis.title=element_text(size = rel(sizerel)),
+  axis.text.x=element_text(size = rel(sizerel)),
+  axis.text.y=element_text(size = rel(sizerel)),
+  legend.text=element_text(size = rel(sizerel)),
   legend.title=element_text(size=rel(0)))
 
-IncomeDistribution<-IncomeDistribution+ggtitle("Income Distribution") +ylab("#")
+IncomeDistribution<-IncomeDistribution+ggtitle(" ") +ylab("S/.")
 IncomeDistribution
 
 dev.set()
@@ -1224,14 +1245,14 @@ InformalLaborSupply<-InformalLaborSupply+scale_colour_discrete(labels=c("Data","
 InformalLaborSupply<-InformalLaborSupply+ theme_bw()
 InformalLaborSupply<-InformalLaborSupply+scale_x_continuous(breaks = seq(1,9,1))
 InformalLaborSupply<-InformalLaborSupply + theme(
-  plot.title = element_text(hjust=0.5,size = rel(2)),
-  axis.title=element_text(size = rel(2)),
-  axis.text.x=element_text(size = rel(2)),
-  axis.text.y=element_text(size = rel(2)),
-  legend.text=element_text(size = rel(2)),
+  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+  axis.title=element_text(size = rel(sizerel)),
+  axis.text.x=element_text(size = rel(sizerel)),
+  axis.text.y=element_text(size = rel(sizerel)),
+  legend.text=element_text(size = rel(sizerel)),
   legend.title=element_text(size=rel(0)))
 
-InformalLaborSupply<-InformalLaborSupply+ggtitle("Income Distribution") +ylab("#")
+InformalLaborSupply<-InformalLaborSupply+ggtitle(" ") +ylab("Proportion")
 InformalLaborSupply
 
 dev.set()
@@ -1240,20 +1261,20 @@ InformalLaborSupply
 dev.off()
 
 
-#TotalLaborSupply
+#TotalLaborSupply 1 
 TotalLaborSupply<-ggplot(data=Comparing,aes(x=Decile,y=TotalLaborSupply,colour=Sample))+geom_line(size=sizeline)+geom_point()
 TotalLaborSupply<-TotalLaborSupply+scale_colour_discrete(labels=c("Data","Model")  )
 TotalLaborSupply<-TotalLaborSupply+ theme_bw()
 TotalLaborSupply<-TotalLaborSupply+scale_x_continuous(breaks = seq(1,9,1))
 TotalLaborSupply<-TotalLaborSupply + theme(
-  plot.title = element_text(hjust=0.5,size = rel(2)),
-  axis.title=element_text(size = rel(2)),
-  axis.text.x=element_text(size = rel(2)),
-  axis.text.y=element_text(size = rel(2)),
-  legend.text=element_text(size = rel(2)),
+  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+  axis.title=element_text(size = rel(sizerel)),
+  axis.text.x=element_text(size = rel(sizerel)),
+  axis.text.y=element_text(size = rel(sizerel)),
+  legend.text=element_text(size = rel(sizerel)),
   legend.title=element_text(size=rel(0)))
 
-TotalLaborSupply<-TotalLaborSupply+ggtitle("Total labor supply") +ylab("#")
+TotalLaborSupply<-TotalLaborSupply+ggtitle(" ") +ylab("#")
 
 
 dev.set()
@@ -1262,20 +1283,43 @@ TotalLaborSupply
 dev.off()
 
 
+#TotalLaborSupply 2 
+TotalLaborSupply<-ggplot(data=Comparing,aes(x=Decile,y=TotalLaborSupply2,colour=Sample))+geom_line(size=sizeline)+geom_point()
+TotalLaborSupply<-TotalLaborSupply+scale_colour_discrete(labels=c("Data","Model")  )
+TotalLaborSupply<-TotalLaborSupply+ theme_bw()
+TotalLaborSupply<-TotalLaborSupply+scale_x_continuous(breaks = seq(1,9,1))
+TotalLaborSupply<-TotalLaborSupply + theme(
+  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+  axis.title=element_text(size = rel(sizerel)),
+  axis.text.x=element_text(size = rel(sizerel)),
+  axis.text.y=element_text(size = rel(sizerel)),
+  legend.text=element_text(size = rel(sizerel)),
+  legend.title=element_text(size=rel(0)))
+
+TotalLaborSupply<-TotalLaborSupply+ggtitle(" ") +ylab("#")
+
+
+dev.set()
+png(file="TotalLaborSupply2.png",width=1600,height=850)
+TotalLaborSupply
+dev.off()
+
+
+
 #Informal proportion demand
 InformalDemand<-ggplot(data=InformalPROPDemand,aes(x=Decile,y=V1,colour=Sample))+geom_line(size=sizeline)+geom_point()
 InformalDemand<-InformalDemand+scale_colour_discrete(labels=c("Data","Model")  )
 InformalDemand<-InformalDemand+ theme_bw()
 InformalDemand<-InformalDemand+scale_x_continuous(breaks = seq(1,9,1))
 InformalDemand<-InformalDemand + theme(
-  plot.title = element_text(hjust=0.5,size = rel(2)),
-  axis.title=element_text(size = rel(2)),
-  axis.text.x=element_text(size = rel(2)),
-  axis.text.y=element_text(size = rel(2)),
-  legend.text=element_text(size = rel(2)),
+  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+  axis.title=element_text(size = rel(sizerel)),
+  axis.text.x=element_text(size = rel(sizerel)),
+  axis.text.y=element_text(size = rel(sizerel)),
+  legend.text=element_text(size = rel(sizerel)),
   legend.title=element_text(size=rel(0)))
 
-InformalDemand<-InformalDemand+ggtitle("Informal labor demand") +ylab("#")
+InformalDemand<-InformalDemand+ggtitle(" ") +ylab("#")
 InformalDemand
 
 dev.set()
@@ -1298,16 +1342,16 @@ dev.off()
 #Plot relationship between moments and parameters#
 #------------------------------------------------#
 
-
+setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Naive2/ModelFit/ModelRelationships/ParametersAndEntrepreneurs')
 
 #1.Parameters and entrepreneurs
-ParamPropentrep<-data.table(Parameters,PropEntrepreneurs)
+ParamPropentrep<-data.table(Parameters[1:10175],PropEntrepreneurs)
 setnames(ParamPropentrep,15,"Entrepreneurs")
 
 #Graphs with regressions
 
 #1. Aalpha
-p<-ggplot(data=ParamPropentrep,aes(x=aalpha,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=aalpha,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="Aalpha.png",width=1600,height=850)
@@ -1316,7 +1360,7 @@ dev.off()
 
 
 #2. Ggamma
-p<-ggplot(data=ParamPropentrep,aes(x=ggamma,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=ggamma,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="Ggama.png",width=1600,height=850)
@@ -1324,7 +1368,7 @@ p
 dev.off()
 
 #3. Ddelta
-p<-ggplot(data=ParamPropentrep,aes(x=ddelta,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=ddelta,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="Ddelta.png",width=1600,height=850)
@@ -1333,7 +1377,7 @@ dev.off()
 
 
 #4. Bbeta
-p<-ggplot(data=ParamPropentrep,aes(x=bbeta,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=bbeta,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="bbeta.png",width=1600,height=850)
@@ -1343,7 +1387,7 @@ dev.off()
 
 
 #5. ssigma
-p<-ggplot(data=ParamPropentrep,aes(x=ssigma,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=ssigma,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="ssigma.png",width=1600,height=850)
@@ -1352,7 +1396,7 @@ dev.off()
 
 
 #6. kkappa
-p<-ggplot(data=ParamPropentrep,aes(x=kkappa,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=kkappa,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="kkappa.png",width=1600,height=850)
@@ -1360,7 +1404,7 @@ p
 dev.off()
 
 #7. psi
-p<-ggplot(data=ParamPropentrep,aes(x=psi,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=psi,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="psi.png",width=1600,height=850)
@@ -1369,7 +1413,7 @@ dev.off()
 
 
 #8. chi
-p<-ggplot(data=ParamPropentrep,aes(x=chi,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=chi,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="chi.png",width=1600,height=850)
@@ -1378,7 +1422,7 @@ dev.off()
 
 
 #9. rho
-p<-ggplot(data=ParamPropentrep,aes(x=rho,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=rho,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="rho.png",width=1600,height=850)
@@ -1387,7 +1431,7 @@ dev.off()
 
 
 #10. mmu1
-p<-ggplot(data=ParamPropentrep,aes(x=mmu1,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=mmu1,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="mmu1.png",width=1600,height=850)
@@ -1396,7 +1440,7 @@ dev.off()
 
 
 #11. mmu2
-p<-ggplot(data=ParamPropentrep,aes(x=mmu2,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=mmu2,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="mmu2.png",width=1600,height=850)
@@ -1405,7 +1449,7 @@ dev.off()
 
 
 #12. ssigma1
-p<-ggplot(data=ParamPropentrep,aes(x=ssigma1,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=ssigma1,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="ssigma1.png",width=1600,height=850)
@@ -1414,7 +1458,7 @@ dev.off()
 
 
 #13. ssigma2
-p<-ggplot(data=ParamPropentrep,aes(x=ssigma2,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=ssigma2,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="ssigma2.png",width=1600,height=850)
@@ -1423,7 +1467,7 @@ dev.off()
 
 
 #14. rho12
-p<-ggplot(data=ParamPropentrep,aes(x=rho12,y=Entrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=ParamPropentrep,aes(x=rho12,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="rho12.png",width=1600,height=850)
@@ -1434,10 +1478,10 @@ dev.off()
 
 
 
-lm( Entrepreneurs~ aalpha+bbeta+ddelta+ggamma+kkappa+ssigma+rho+ssigma1+ssigma2+rho12, ParamPropentrep)
+lm( PropEntrepreneurs~ aalpha+bbeta+ddelta+ggamma+kkappa+ssigma+rho+ssigma1+ssigma2+rho12, ParamPropentrep)
 
 
-mod <- lm(Entrepreneurs ~ aalpha + 
+mod <- lm(PropEntrepreneurs ~ aalpha + 
             ggamma +
             ddelta+
             bbeta+
@@ -1453,11 +1497,168 @@ mod <- lm(Entrepreneurs ~ aalpha +
             rho12
             ,ParamPropentrep)
 
-coef(summary(mod))
+write(print(coef(summary(mod))),file="Regression.txt")
 
-or
 
-coef(summary(mod))[, "Std. Error"]
+
+#2. Moments of informality. 
+
+
+setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Naive2/ModelFit/ModelRelationships/ParametersAndInformality')
+
+
+#Graphs with regressions
+
+#1. Aalpha
+p<-ggplot(data=EverythingEqDistance,aes(x=aalpha,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="Aalpha.png",width=1600,height=850)
+p
+dev.off()
+
+
+#2. Ggamma
+p<-ggplot(data=EverythingEqDistance,aes(x=ggamma,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="Ggama.png",width=1600,height=850)
+p
+dev.off()
+
+#3. Ddelta
+p<-ggplot(data=EverythingEqDistance,aes(x=ddelta,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="Ddelta.png",width=1600,height=850)
+p
+dev.off()
+
+
+#4. Bbeta
+p<-ggplot(data=EverythingEqDistance,aes(x=bbeta,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="bbeta.png",width=1600,height=850)
+p
+dev.off()
+
+
+
+#5. ssigma
+p<-ggplot(data=EverythingEqDistance,aes(x=ssigma,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="ssigma.png",width=1600,height=850)
+p
+dev.off()
+
+
+#6. kkappa
+p<-ggplot(data=EverythingEqDistance,aes(x=kkappa,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="kkappa.png",width=1600,height=850)
+p
+dev.off()
+
+#7. psi
+p<-ggplot(data=EverythingEqDistance,aes(x=psi,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="psi.png",width=1600,height=850)
+p
+dev.off()
+
+
+#8. chi
+p<-ggplot(data=EverythingEqDistance,aes(x=chi,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="chi.png",width=1600,height=850)
+p
+dev.off()
+
+
+#9. rho
+p<-ggplot(data=EverythingEqDistance,aes(x=rho,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="rho.png",width=1600,height=850)
+p
+dev.off()
+
+
+#10. mmu1
+p<-ggplot(data=EverythingEqDistance,aes(x=mmu1,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="mmu1.png",width=1600,height=850)
+p
+dev.off()
+
+
+#11. mmu2
+p<-ggplot(data=EverythingEqDistance,aes(x=mmu2,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="mmu2.png",width=1600,height=850)
+p
+dev.off()
+
+
+#12. ssigma1
+p<-ggplot(data=EverythingEqDistance,aes(x=ssigma1,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="ssigma1.png",width=1600,height=850)
+p
+dev.off()
+
+
+#13. ssigma2
+p<-ggplot(data=EverythingEqDistance,aes(x=ssigma2,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="ssigma2.png",width=1600,height=850)
+p
+dev.off()
+
+
+#14. rho12
+p<-ggplot(data=EverythingEqDistance,aes(x=rho12,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-p+geom_smooth(method="lm")
+dev.set()
+png(file="rho12.png",width=1600,height=850)
+p
+dev.off()
+
+
+
+
+
+lm( InformalDemandProportionV4~ aalpha+bbeta+ddelta+ggamma+kkappa+ssigma+rho+ssigma1+ssigma2+rho12, EverythingEqDistance)
+
+
+mod <- lm(InformalDemandProportionV4 ~ aalpha + 
+            ggamma +
+            ddelta+
+            bbeta+
+            ssigma+
+            kkappa+
+            psi+
+            chi+
+            rho+
+            mmu1+
+            mmu2+
+            ssigma1+
+            ssigma2+
+            rho12
+          ,EverythingEqDistance)
+
+write(print(coef(summary(mod))),file="Regression.txt")
+
+
 
 
 
