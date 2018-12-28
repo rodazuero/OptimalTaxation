@@ -535,6 +535,10 @@ Passed as it is to ExcessDemandTotal
 Passed to StandardizedExcessDemands. Here is the weird thing. It is passed to ExcessDemandFunctions
 
 
+#There is a problem with delta and gamma passing them. 
+
+#In tesla: in addition to modifying everything as in the normal one, it use necessary to change DistanceNonVectorized. 
+
 
 
 

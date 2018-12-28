@@ -33,17 +33,17 @@ setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxatio
 #install.packages('tidyverse',dependencies=TRUE)
 #install.packages('rlang',dependencies=TRUE)
 #devtools::install_github("r-lib/rlang", build_vignettes = TRUE)
-#library(nleqslv)
-#library(lattice)
-#library("gridExtra")
-#library("cowplot")
-#library(ggpubr)
-#library(ggplot2)
-#library(reshape)
-#library(grid)
+library(nleqslv)
+library(lattice)
+library("gridExtra")
+library("cowplot")
+library(ggpubr)
+library(ggplot2)
+library(reshape)
+library(grid)
 
-#library(data.table)
-#library(pastecs)
+library(data.table)
+library(pastecs)
 
 #----------------------#
 #Loading the files     #
@@ -55,13 +55,14 @@ Parameters<-read.csv("ParametersCSV.csv", header = F, sep=",")
 
 #Loading distance from theoretical to empirical moments
 DistanceMom<-read.csv("DistanceMoments.csv", header = F, sep=",")
-stat.desc(subset(DistanceMom[,1],DistanceMom[,1]!=5.71312e+01)) 
+#stat.desc(subset(DistanceMom[,1],DistanceMom[,1]!=5.71312e+01)) 
 
 colnames(DistanceMom)<-"Distance"
 
 #Loading equilibrium 
 EqValues<-read.csv("EquilibriumValue.csv", header = F, sep=",")
 EqValues<-EqValues[,1]
+
 
 #Loading the moments
 ProductionMoments<-read.csv("ThMoments0CSV.csv", header = F, sep=",")
@@ -146,7 +147,7 @@ Everything<-data.table(Parameters,DistanceMom,AllMmoments[1:10175])
 #-----------------------------------#
 
 
-Parameters<-data.table(Parameters,AllMmoments$Indic)
+Parameters<-data.table(Parameters,AllMmoments$Indic[1:10175])
 setnames(Parameters,16,"Indic")
 #For those where there is equilibrium, set Indic =1. 
 
@@ -1122,9 +1123,9 @@ TotalLaborSupply<-c(EverythingEqDistance$TotalLaborSupplyV1[i],
 
 
 
-Comparing$TotalLaborSupply <-  c(TotalLaborSupply,T19$horas[1:9]/T19$horas[5] )
+Comparing$TotalLaborSupply <-  c(TotalLaborSupply,MOMENTO19$`Version 2A`[1:9] )
 
-Comparing$TotalLaborSupply2<-c(TotalLaborSupply,T20$Participacion[1:9]/T20$Participacion[5] )
+Comparing$TotalLaborSupply2<-c(TotalLaborSupply,MOMENTO19$`Version 2A`[1:9])
 
 #8. Proportion of entrepreneurs
 PropEntrep<-data.table(c(EverythingEqDistance$PropEntrepreneurs[i],(M4[2,2]/(M4[2,1]+M4[2,2]))))
@@ -1142,7 +1143,7 @@ InformalPROPDemand
 #-----#
 
 #Set directory
-setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Naive2/ModelFit')
+setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Naive2/ModelFit')
 
 #Size of line
 sizeline=10

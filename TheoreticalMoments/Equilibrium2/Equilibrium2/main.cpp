@@ -219,7 +219,7 @@ long double PITM(double tthetaw, double wf, double lf){
 }
 
 //7. Final profits
-long double FinProfits(const double *Args, double paramvec[8]){
+long double FinProfits(const double *Args, double paramvec[9]){
     //vector<double> paramvec=*(vector<double>*)params;
     //Before, it was (const double *Args, void *params){
     
@@ -251,7 +251,7 @@ long double FinProfits(const double *Args, double paramvec[8]){
     
     //Evasion costs
     double infcost=pow(ni,1+ggamma)*(ddelta/(1+ggamma));
-    cout << ggamma << " ggamma "<< endl;
+    //cout << ggamma << " ggamma "<< endl;
     
     double ans=term1-taxes-infcost-evcost;
     
@@ -1072,8 +1072,8 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
     
     //double m2[] = {0.01, 0.003,  0.003,  0.01};
     double aalpha=DOthers[0];
-    double ddelta=DOthers[1];
-    double ggamma=DOthers[2];
+    double ggamma=DOthers[1];
+    double ddelta=DOthers[2];
     double bbeta=DOthers[3];
     double ssigma=DOthers[4];
     double kkappa=DOthers[5];
@@ -1267,7 +1267,8 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         //Wsol contains: ni, nf, z, prof
         
         //1. Production
-        ProductionTAXES[it]=Tthetae[it]*pow((0+WsolTAXES[0]+WsolTAXES[1]),aalpha);
+        ProductionTAXES[it]=production(WsolTAXES[0],  WsolTAXES[1],  aalpha,  Tthetae[it],0);
+
         
         //2. Taxes payed;
         TaxesPayed[it]=TcActual(WsolTAXES[2],WsolTAXES[0],WsolTAXES[1],aalpha,EntreprenVecPair[it].first,wi,wf,c);
@@ -1412,11 +1413,13 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         Wsol=profitsFinMaxim(InitProfdouble,  wi,wf,aalpha,ddelta, ggamma,bbeta,
                              ssigma, Tthetae[it],c);
         
+        cout << ddelta << " ddelta"<< endl;
+        cout << ggamma << " ggamma "<< endl;
+        
         //Wsol contains: ni, nf, z, prof
         
         //1. Production
-        Production[it]=production(Wsol[0], Wsol[1], aalpha, Tthetae[it],c);
-        //Tthetae[it]*pow((Wsol[0]+Wsol[1]),aalpha);
+        Production[it]=Tthetae[it]*pow((Wsol[0]+Wsol[1]),aalpha);
         
         //2. Taxes payed;
         TaxesAbsolute[it]=TcActual(Wsol[2],Wsol[0],Wsol[1],aalpha,Tthetae[it],wi,wf,c);
@@ -1766,14 +1769,14 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     
     //Writing the csv file of the moments
-    ThMoments0CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/ThMoments0CSV.csv", ios::out | ios::app);
-    ThMoments1CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/ThMoments1CSV.csv", ios::out | ios::app);
-    ThMoments2CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/ThMoments2CSV.csv", ios::out | ios::app);
-    ThMoments3CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/ThMoments3CSV.csv", ios::out | ios::app);
-    ThMoments4CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/ThMoments4CSV.csv", ios::out | ios::app);
-    ThMoments5CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/ThMoments5CSV.csv", ios::out | ios::app);
-    ThMoments6CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/ThMoments6CSV.csv", ios::out | ios::app);
-    ThMoments7CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/ThMoments7CSV.csv", ios::out | ios::app);
+    ThMoments0CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments0CSV.csv", ios::out | ios::app);
+    ThMoments1CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments1CSV.csv", ios::out | ios::app);
+    ThMoments2CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments2CSV.csv", ios::out | ios::app);
+    ThMoments3CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments3CSV.csv", ios::out | ios::app);
+    ThMoments4CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments4CSV.csv", ios::out | ios::app);
+    ThMoments5CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments5CSV.csv", ios::out | ios::app);
+    ThMoments6CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments6CSV.csv", ios::out | ios::app);
+    ThMoments7CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments7CSV.csv", ios::out | ios::app);
     for(int it=0; it<9; it++){
         ThMoments0CSV<<Theomoments[it][0] << " , " ;
         ThMoments1CSV<<Theomoments[it][1] << " , " ;
@@ -1825,10 +1828,10 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     
     
-    ParametersCSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/ParametersCSV.csv", ios::out | ios::app);
+    ParametersCSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ParametersCSV.csv", ios::out | ios::app);
     cout << " loading parameters in the csv file0"<< endl;
     //Printing the parameters
-    for(int it=0; it<14; it++){
+    for(int it=0; it<15; it++){
         cout <<Others[it] << "PARAAAAAAAAAAMAMAMA" << endl;
         ParametersCSV<<Others[it] << " , " ;
     }
@@ -2299,7 +2302,7 @@ int main(int argc, const char * argv[]) {
     cout << PITtestMarginal<< " PITtestMarginal "<< endl;
     
     //7. FinProfits
-    double Params[8]={};
+    double Params[9]={};
     
     Params[0]=wi;
     Params[1]=wf;
@@ -2309,6 +2312,7 @@ int main(int argc, const char * argv[]) {
     Params[5]=bbeta;
     Params[6]=ssigma;
     Params[7]=tthetae;
+    Params[8]=c;
     //int v=0;
     //void value = *(double *)Params;
     //void *p=&Params;
@@ -2424,7 +2428,7 @@ int main(int argc, const char * argv[]) {
     }
     //Defining the inputs
     vector<double> ParamsDecision;
-    ParamsDecision.resize(11);
+    ParamsDecision.resize(12);
     
     ParamsDecision[0]=wi;
     ParamsDecision[1]=wf;
@@ -2437,6 +2441,7 @@ int main(int argc, const char * argv[]) {
     ParamsDecision[8]=rrho;
     ParamsDecision[9]=psi;
     ParamsDecision[10]=chi;
+    ParamsDecision[11]=c;
     
     
     
@@ -2504,7 +2509,7 @@ int main(int argc, const char * argv[]) {
     
     //Define vector for excessDemandFunctions
     vector<double> ParamsDecisionExcessDemand;
-    ParamsDecisionExcessDemand.resize(14);
+    ParamsDecisionExcessDemand.resize(15);
     ParamsDecisionExcessDemand[0]=aalpha;
     ParamsDecisionExcessDemand[1]=ddelta;
     ParamsDecisionExcessDemand[2]=ggamma;
@@ -2519,14 +2524,15 @@ int main(int argc, const char * argv[]) {
     ParamsDecisionExcessDemand[11]=ssigma1;
     ParamsDecisionExcessDemand[12]=ssigma2;
     ParamsDecisionExcessDemand[13]=rho12;
+    ParamsDecisionExcessDemand[14]=c;
     
     
     
     
     
     
-    double Others[20];
-    for(int it=0;it<14;it++){
+    double Others[21];
+    for(int it=0;it<15;it++){
         Others[it]=ParamsDecisionExcessDemand[it];
     }
     
@@ -2716,7 +2722,7 @@ int main(int argc, const char * argv[]) {
     cout << " HEEEREEEEEE      "<< endl;
     
     //Loading the parameters first
-    double ParStandardDistance[13];
+    double ParStandardDistance[14];
     ParStandardDistance[0]=ggamma;
     ParStandardDistance[1]=ddelta;
     ParStandardDistance[2]=bbeta;
@@ -2730,6 +2736,7 @@ int main(int argc, const char * argv[]) {
     ParStandardDistance[10]=ssigma1;
     ParStandardDistance[11]=ssigma2;
     ParStandardDistance[12]=rho12;
+    ParStandardDistance[13]=c;
     
     //Loading additional parameters
     double AddPar[8];
@@ -2751,10 +2758,10 @@ int main(int argc, const char * argv[]) {
     //StandardizedDistanceEstimator(ParStandardDistance,  AddPar);
     
     //Running the minimizing distance estimator
-    arma::vec MinimizeDistanceParameters(13);
+    arma::vec MinimizeDistanceParameters(14);
     arma::vec AdditionalVAriables(8);
     
-    for(int it=0; it<13; it++){
+    for(int it=0; it<14; it++){
         MinimizeDistanceParameters[it]=ParStandardDistance[it];
     }
     
