@@ -130,20 +130,20 @@ long double TnActual(double nomina){
 
 //1.9. Production
 long double production(double ni, double nf, double aalpha, double tthetae,double c){
-    double prod=tthetae*pow((0+ni+nf),aalpha);
+    double prod=tthetae*pow((c+ni+nf),aalpha);
     return(prod);
 }
 
 //2. Pre-tax profits.Checked
 long double profm(double ni, double nf, double aalpha, double tthetae, double wi, double wf, double c){
-    double pi1=tthetae*pow((0+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
+    double pi1=tthetae*pow((c+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
     return(pi1);
     
 }
 
 //3. Corporate tax profits, marginal
 long double Tc(double z, double ni, double nf, double aalpha,double tthetae, double wi, double wf,double c){
-    double profm=tthetae*pow((0+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
+    double profm=tthetae*pow((c+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
     double arg=profm-z;
     double firsterm=-exp(-arg);
     //If negative profits, set zero marginal rate
@@ -158,11 +158,11 @@ long double Tc(double z, double ni, double nf, double aalpha,double tthetae, dou
 // For instance. 189=5000*12*0.315/100
 long double TcActual(double z, double ni, double nf, double aalpha, double tthetae, double wi, double wf,double c){
     
-    double profm=tthetae*pow((0+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
+    double profm=tthetae*pow((c+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
     double arg=profm-z;
     double ans=0;
     double tax=0;
-    double prod=tthetae*pow((0+ni+nf),aalpha);
+    double prod=tthetae*pow((c+ni+nf),aalpha);
     if(prod-z<=0){
         ans=0;
     }
@@ -252,7 +252,7 @@ long double FinProfits(const double *Args, double paramvec[9]){
     //Evasion costs
     double infcost=pow(ni,1+ggamma)*(ddelta/(1+ggamma));
     //cout << ggamma << " ggamma "<< endl;
-    
+    //cout << ggamma << " ggamma "<< endl;
     double ans=term1-taxes-infcost-evcost;
     
     return(ans);
@@ -1267,7 +1267,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         //Wsol contains: ni, nf, z, prof
         
         //1. Production
-        ProductionTAXES[it]=production(WsolTAXES[0],  WsolTAXES[1],  aalpha,  Tthetae[it],0);
+        ProductionTAXES[it]=production(WsolTAXES[0],  WsolTAXES[1],  aalpha,  Tthetae[it],c);
 
         
         //2. Taxes payed;
@@ -1419,7 +1419,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         //Wsol contains: ni, nf, z, prof
         
         //1. Production
-        Production[it]=Tthetae[it]*pow((Wsol[0]+Wsol[1]),aalpha);
+        Production[it]=Tthetae[it]*pow((c+Wsol[0]+Wsol[1]),aalpha);
         
         //2. Taxes payed;
         TaxesAbsolute[it]=TcActual(Wsol[2],Wsol[0],Wsol[1],aalpha,Tthetae[it],wi,wf,c);
