@@ -1166,7 +1166,7 @@ MOMENTO19$`Version 16B`<-H16.B$horas/H16.B$horas[5]
 
 
 
-G19<-ggplot(data=T19,aes(x=Percentil,y=`Version 1A`))+
+G19<-ggplot(data=MOMENTO19,aes(x=Percentil,y=`Version 1A`))+
   geom_line()+
   labs(x=expression(theta~w),y="Number of hours worked per week")+
   theme(axis.text=element_text(size=24),
