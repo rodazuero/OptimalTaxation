@@ -543,6 +543,21 @@ Passed to StandardizedExcessDemands. Here is the weird thing. It is passed to Ex
 #Need to fix the problem that NaN are spitted out when 0 informality. Esto es en Momentos3.csv. 
 
 
+
+#Rearranging everything to make it optimize the function properly. 
+Model2265 is taken as starting point. We also need to change the upper and lower bounds of the optimizers. 
+
+aalpha  ggamma  ddelta   bbeta  ssigma  kkappa     psi     chi     rho
+1: 0.152344 6.91592 647.371 324.761 8.34678 263.246 3.17603 691.115 3.10674
+       mmu1    mmu2 ssigma1 ssigma2    rho12        c NA Distance V2 ProductionV1
+1: 0.510156 4.01797 1.60879 4.23574 0.141992. 
+
+Also, modifying the parameters to make it the minimizer with alpha included if we want. MinimizeDistancePArameters contained 14 elements. It should now contain 15 elements. 
+
+Change: 
+StandardizedDistanceEstimator now Parameters is a 15 elements. 15th is alpha.
+MinimizingDistance:  parameters also 15th should be alpha.  
+
 #Running code:
 g++ mainTesla.cpp -std=gnu++0x -I/usr/include/c++/3.4.6/backward/  -I/usr/lib64/R/library/BH/include/  -I/home/razu/install/include/ -I/usr/lib64/R/library/RcppArmadillo/include/ -I/home/razu/boost_1_61_0/ -L/home/razu/install/lib/ -lnlopt   -fopenmp -Wall   -lgsl -lgslcblas  -o main
 

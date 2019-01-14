@@ -1416,8 +1416,10 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         cout << Wsol[0]+Wsol[1] << " Wsol[0]+Wsol[1] "<< endl;
         
         //4. Proportioninformaldemanded
-        PropInformalDemanded[it]=Wsol[0]/(max(WorkersTotalDemanded[it],0.001))
-        cout << Wsol[0]/WorkersTotalDemanded[it] << "Wsol[0]/WorkersTotalDemanded[it]  "<< endl;
+        PropInformalDemanded[it]=Wsol[0]/(max(WorkersTotalDemanded[it],0.001));
+        cout << Wsol[0] << " Wsol[0]"<< endl;
+        cout << max(WorkersTotalDemanded[it],0.001) << " max(WorkersTotalDemanded[it],0.001) hereeeeeeeeeeeeee"<< endl;
+        cout << PropInformalDemanded[it] << "Wsol[0]/(max(WorkersTotalDemanded[it],0.001))  "<< endl;
         
         
     }
@@ -1835,9 +1837,10 @@ double StandardizedDistanceEstimator(const double *Parameters, double Additional
     double ssigma2=Parameters[11];
     double rho12=Parameters[12];
     double c=Parameters[13];
+    double aalpha=Parameters[14];
     
     //Now loading the remaining of the variables necessary for the analysis
-    double aalpha=AdditionalVars[0];
+    //double aalpha=AdditionalVars[0]; Changed to be optimized as well.
     
     //Wages
     arma::vec WagesVector=arma::zeros(2);
@@ -1930,9 +1933,10 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     double ssigma2=Parameters[11];
     double rho12=Parameters[12];
     double c=Parameters[13];
+    double aalpha=Parameters[14];
     
     //We also need to translate it to a double to use the minimizer
-    double ParamDoubles[14];
+    double ParamDoubles[15];
     ParamDoubles[0]=ggamma;
     ParamDoubles[1]=ddelta;
     ParamDoubles[2]=bbeta;
@@ -1947,9 +1951,10 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     ParamDoubles[11]=ssigma2;
     ParamDoubles[12]=rho12;
     ParamDoubles[13]=c;
+    ParamDoubles[14]=aalpha;
     
     //Establishing upper bounds
-    double ubParameters[13];
+    double ubParameters[15];
     ubParameters[0]=5;
     ubParameters[1]=5;
     ubParameters[2]=5;
@@ -1964,9 +1969,10 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     ubParameters[11]=5;
     ubParameters[12]=5;
     ubParameters[13]=5;
+    ubParameters[14]=1;
     
     //Establishing the lower bounds
-    double lbParameters[13];
+    double lbParameters[15];
     lbParameters[0]=0.01;
     lbParameters[1]=0.01;
     lbParameters[2]=0.01;
@@ -1981,6 +1987,7 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     lbParameters[11]=0.01;
     lbParameters[12]=0.01;
     lbParameters[13]=0.01;
+    lbParameters[14]=0.01;
     
     //Putting the Other parameters in the double format
     double doubAdditionalPar[9];
@@ -1998,7 +2005,7 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     
     //Start creating the optimizer object
     nlopt_opt MinDistance;
-    MinDistance = nlopt_create(NLOPT_LN_NELDERMEAD, 14);
+    MinDistance = nlopt_create(NLOPT_LN_NELDERMEAD, 15);
     
     nlopt_set_lower_bounds(MinDistance, lbParameters);
     nlopt_set_upper_bounds(MinDistance, ubParameters);
@@ -2781,12 +2788,13 @@ int main(int argc, const char * argv[]) {
     //StandardizedDistanceEstimator(ParStandardDistance,  AddPar);
     
     //Running the minimizing distance estimator
-    arma::vec MinimizeDistanceParameters(14);
+    arma::vec MinimizeDistanceParameters(15);
     arma::vec AdditionalVAriables(8);
     
     for(int it=0; it<14; it++){
         MinimizeDistanceParameters[it]=ParStandardDistance[it];
     }
+    MinimizeDistanceParameters[14]=aalpha;
     
     for(int it=0; it<8; it++){
         AdditionalVAriables[it]=AddPar[it];
@@ -2799,13 +2807,13 @@ int main(int argc, const char * argv[]) {
     cout << " minimizing the distance!!!!!!!!! finally"<< endl;
     cout << " minimizing the distance!!!!!!!!! finally"<< endl;
     
-    MinimizingDistance(MinimizeDistanceParameters,AdditionalVAriables);
+    //MinimizingDistance(MinimizeDistanceParameters,AdditionalVAriables);
     
     
     
     
     
-    WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
+    //WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
     
     cout << WagesEquilibrium[0] << " WagesEquilibrium[0]"<< endl;
     cout << WagesEquilibrium[1] << " WagesEquilibrium[1]"<< endl;

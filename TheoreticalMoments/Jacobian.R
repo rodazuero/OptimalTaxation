@@ -1004,7 +1004,7 @@ Comparing<-data.table(as.factor(c(rep(1,9),rep(0,9))))
 colnames(Comparing)<-c("Sample")
 Comparing$Decile<-c(seq(1,9,1),seq(1,9,1))
 
-for(i in 2221:2321){
+for(i in 2265:2265){
   #Deciding which observation to be analyzed
   #i=1
 
