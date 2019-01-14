@@ -21,11 +21,10 @@ rm(list=ls(all=TRUE))
 
 
 #Obtaining the empirical moments#
-source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/EmpiricalMoments/Momentos.R')
+source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/EmpiricalMoments/Momentos.R')
 
 
-
-setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Naive2/')
+setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15_Initial')
 
 
 
@@ -97,7 +96,8 @@ PropEntrepreneurs<-PropEntrepreneurs[,1]
 
 
 
-
+#EquilibriumValues has 1046. Take one less\
+EqValues<-EqValues[1:10465]
 
 AllMmoments<-data.table(ProductionMoments,Taxesproportionally,
                         TotalWorkersDemanded,InformalDemandProportion,
@@ -119,20 +119,45 @@ AllMmoments[,Indic3 :=1-(ProductionV1+ProductionV2+ProductionV3
                         +ProductionV4+ ProductionV5 + ProductionV6+
                           ProductionV7+ProductionV8+ProductionV9==0)]
 
+#4. If total taxes are zero:
+AllMmoments[,Indic4:=1-(TaxesproportionallyV1+TaxesproportionallyV2+TaxesproportionallyV3
+                        +TaxesproportionallyV4+TaxesproportionallyV5+TaxesproportionallyV6
+                        +TaxesproportionallyV7+TaxesproportionallyV8+TaxesproportionallyV9==0)]
+
+#5. If total labor demand is zero:
+AllMmoments[,Indic5:=1-(TotalWorkersDemandedV1+TotalWorkersDemandedV2+TotalWorkersDemandedV3
+                        +TotalWorkersDemandedV4+TotalWorkersDemandedV5+TotalWorkersDemandedV6
+                        +TotalWorkersDemandedV7+TotalWorkersDemandedV8+TotalWorkersDemandedV9==0)]
+
+#6. Replace informal proportion demand if -nan to zero. 
+AllMmoments[is.na(InformalDemandProportionV1), InformalDemandProportionV1 := 0]
+AllMmoments[is.na(InformalDemandProportionV2), InformalDemandProportionV2 := 0]
+AllMmoments[is.na(InformalDemandProportionV3), InformalDemandProportionV3 := 0]
+AllMmoments[is.na(InformalDemandProportionV4), InformalDemandProportionV4 := 0]
+AllMmoments[is.na(InformalDemandProportionV5), InformalDemandProportionV5 := 0]
+AllMmoments[is.na(InformalDemandProportionV6), InformalDemandProportionV6 := 0]
+AllMmoments[is.na(InformalDemandProportionV7), InformalDemandProportionV7 := 0]
+AllMmoments[is.na(InformalDemandProportionV8), InformalDemandProportionV8 := 0]
+AllMmoments[is.na(InformalDemandProportionV9), InformalDemandProportionV9 := 0]
+
 
 #4. Total
-AllMmoments[,Indic :=1-1*(Indic1==0|Indic2==0|Indic3==0)]
+AllMmoments[,Indic :=1-1*(Indic1==0|Indic2==0|Indic3==0|Indic4==0|Indic5==0)]
 
-#5. And remove Indic1, Indic2, Indic3
+#5. And remove Indics
 AllMmoments[,Indic1:=NULL]
 AllMmoments[,Indic2:=NULL]
 AllMmoments[,Indic3:=NULL]
+AllMmoments[,Indic4:=NULL]
+AllMmoments[,Indic5:=NULL]
 
+
+##Names modified to have C, the constant in the production function as additional parameter
 names<-c("aalpha","ggamma","ddelta","bbeta","ssigma","kkappa","psi","chi",
-         "rho","mmu1","mmu2","ssigma1","ssigma2","rho12","NA")
+         "rho","mmu1","mmu2","ssigma1","ssigma2","rho12","c","NA")
 colnames(Parameters)<-names
 
-Everything<-data.table(Parameters,DistanceMom,AllMmoments[1:10175])
+Everything<-data.table(Parameters,DistanceMom,AllMmoments)
 
 #----------------------------------------------------------------------#
 #We only take those where positive number of entrepreneurs where found #
@@ -147,8 +172,8 @@ Everything<-data.table(Parameters,DistanceMom,AllMmoments[1:10175])
 #-----------------------------------#
 
 
-Parameters<-data.table(Parameters,AllMmoments$Indic[1:10175])
-setnames(Parameters,16,"Indic")
+Parameters<-data.table(Parameters,AllMmoments$Indic)
+setnames(Parameters,17,"Indic")
 #For those where there is equilibrium, set Indic =1. 
 
 #Subsetting the two 
@@ -872,24 +897,23 @@ ggarrange(gtN, gt)
 dev.off()
 
 
-#15. chi/mean(tthetaw)
-
-Parameters$chithe=Parameters$chi/(Parameters$mmu1+0.5*Parameters$chi)
-ParametersEquilibria$chithe=ParametersEquilibria$chi/(ParametersEquilibria$mmu1+0.5*ParametersEquilibria$chi)
-ParametersNoEquilibria$chithe=ParametersNoEquilibria$chi/(ParametersNoEquilibria$mmu1+0.5*ParametersNoEquilibria$chi)
 
 
+
+
+#14.2 c
+#1.1 Equilibrium
 
 
 #Extra text
-Desc<-stat.desc(ParametersEquilibria$chithe)
+Desc<-stat.desc(ParametersEquilibria$c)
 Desc<-data.frame(as.list(Desc))
 Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
 
 
 
 #Plot
-m <- ggplot(ParametersEquilibria, aes(x = chithe))
+m <- ggplot(ParametersEquilibria, aes(x = c))
 m<-m + geom_histogram(binwidth = 0.02) 
 m<-m+labs(title="Equilibria")
 m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-1.5,ymax=-0.5)
@@ -903,14 +927,14 @@ grid.draw(gt)
 
 
 #Extra text
-Desc<-stat.desc(ParametersNoEquilibria$chithe)
+Desc<-stat.desc(ParametersNoEquilibria$c)
 Desc<-data.frame(as.list(Desc))
 Extratext<-paste("Min:",round(Desc$min,3), "Max:",round(Desc$ma,3),"Mean:",round(Desc$mean,3))
 
 
 
 #Plot
-m <- ggplot(ParametersNoEquilibria, aes(x = chithe))
+m <- ggplot(ParametersNoEquilibria, aes(x = c))
 m<-m + geom_histogram(binwidth = 0.02) 
 m<-m+labs(title="No Equilibria")
 m<-m+annotation_custom(grob=textGrob(Extratext,gp = gpar(fontsize = 8)),xmin=0,xmax=10,ymin=-15,ymax=-10)
@@ -922,16 +946,18 @@ grid.draw(gtN)
 
 
 dev.set()
-png(file="Figures/chithe.png",width=398,height=389)
+png(file="Figures/c.png",width=398,height=389)
 ggarrange(gtN, gt)
 dev.off()
+
+
 
 
 
 #Probit model to analyze the relationship between parameters and equilibria
 
 
-mod<-lm( Indic~ aalpha+ggamma+ddelta+bbeta+ssigma+kkappa+psi+chi+rho+mmu1+mmu2+ssigma1+ssigma2+rho12, Parameters)
+mod<-lm( Indic~ aalpha+ggamma+ddelta+bbeta+ssigma+kkappa+psi+chi+rho+mmu1+mmu2+ssigma1+ssigma2+rho12+c, Parameters)
 
 
 
@@ -947,8 +973,7 @@ sink()
 #Conclusion after the analysis:
 #------------------------------#
 
-#1. Decrease the values of ddelta. Have it between 0 and 200. 
-#2. Decrease chi. Between 0 and 30. 
+#1. 
 
 
 #----------------------#
@@ -979,365 +1004,375 @@ Comparing<-data.table(as.factor(c(rep(1,9),rep(0,9))))
 colnames(Comparing)<-c("Sample")
 Comparing$Decile<-c(seq(1,9,1),seq(1,9,1))
 
-
-#Deciding which observation to be analyzed
-i=1
-
-#Including the theoretical and empirical moments
-
-#I will do a subsample of sobols for which entrepreneurs where relevant:
-#And store the original EverythingEqDistance in other stuff
-
-#Only run it once to keep it!:
-
-#EverythingEqDistanceOriginal<-EverythingEqDistance
-#If you want to subset the equilibria analyzed this is the place to do it. 
-#Otherwise, just keep going. 
-
-#And the rest:
-#EverythingEqDistanceEntrep<-subset(EverythingEqDistanceOriginal,PropEntrepreneurs>0.19)
-#max(EverythingEqDistanceEntrep$InformalDemandProportionV4)
-#EverythingEqDistanceEntrep$InformalDemandProportionV5[i]
-#EverythingEqDistance<-EverythingEqDistanceEntrep
-
-
-
-#1. Production
-
-
-
-ProductionTheoretical<-c(EverythingEqDistance$ProductionV1[i],
-              EverythingEqDistance$ProductionV2[i],
-              EverythingEqDistance$ProductionV3[i],
-              EverythingEqDistance$ProductionV4[i],
-              EverythingEqDistance$ProductionV5[i],
-              EverythingEqDistance$ProductionV6[i],
-              EverythingEqDistance$ProductionV7[i],
-              EverythingEqDistance$ProductionV8[i],
-              EverythingEqDistance$ProductionV9[i])
-
-
-Comparing$Production <-  c(ProductionTheoretical/1000, MOMENTO7A$Produccion[1:9])
-
-
-#2. Taxes Proportionally cumulative
-
-
-
-Taxesproportionally<-c(EverythingEqDistance$TaxesproportionallyV1[i],
-                         EverythingEqDistance$TaxesproportionallyV2[i],
-                         EverythingEqDistance$TaxesproportionallyV3[i],
-                         EverythingEqDistance$TaxesproportionallyV4[i],
-                         EverythingEqDistance$TaxesproportionallyV5[i],
-                         EverythingEqDistance$TaxesproportionallyV6[i],
-                         EverythingEqDistance$TaxesproportionallyV7[i],
-                         EverythingEqDistance$TaxesproportionallyV8[i],
-                         EverythingEqDistance$TaxesproportionallyV9[i])
-
-
-Comparing$TaxesPayedProportionally <-  c(Taxesproportionally, MOMENTO7A$`Proporción de pago de impuestos acumulada`[1:9]/sum(MOMENTO7A$`Proporción de pago de impuestos acumulada`[1:9]))
-
-
-#3. Total workers demanded
-
-DemandTotalWorkers<-c(EverythingEqDistance$TotalWorkersDemandedV1[i],
-                       EverythingEqDistance$TotalWorkersDemandedV2[i],
-                       EverythingEqDistance$TotalWorkersDemandedV3[i],
-                       EverythingEqDistance$TotalWorkersDemandedV4[i],
-                       EverythingEqDistance$TotalWorkersDemandedV5[i],
-                       EverythingEqDistance$TotalWorkersDemandedV6[i],
-                       EverythingEqDistance$TotalWorkersDemandedV7[i],
-                       EverythingEqDistance$TotalWorkersDemandedV8[i],
-                       EverythingEqDistance$TotalWorkersDemandedV9[i])
-
-
-Comparing$TotalDemandWorkers <-  c(DemandTotalWorkers,MOMENTO2$`Numero de trabajadores`[1:9] )
-
-
-
-
-#4. Informal Demand proportion
-InformalDemandProportion<-c(EverythingEqDistance$InformalDemandProportionV4[i],
-                            EverythingEqDistance$InformalDemandProportionV7[i],
-                            EverythingEqDistance$InformalDemandProportionV8[i])
-
-InformalPROPDemand <- data.table(c(MOMENTO3$Informalidad[1]/100,MOMENTO3$Informalidad[2]/100,MOMENTO3$Informalidad[3]/100,
-                                   InformalDemandProportion))
-
-InformalPROPDemand$Decile<-c(4,7,8,4,7,8)
-InformalPROPDemand$Sample<-as.factor(c(0,0,0,1,1,1))
-
-
-
-#5. Income distribution
-
-
-Income<-c(EverythingEqDistance$IncomeDistributionV1[i],
-          EverythingEqDistance$IncomeDistributionV2[i],
-          EverythingEqDistance$IncomeDistributionV3[i],
-          EverythingEqDistance$IncomeDistributionV4[i],
-          EverythingEqDistance$IncomeDistributionV5[i],
-          EverythingEqDistance$IncomeDistributionV6[i],
-          EverythingEqDistance$IncomeDistributionV7[i],
-          EverythingEqDistance$IncomeDistributionV8[i],
-          EverythingEqDistance$IncomeDistributionV9[i])
-
-
-
-Comparing$IncomeDistribution <-  c(Income,as.numeric(M5.3A[4:12,2]) )
-
-
-#6. Informal labor supply
-
-
-InformalLaborSupply<-c(EverythingEqDistance$InformalLaborSupplyPropV1[i],
-          EverythingEqDistance$InformalLaborSupplyPropV2[i],
-          EverythingEqDistance$InformalLaborSupplyPropV3[i],
-          EverythingEqDistance$InformalLaborSupplyPropV4[i],
-          EverythingEqDistance$InformalLaborSupplyPropV5[i],
-          EverythingEqDistance$InformalLaborSupplyPropV6[i],
-          EverythingEqDistance$InformalLaborSupplyPropV7[i],
-          EverythingEqDistance$InformalLaborSupplyPropV8[i],
-          EverythingEqDistance$InformalLaborSupplyPropV9[i])
-
-
-
-Comparing$InformalLaborSupply <-  c(InformalLaborSupply,MOMENTO8$`Informalidad (%)`[1:9]/100 )
-
-
-
-
-
-#7. Total labor supply
-
-
-TotalLaborSupply<-c(EverythingEqDistance$TotalLaborSupplyV1[i],
-                       EverythingEqDistance$TotalLaborSupplyV2[i],
-                       EverythingEqDistance$TotalLaborSupplyV3[i],
-                       EverythingEqDistance$TotalLaborSupplyV4[i],
-                       EverythingEqDistance$TotalLaborSupplyV5[i],
-                       EverythingEqDistance$TotalLaborSupplyV6[i],
-                       EverythingEqDistance$TotalLaborSupplyV7[i],
-                       EverythingEqDistance$TotalLaborSupplyV8[i],
-                       EverythingEqDistance$TotalLaborSupplyV9[i])
-
-
-
-Comparing$TotalLaborSupply <-  c(TotalLaborSupply,MOMENTO19$`Version 2A`[1:9] )
-
-Comparing$TotalLaborSupply2<-c(TotalLaborSupply,MOMENTO19$`Version 2A`[1:9])
-
-#8. Proportion of entrepreneurs
-PropEntrep<-data.table(c(EverythingEqDistance$PropEntrepreneurs[i],(M4[2,2]/(M4[2,1]+M4[2,2]))))
-PropEntrep$Sample<-c(as.factor(c(0,1)))
-print(PropEntrep)
-InformalPROPDemand
-
-
-#Subsetting the ones where entrepreneurs are more than 25%:
-
-
-
-#-----#
-#Plots#
-#-----#
-
-#Set directory
-setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Naive2/ModelFit')
-
-#Size of line
-sizeline=10
-sizerel=7
-#Production
-Production<-ggplot(data=Comparing,aes(x=Decile,y=Production,colour=Sample))+geom_line(size=sizeline)+geom_point()
-Production<-Production+scale_colour_discrete(labels=c("Data","Model")  )
-Production<-Production+ theme_bw()
-Production<-Production+scale_x_continuous(breaks = seq(1,9,1))
-Production<-Production + theme(
-  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
-  axis.title=element_text(size = rel(sizerel)),
-  axis.text.x=element_text(size = rel(sizerel)),
-  axis.text.y=element_text(size = rel(sizerel)),
-  legend.text=element_text(size = rel(sizerel)),
-  legend.title=element_text(size=rel(0)))
-
-Production<-Production+ggtitle(" ") +ylab("Thousands of S/.")
-Production
-
-dev.set()
-png(file="Production.png",width=1600,height=850)
-Production
-dev.off()
-
-
-
-
-
-#Taxes
-Taxes<-ggplot(data=Comparing,aes(x=Decile,y=TaxesPayedProportionally,colour=Sample))+geom_line(size=sizeline)+geom_point()
-Taxes<-Taxes+scale_colour_discrete(labels=c("Data","Model")  )
-Taxes<-Taxes+ theme_bw()
-Taxes<-Taxes+scale_x_continuous(breaks = seq(1,9,1))
-Taxes<-Taxes + theme(
-  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
-  axis.title=element_text(size = rel(sizerel)),
-  axis.text.x=element_text(size = rel(sizerel)),
-  axis.text.y=element_text(size = rel(sizerel)),
-  legend.text=element_text(size = rel(sizerel)),
-  legend.title=element_text(size=rel(0)))
-
-Taxes<-Taxes+ggtitle(" ") +ylab("%")
-Taxes
-
-dev.set()
-png(file="Taxes.png",width=1600,height=850)
-Taxes
-dev.off()
-
-
-#Total demand workers
-
-#DemandWorkers
-DemandWorkers<-ggplot(data=Comparing,aes(x=Decile,y=TotalDemandWorkers,colour=Sample))+geom_line(size=sizeline)+geom_point()
-DemandWorkers<-DemandWorkers+scale_colour_discrete(labels=c("Data","Model")  )
-DemandWorkers<-DemandWorkers+ theme_bw()
-DemandWorkers<-DemandWorkers+scale_x_continuous(breaks = seq(1,9,1))
-DemandWorkers<-DemandWorkers + theme(
-  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
-  axis.title=element_text(size = rel(sizerel)),
-  axis.text.x=element_text(size = rel(sizerel)),
-  axis.text.y=element_text(size = rel(sizerel)),
-  legend.text=element_text(size = rel(sizerel)),
-  legend.title=element_text(size=rel(0)))
-
-DemandWorkers<-DemandWorkers+ggtitle(" ") +ylab("#")
-DemandWorkers
-
-dev.set()
-png(file="DemandWorkers.png",width=1600,height=850)
-DemandWorkers
-dev.off()
-
-
-#IncomeDistribution
-IncomeDistribution<-ggplot(data=Comparing,aes(x=Decile,y=IncomeDistribution,colour=Sample))+geom_line(size=sizeline)+geom_point()
-IncomeDistribution<-IncomeDistribution+scale_colour_discrete(labels=c("Data","Model")  )
-IncomeDistribution<-IncomeDistribution+ theme_bw()
-IncomeDistribution<-IncomeDistribution+scale_x_continuous(breaks = seq(1,9,1))
-IncomeDistribution<-IncomeDistribution + theme(
-  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
-  axis.title=element_text(size = rel(sizerel)),
-  axis.text.x=element_text(size = rel(sizerel)),
-  axis.text.y=element_text(size = rel(sizerel)),
-  legend.text=element_text(size = rel(sizerel)),
-  legend.title=element_text(size=rel(0)))
-
-IncomeDistribution<-IncomeDistribution+ggtitle(" ") +ylab("S/.")
-IncomeDistribution
-
-dev.set()
-png(file="IncomeDistribution.png",width=1600,height=850)
-IncomeDistribution
-dev.off()
-
-#InformalLaborSupply
-InformalLaborSupply<-ggplot(data=Comparing,aes(x=Decile,y=InformalLaborSupply,colour=Sample))+geom_line(size=sizeline)+geom_point()
-InformalLaborSupply<-InformalLaborSupply+scale_colour_discrete(labels=c("Data","Model")  )
-InformalLaborSupply<-InformalLaborSupply+ theme_bw()
-InformalLaborSupply<-InformalLaborSupply+scale_x_continuous(breaks = seq(1,9,1))
-InformalLaborSupply<-InformalLaborSupply + theme(
-  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
-  axis.title=element_text(size = rel(sizerel)),
-  axis.text.x=element_text(size = rel(sizerel)),
-  axis.text.y=element_text(size = rel(sizerel)),
-  legend.text=element_text(size = rel(sizerel)),
-  legend.title=element_text(size=rel(0)))
-
-InformalLaborSupply<-InformalLaborSupply+ggtitle(" ") +ylab("Proportion")
-InformalLaborSupply
-
-dev.set()
-png(file="InformalLaborSupply.png",width=1600,height=850)
-InformalLaborSupply
-dev.off()
-
-
-#TotalLaborSupply 1 
-TotalLaborSupply<-ggplot(data=Comparing,aes(x=Decile,y=TotalLaborSupply,colour=Sample))+geom_line(size=sizeline)+geom_point()
-TotalLaborSupply<-TotalLaborSupply+scale_colour_discrete(labels=c("Data","Model")  )
-TotalLaborSupply<-TotalLaborSupply+ theme_bw()
-TotalLaborSupply<-TotalLaborSupply+scale_x_continuous(breaks = seq(1,9,1))
-TotalLaborSupply<-TotalLaborSupply + theme(
-  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
-  axis.title=element_text(size = rel(sizerel)),
-  axis.text.x=element_text(size = rel(sizerel)),
-  axis.text.y=element_text(size = rel(sizerel)),
-  legend.text=element_text(size = rel(sizerel)),
-  legend.title=element_text(size=rel(0)))
-
-TotalLaborSupply<-TotalLaborSupply+ggtitle(" ") +ylab("#")
-
-
-dev.set()
-png(file="TotalLaborSupply.png",width=1600,height=850)
-TotalLaborSupply
-dev.off()
-
-
-#TotalLaborSupply 2 
-TotalLaborSupply<-ggplot(data=Comparing,aes(x=Decile,y=TotalLaborSupply2,colour=Sample))+geom_line(size=sizeline)+geom_point()
-TotalLaborSupply<-TotalLaborSupply+scale_colour_discrete(labels=c("Data","Model")  )
-TotalLaborSupply<-TotalLaborSupply+ theme_bw()
-TotalLaborSupply<-TotalLaborSupply+scale_x_continuous(breaks = seq(1,9,1))
-TotalLaborSupply<-TotalLaborSupply + theme(
-  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
-  axis.title=element_text(size = rel(sizerel)),
-  axis.text.x=element_text(size = rel(sizerel)),
-  axis.text.y=element_text(size = rel(sizerel)),
-  legend.text=element_text(size = rel(sizerel)),
-  legend.title=element_text(size=rel(0)))
-
-TotalLaborSupply<-TotalLaborSupply+ggtitle(" ") +ylab("#")
-
-
-dev.set()
-png(file="TotalLaborSupply2.png",width=1600,height=850)
-TotalLaborSupply
-dev.off()
-
-
-
-#Informal proportion demand
-InformalDemand<-ggplot(data=InformalPROPDemand,aes(x=Decile,y=V1,colour=Sample))+geom_line(size=sizeline)+geom_point()
-InformalDemand<-InformalDemand+scale_colour_discrete(labels=c("Data","Model")  )
-InformalDemand<-InformalDemand+ theme_bw()
-InformalDemand<-InformalDemand+scale_x_continuous(breaks = seq(1,9,1))
-InformalDemand<-InformalDemand + theme(
-  plot.title = element_text(hjust=0.5,size = rel(sizerel)),
-  axis.title=element_text(size = rel(sizerel)),
-  axis.text.x=element_text(size = rel(sizerel)),
-  axis.text.y=element_text(size = rel(sizerel)),
-  legend.text=element_text(size = rel(sizerel)),
-  legend.title=element_text(size=rel(0)))
-
-InformalDemand<-InformalDemand+ggtitle(" ") +ylab("#")
-InformalDemand
-
-dev.set()
-png(file="InformalLaborDemand.png",width=1600,height=850)
-InformalDemand
-dev.off()
-
-#Proportion of entrepreneurs
-PropEntrep$Sample<-c("Model","Data")
-PropEntrepGraph<-ggplot(data=PropEntrep,aes(y=V1,x=Sample))+geom_bar(stat="identity")
-PropEntrepGraph<-PropEntrepGraph+ggtitle("Proportion entrepreneurs") +ylab("%")
-dev.set()
-png(file="PropEntrepGraph.png",width=1600,height=850)
-PropEntrepGraph
-dev.off()
-
-
+for(i in 2221:2321){
+  #Deciding which observation to be analyzed
+  #i=1
+
+  
+  Folder=paste('Model',i, sep = "")
+  cd="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15_Initial/ModelFit/"
+  setwd(cd)
+  newcd=paste(cd,Folder,sep="")
+  dir.create(Folder)
+  setwd(newcd)
+  
+  #Including the theoretical and empirical moments
+  
+  #I will do a subsample of sobols for which entrepreneurs where relevant:
+  #And store the original EverythingEqDistance in other stuff
+  
+  #Only run it once to keep it!:
+  
+  #EverythingEqDistanceOriginal<-EverythingEqDistance
+  #If you want to subset the equilibria analyzed this is the place to do it. 
+  #Otherwise, just keep going. 
+  
+  #And the rest:
+  #EverythingEqDistanceEntrep<-subset(EverythingEqDistanceOriginal,PropEntrepreneurs>0.19)
+  #max(EverythingEqDistanceEntrep$InformalDemandProportionV4)
+  #EverythingEqDistanceEntrep$InformalDemandProportionV5[i]
+  #EverythingEqDistance<-EverythingEqDistanceEntrep
+  
+  
+  
+  #1. Production
+  
+  
+  
+  ProductionTheoretical<-c(EverythingEqDistance$ProductionV1[i],
+                EverythingEqDistance$ProductionV2[i],
+                EverythingEqDistance$ProductionV3[i],
+                EverythingEqDistance$ProductionV4[i],
+                EverythingEqDistance$ProductionV5[i],
+                EverythingEqDistance$ProductionV6[i],
+                EverythingEqDistance$ProductionV7[i],
+                EverythingEqDistance$ProductionV8[i],
+                EverythingEqDistance$ProductionV9[i])
+  
+  
+  Comparing$Production <-  c(ProductionTheoretical/1000, MOMENTO7A$Produccion[1:9])
+  
+  
+  #2. Taxes Proportionally cumulative
+  
+  
+  
+  Taxesproportionally<-c(EverythingEqDistance$TaxesproportionallyV1[i],
+                           EverythingEqDistance$TaxesproportionallyV2[i],
+                           EverythingEqDistance$TaxesproportionallyV3[i],
+                           EverythingEqDistance$TaxesproportionallyV4[i],
+                           EverythingEqDistance$TaxesproportionallyV5[i],
+                           EverythingEqDistance$TaxesproportionallyV6[i],
+                           EverythingEqDistance$TaxesproportionallyV7[i],
+                           EverythingEqDistance$TaxesproportionallyV8[i],
+                           EverythingEqDistance$TaxesproportionallyV9[i])
+  
+  
+  Comparing$TaxesPayedProportionally <-  c(Taxesproportionally, MOMENTO7A$`Proporción de pago de impuestos acumulada`[1:9]/sum(MOMENTO7A$`Proporción de pago de impuestos acumulada`[1:9]))
+  
+  
+  #3. Total workers demanded
+  
+  DemandTotalWorkers<-c(EverythingEqDistance$TotalWorkersDemandedV1[i],
+                         EverythingEqDistance$TotalWorkersDemandedV2[i],
+                         EverythingEqDistance$TotalWorkersDemandedV3[i],
+                         EverythingEqDistance$TotalWorkersDemandedV4[i],
+                         EverythingEqDistance$TotalWorkersDemandedV5[i],
+                         EverythingEqDistance$TotalWorkersDemandedV6[i],
+                         EverythingEqDistance$TotalWorkersDemandedV7[i],
+                         EverythingEqDistance$TotalWorkersDemandedV8[i],
+                         EverythingEqDistance$TotalWorkersDemandedV9[i])
+  
+  
+  Comparing$TotalDemandWorkers <-  c(DemandTotalWorkers,MOMENTO2$`Numero de trabajadores`[1:9] )
+  
+  
+  
+  
+  #4. Informal Demand proportion
+  InformalDemandProportion<-c(EverythingEqDistance$InformalDemandProportionV4[i],
+                              EverythingEqDistance$InformalDemandProportionV7[i],
+                              EverythingEqDistance$InformalDemandProportionV8[i])
+  
+  InformalPROPDemand <- data.table(c(MOMENTO3$Informalidad[1]/100,MOMENTO3$Informalidad[2]/100,MOMENTO3$Informalidad[3]/100,
+                                     InformalDemandProportion))
+  
+  InformalPROPDemand$Decile<-c(4,7,8,4,7,8)
+  InformalPROPDemand$Sample<-as.factor(c(0,0,0,1,1,1))
+  
+  
+  
+  #5. Income distribution
+  
+  
+  Income<-c(EverythingEqDistance$IncomeDistributionV1[i],
+            EverythingEqDistance$IncomeDistributionV2[i],
+            EverythingEqDistance$IncomeDistributionV3[i],
+            EverythingEqDistance$IncomeDistributionV4[i],
+            EverythingEqDistance$IncomeDistributionV5[i],
+            EverythingEqDistance$IncomeDistributionV6[i],
+            EverythingEqDistance$IncomeDistributionV7[i],
+            EverythingEqDistance$IncomeDistributionV8[i],
+            EverythingEqDistance$IncomeDistributionV9[i])
+  
+  
+  
+  Comparing$IncomeDistribution <-  c(Income,as.numeric(M5.3A[4:12,2]) )
+  
+  
+  #6. Informal labor supply
+  
+  
+  InformalLaborSupply<-c(EverythingEqDistance$InformalLaborSupplyPropV1[i],
+            EverythingEqDistance$InformalLaborSupplyPropV2[i],
+            EverythingEqDistance$InformalLaborSupplyPropV3[i],
+            EverythingEqDistance$InformalLaborSupplyPropV4[i],
+            EverythingEqDistance$InformalLaborSupplyPropV5[i],
+            EverythingEqDistance$InformalLaborSupplyPropV6[i],
+            EverythingEqDistance$InformalLaborSupplyPropV7[i],
+            EverythingEqDistance$InformalLaborSupplyPropV8[i],
+            EverythingEqDistance$InformalLaborSupplyPropV9[i])
+  
+  
+  
+  Comparing$InformalLaborSupply <-  c(InformalLaborSupply,MOMENTO8$`Informalidad (%)`[1:9]/100 )
+  
+  
+  
+  
+  
+  #7. Total labor supply
+  
+  
+  TotalLaborSupply<-c(EverythingEqDistance$TotalLaborSupplyV1[i],
+                         EverythingEqDistance$TotalLaborSupplyV2[i],
+                         EverythingEqDistance$TotalLaborSupplyV3[i],
+                         EverythingEqDistance$TotalLaborSupplyV4[i],
+                         EverythingEqDistance$TotalLaborSupplyV5[i],
+                         EverythingEqDistance$TotalLaborSupplyV6[i],
+                         EverythingEqDistance$TotalLaborSupplyV7[i],
+                         EverythingEqDistance$TotalLaborSupplyV8[i],
+                         EverythingEqDistance$TotalLaborSupplyV9[i])
+  
+  
+  
+  Comparing$TotalLaborSupply <-  c(TotalLaborSupply,MOMENTO19$`Version 2A`[1:9] )
+  
+  Comparing$TotalLaborSupply2<-c(TotalLaborSupply,MOMENTO19$`Version 2A`[1:9])
+  
+  #8. Proportion of entrepreneurs
+  PropEntrep<-data.table(c(EverythingEqDistance$PropEntrepreneurs[i],(M4[2,2]/(M4[2,1]+M4[2,2]))))
+  PropEntrep$Sample<-c(as.factor(c(0,1)))
+  print(PropEntrep)
+  InformalPROPDemand
+  
+  
+  #Subsetting the ones where entrepreneurs are more than 25%:
+  
+  
+  
+  #-----#
+  #Plots#
+  #-----#
+  
+  #Set directory
+  #setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15_Initial/ModelFit')
+  print("hahahahaha")
+  #Size of line
+  sizeline=10
+  sizerel=7
+  #Production
+  Production<-ggplot(data=Comparing,aes(x=Decile,y=Production,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  Production<-Production+scale_colour_discrete(labels=c("Data","Model")  )
+  Production<-Production+ theme_bw()
+  Production<-Production+scale_x_continuous(breaks = seq(1,9,1))
+  Production<-Production + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  Production<-Production+ggtitle(" ") +ylab("Thousands of S/.")
+  Production
+  
+  dev.set()
+  png(file="Production.png",width=1600,height=850)
+  print(Production)
+  dev.off()
+  print("haha")
+
+  
+  
+  
+  
+  
+  #Taxes
+  Taxes<-ggplot(data=Comparing,aes(x=Decile,y=TaxesPayedProportionally,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  Taxes<-Taxes+scale_colour_discrete(labels=c("Data","Model")  )
+  Taxes<-Taxes+ theme_bw()
+  Taxes<-Taxes+scale_x_continuous(breaks = seq(1,9,1))
+  Taxes<-Taxes + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  Taxes<-Taxes+ggtitle(" ") +ylab("%")
+  Taxes
+  
+  dev.set()
+  png(file="Taxes.png",width=1600,height=850)
+  print(Taxes)
+  dev.off()
+  
+  
+  #Total demand workers
+  
+  #DemandWorkers
+  DemandWorkers<-ggplot(data=Comparing,aes(x=Decile,y=TotalDemandWorkers,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  DemandWorkers<-DemandWorkers+scale_colour_discrete(labels=c("Data","Model")  )
+  DemandWorkers<-DemandWorkers+ theme_bw()
+  DemandWorkers<-DemandWorkers+scale_x_continuous(breaks = seq(1,9,1))
+  DemandWorkers<-DemandWorkers + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  DemandWorkers<-DemandWorkers+ggtitle(" ") +ylab("#")
+  DemandWorkers
+  
+  dev.set()
+  png(file="DemandWorkers.png",width=1600,height=850)
+  print(DemandWorkers)
+  dev.off()
+  
+  
+  #IncomeDistribution
+  IncomeDistribution<-ggplot(data=Comparing,aes(x=Decile,y=IncomeDistribution,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  IncomeDistribution<-IncomeDistribution+scale_colour_discrete(labels=c("Data","Model")  )
+  IncomeDistribution<-IncomeDistribution+ theme_bw()
+  IncomeDistribution<-IncomeDistribution+scale_x_continuous(breaks = seq(1,9,1))
+  IncomeDistribution<-IncomeDistribution + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  IncomeDistribution<-IncomeDistribution+ggtitle(" ") +ylab("S/.")
+  IncomeDistribution
+  
+  dev.set()
+  png(file="IncomeDistribution.png",width=1600,height=850)
+  print(IncomeDistribution)
+  dev.off()
+  
+  #InformalLaborSupply
+  InformalLaborSupply<-ggplot(data=Comparing,aes(x=Decile,y=InformalLaborSupply,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  InformalLaborSupply<-InformalLaborSupply+scale_colour_discrete(labels=c("Data","Model")  )
+  InformalLaborSupply<-InformalLaborSupply+ theme_bw()
+  InformalLaborSupply<-InformalLaborSupply+scale_x_continuous(breaks = seq(1,9,1))
+  InformalLaborSupply<-InformalLaborSupply + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  InformalLaborSupply<-InformalLaborSupply+ggtitle(" ") +ylab("Proportion")
+  InformalLaborSupply
+  
+  dev.set()
+  png(file="InformalLaborSupply.png",width=1600,height=850)
+  print(InformalLaborSupply)
+  dev.off()
+  
+  
+  #TotalLaborSupply 1 
+  TotalLaborSupply<-ggplot(data=Comparing,aes(x=Decile,y=TotalLaborSupply,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  TotalLaborSupply<-TotalLaborSupply+scale_colour_discrete(labels=c("Data","Model")  )
+  TotalLaborSupply<-TotalLaborSupply+ theme_bw()
+  TotalLaborSupply<-TotalLaborSupply+scale_x_continuous(breaks = seq(1,9,1))
+  TotalLaborSupply<-TotalLaborSupply + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  TotalLaborSupply<-TotalLaborSupply+ggtitle(" ") +ylab("#")
+  
+  
+  dev.set()
+  png(file="TotalLaborSupply.png",width=1600,height=850)
+  print(TotalLaborSupply)
+  dev.off()
+  
+  
+  #TotalLaborSupply 2 
+  TotalLaborSupply<-ggplot(data=Comparing,aes(x=Decile,y=TotalLaborSupply2,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  TotalLaborSupply<-TotalLaborSupply+scale_colour_discrete(labels=c("Data","Model")  )
+  TotalLaborSupply<-TotalLaborSupply+ theme_bw()
+  TotalLaborSupply<-TotalLaborSupply+scale_x_continuous(breaks = seq(1,9,1))
+  TotalLaborSupply<-TotalLaborSupply + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  TotalLaborSupply<-TotalLaborSupply+ggtitle(" ") +ylab("#")
+  
+  
+  dev.set()
+  png(file="TotalLaborSupply2.png",width=1600,height=850)
+  print(TotalLaborSupply)
+  dev.off()
+  
+  
+  
+  #Informal proportion demand
+  InformalDemand<-ggplot(data=InformalPROPDemand,aes(x=Decile,y=V1,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  InformalDemand<-InformalDemand+scale_colour_discrete(labels=c("Data","Model")  )
+  InformalDemand<-InformalDemand+ theme_bw()
+  InformalDemand<-InformalDemand+scale_x_continuous(breaks = seq(1,9,1))
+  InformalDemand<-InformalDemand + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  InformalDemand<-InformalDemand+ggtitle(" ") +ylab("#")
+  InformalDemand
+  
+  dev.set()
+  png(file="InformalLaborDemand.png",width=1600,height=850)
+  print(InformalDemand)
+  dev.off()
+  
+  #Proportion of entrepreneurs
+  PropEntrep$Sample<-c("Model","Data")
+  PropEntrepGraph<-ggplot(data=PropEntrep,aes(y=V1,x=Sample))+geom_bar(stat="identity")
+  PropEntrepGraph<-PropEntrepGraph+ggtitle("Proportion entrepreneurs") +ylab("%")
+  dev.set()
+  png(file="PropEntrepGraph.png",width=1600,height=850)
+  print(PropEntrepGraph)
+  dev.off()
+
+}
 
 #------------------------------------------------#
 #Plot relationship between moments and parameters#
