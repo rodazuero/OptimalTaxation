@@ -1416,7 +1416,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         cout << Wsol[0]+Wsol[1] << " Wsol[0]+Wsol[1] "<< endl;
         
         //4. Proportioninformaldemanded
-        PropInformalDemanded[it]=Wsol[0]/(max(WorkersTotalDemanded[it],0.001));
+        PropInformalDemanded[it]=Wsol[0]/(max(WorkersTotalDemanded[it],0.001))
         cout << Wsol[0]/WorkersTotalDemanded[it] << "Wsol[0]/WorkersTotalDemanded[it]  "<< endl;
         
         
@@ -1451,16 +1451,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         TotalIncome[it]=SolWorker[0]*Tthetaw[it]*wi+SolWorker[1]*Tthetaw[it]*wf;
         
         //2. Informal labor supply proportion
-        cout << " --informal labor supply---- "<< endl;
-        cout << InitLWorkersDouble[0] << " InitLWorkersDouble[0]   " << endl;
-        cout << InitLWorkersDouble[1] <<" InitLWorkersDouble[1]   " << endl;
-        cout << wf <<"   wf " << endl;
-        cout << wi <<"  wi  " << endl;
-        cout << Tthetaw[it] << " Tthetaw[it] "<< endl;
-        cout << it << " it "<< endl;
-        cout << SolWorker[0] << " SolWorker[0]"<< endl;
-        cout << SolWorker[1] << " SolWorker[1]"<< endl;
-        cout << SolWorker[0]/(SolWorker[0]+SolWorker[1]) << " SolWorker[0]/(SolWorker[0]+SolWorker[1])"<< endl;
+
         InformalLaborSupplyProp[it]=SolWorker[0]/max((SolWorker[0]+SolWorker[1]),0.0001);
         
         cout << InformalLaborSupplyProp[it] << " InformalLaborSupplyProp[it]"<< endl;
@@ -2814,7 +2805,7 @@ int main(int argc, const char * argv[]) {
     
     
     
-    //WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
+    WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
     
     cout << WagesEquilibrium[0] << " WagesEquilibrium[0]"<< endl;
     cout << WagesEquilibrium[1] << " WagesEquilibrium[1]"<< endl;

@@ -535,9 +535,22 @@ Passed as it is to ExcessDemandTotal
 Passed to StandardizedExcessDemands. Here is the weird thing. It is passed to ExcessDemandFunctions
 
 
-#There is a problem with delta and gamma passing them. 
+#There is a problem with delta and gamma passing them. Problem solved. 
 
 #In tesla: in addition to modifying everything as in the normal one, it use necessary to change DistanceNonVectorized. 
+
+
+#Need to fix the problem that NaN are spitted out when 0 informality. Esto es en Momentos3.csv. 
+
+
+#Running code:
+g++ mainTesla.cpp -std=gnu++0x -I/usr/include/c++/3.4.6/backward/  -I/usr/lib64/R/library/BH/include/  -I/home/razu/install/include/ -I/usr/lib64/R/library/RcppArmadillo/include/ -I/home/razu/boost_1_61_0/ -L/home/razu/install/lib/ -lnlopt   -fopenmp -Wall   -lgsl -lgslcblas  -o main
+
+nohup ./main > nohupNLOPT.out&
+
+
+
+
 
 
 

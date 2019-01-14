@@ -2782,7 +2782,7 @@ int main(int argc, const char * argv[]) {
     
     
     
-    WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
+    //WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
     
     cout << WagesEquilibrium[0] << " WagesEquilibrium[0]"<< endl;
     cout << WagesEquilibrium[1] << " WagesEquilibrium[1]"<< endl;
