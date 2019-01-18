@@ -52,6 +52,7 @@ ofstream ThMoments4CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibriu
 ofstream ThMoments5CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments5CSV.csv");
 ofstream ThMoments6CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments6CSV.csv");
 ofstream ThMoments7CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments7CSV.csv");
+ofstream ThMoments8CSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments8CSV.csv");
 
 ofstream ParametersCSV("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ParametersCSV.csv");
 
@@ -129,20 +130,20 @@ long double TnActual(double nomina){
     return(0.09*nomina);
 }//1.9. Production
 long double production(double ni, double nf, double aalpha, double tthetae,double c){
-    double prod=tthetae*pow((c+ni+nf),aalpha);
+    double prod=tthetae*pow((c*0+ni+nf),aalpha);
     return(prod);
 }
 
-//2. Pre-tax profits.Checked
+//2. Pre-tax profits.Checked. CX0 to exclude it
 long double profm(double ni, double nf, double aalpha, double tthetae, double wi, double wf, double c){
-    double pi1=tthetae*pow((c+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
+    double pi1=tthetae*pow((c*0+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
     return(pi1);
     
 }
 
-//3. Corporate tax profits, marginal
+//3. Corporate tax profits, marginalCX0 to exclude it
 long double Tc(double z, double ni, double nf, double aalpha,double tthetae, double wi, double wf,double c){
-    double profm=tthetae*pow((c+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
+    double profm=tthetae*pow((c*0+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
     double arg=profm-z;
     double firsterm=-exp(-arg);
     //If negative profits, set zero marginal rate
@@ -152,16 +153,16 @@ long double Tc(double z, double ni, double nf, double aalpha,double tthetae, dou
     return(firsterm);
 }
 
-//4. Tc Actual corporate taxes
+//4. Tc Actual corporate taxesCX0 to exclude it
 //4. Tc Actual corporate taxes. In hundreds of dollars.
 // For instance. 189=5000*12*0.315/100
 long double TcActual(double z, double ni, double nf, double aalpha, double tthetae, double wi, double wf,double c){
     
-    double profm=tthetae*pow((c+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
+    double profm=tthetae*pow((c*0+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
     double arg=profm-z;
     double ans=0;
     double tax=0;
-    double prod=tthetae*pow((c+ni+nf),aalpha);
+    double prod=tthetae*pow((c*0+ni+nf),aalpha);
     if(prod-z<=0){
         ans=0;
     }
@@ -1132,6 +1133,10 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
     int NumberWorkers=0;
     int NumberEntrep=0;
     
+    //Moments to obtain returns to wages and production total
+    double WageTotal=0;
+    double TotalProduction=0;
+    
     
     //First we will identify the individuals who are workers or entrepreneurs
     for(int it=0; it<M; it++){
@@ -1152,14 +1157,19 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
             TthetaWorkerIndex[NumberWorkers]=Ttheta[0];
             WorkerIndex[NumberWorkers]=it;
             NumberWorkers=NumberWorkers+1;
+            WageTotal+=Ttheta[0]*(ParamsDecision[0]*DecVector[0][2]+ParamsDecision[1]*DecVector[1][2]);
         }
         if(DecVector[0][0]==1){
             TthetasEntreprenIndex[NumberEntrep]=Ttheta[1];
             EntreprenIndex[NumberEntrep]=it;
             NumberEntrep=NumberEntrep+1;
+            TotalProduction+=production(DecVector[0][1],  DecVector[1][1],  aalpha,  Ttheta[1], 0);
         }
         
     }
+    double propWages=0;
+    propWages=WageTotal/TotalProduction;
+    cout <<propWages << " propWages "<< endl;
     
     
     //We have now the indeces of those who are workers and those who are entrepreneurs with their corresponding tthetas. Now we need to: 1. Sort them, 2. Generate the corresponding moments.
@@ -1501,7 +1511,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         answer[it][5]=InformalLaborSupplyProp[it];
         answer[it][6]=LaborSupplyProportion[it];
         answer[it][7]=doubNumberEntrep/(doubNumberWorkers+doubNumberEntrep);
-        
+        answer[it][8]=propWages;
         
         cout << " ------ "<< endl;
         cout << Production[it]<< " production it"<< endl;
@@ -1710,6 +1720,9 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
         distance+=pow((TotalLaborSupply[it]-Theomoments[it][6])/(max(0.0001,TotalLaborSupply[it])),2);
         distance+=pow((PropEntrepEmpirical[it]-Theomoments[it][7])/(max(0.0001,PropEntrepEmpirical[it])),2);
         
+        //I will add a part corresponding to the 0.8 approximately retribution to work. Need to adapt.
+        distance+=pow((0.75-Theomoments[it][8])/0.75,2);
+        
         
     }
     
@@ -1739,6 +1752,7 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     ThMoments5CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments5CSV.csv", ios::out | ios::app);
     ThMoments6CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments6CSV.csv", ios::out | ios::app);
     ThMoments7CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments7CSV.csv", ios::out | ios::app);
+    ThMoments8CSV.open("/home/razu/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/ThMoments8CSV.csv", ios::out | ios::app);
     
     for(int it=0; it<9; it++){
         ThMoments0CSV<<Theomoments[it][0] << " , " ;
@@ -1749,6 +1763,7 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
         ThMoments5CSV<<Theomoments[it][5] << " , " ;
         ThMoments6CSV<<Theomoments[it][6] << " , " ;
         ThMoments7CSV<<Theomoments[it][7] << " , " ;
+        ThMoments8CSV<<Theomoments[it][8] << " , " ;
         
     }
     
@@ -1775,6 +1790,9 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     ThMoments7CSV << endl;
     ThMoments7CSV.close();
+    
+    ThMoments8CSV << endl;
+    ThMoments8CSV.close();
     
     
     
@@ -1932,11 +1950,11 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     double ssigma1=Parameters[10];
     double ssigma2=Parameters[11];
     double rho12=Parameters[12];
-    double c=Parameters[13];
-    double aalpha=Parameters[14];
+    double c=0;
+    double aalpha=Parameters[13];
     
     //We also need to translate it to a double to use the minimizer
-    double ParamDoubles[15];
+    double ParamDoubles[14];
     ParamDoubles[0]=ggamma;
     ParamDoubles[1]=ddelta;
     ParamDoubles[2]=bbeta;
@@ -1950,11 +1968,10 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     ParamDoubles[10]=ssigma1;
     ParamDoubles[11]=ssigma2;
     ParamDoubles[12]=rho12;
-    ParamDoubles[13]=c;
-    ParamDoubles[14]=aalpha;
+    ParamDoubles[13]=aalpha;
     
     //Establishing upper bounds
-    double ubParameters[15];
+    double ubParameters[14];
     ubParameters[0]=5;
     ubParameters[1]=5;
     ubParameters[2]=5;
@@ -1968,11 +1985,10 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     ubParameters[10]=5;
     ubParameters[11]=5;
     ubParameters[12]=5;
-    ubParameters[13]=5;
-    ubParameters[14]=1;
+    ubParameters[13]=1;
     
     //Establishing the lower bounds
-    double lbParameters[15];
+    double lbParameters[14];
     lbParameters[0]=0.01;
     lbParameters[1]=0.01;
     lbParameters[2]=0.01;
@@ -1987,7 +2003,6 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     lbParameters[11]=0.01;
     lbParameters[12]=0.01;
     lbParameters[13]=0.01;
-    lbParameters[14]=0.01;
     
     //Putting the Other parameters in the double format
     double doubAdditionalPar[9];
@@ -2005,7 +2020,7 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     
     //Start creating the optimizer object
     nlopt_opt MinDistance;
-    MinDistance = nlopt_create(NLOPT_LN_NELDERMEAD, 15);
+    MinDistance = nlopt_create(NLOPT_LN_NELDERMEAD, 14);
     
     nlopt_set_lower_bounds(MinDistance, lbParameters);
     nlopt_set_upper_bounds(MinDistance, ubParameters);
@@ -2298,7 +2313,7 @@ int main(int argc, const char * argv[]) {
     double ssigma1=0.1;
     double ssigma2=0.9;
     double rho12=0.08;
-    double c=2;
+    double c=0;
     
     
     //0. Payroll taxes marginal
@@ -2512,6 +2527,7 @@ int main(int argc, const char * argv[]) {
     ThMoments5CSV.close();
     ThMoments6CSV.close();
     ThMoments7CSV.close();
+    ThMoments8CSV.close();
     DistanceMoments.close();
     EquilibriumValue.close();
     
