@@ -558,6 +558,19 @@ Change:
 StandardizedDistanceEstimator now Parameters is a 15 elements. 15th is alpha.
 MinimizingDistance:  parameters also 15th should be alpha.  
 
+#Finally: need to recheck that sobol previous did not work effectively with 14 dimensions to see what was going going. 
+
+
+
+We will start a new branch to include alpha in the minimizer and to exclude c from the optimizer. First, exclude c from the minimizer and let it in the sobol situation. 
+
+The situation at the moment. The optimizer in Xcode running code in mac has alpha in the minimizer. In Tesla, it does not. I will prioritize for the moment to simply exclude c from the sobol in tesla. Need to fix upper bound/ and lower bound/ of optimizers.
+
+To change the optimizer to exclude c, we need:
+
+1. Change function MinimizingDistance so that the first input (parameter) no longer contains 
+
+
 #Running code:
 g++ mainTesla.cpp -std=gnu++0x -I/usr/include/c++/3.4.6/backward/  -I/usr/lib64/R/library/BH/include/  -I/home/razu/install/include/ -I/usr/lib64/R/library/RcppArmadillo/include/ -I/home/razu/boost_1_61_0/ -L/home/razu/install/lib/ -lnlopt   -fopenmp -Wall   -lgsl -lgslcblas  -o main
 
@@ -566,7 +579,7 @@ nohup ./main > nohupNLOPT.out&
 
 
 
-
+W
 
 
 
