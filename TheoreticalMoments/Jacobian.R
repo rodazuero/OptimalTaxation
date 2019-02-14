@@ -24,7 +24,7 @@ rm(list=ls(all=TRUE))
 source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/EmpiricalMoments/Momentos.R')
 
 
-setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15_Initial')
+setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/AWS/InAws')
 
 
 
@@ -61,6 +61,8 @@ colnames(DistanceMom)<-"Distance"
 #Loading equilibrium 
 EqValues<-read.csv("EquilibriumValue.csv", header = F, sep=",")
 EqValues<-EqValues[,1]
+#Remove the first equilibrium value
+EqValues<-EqValues[-1]
 
 
 #Loading the moments
@@ -94,15 +96,17 @@ PropEntrepreneurs<-read.csv("ThMoments7CSV.csv", header = F, sep=",")
 PropEntrepreneurs<-PropEntrepreneurs[,1]
 
 
-
+#Moment 8: proportion of income going to wages
+PropAlpha<-read.csv("ThMoments8CSV.csv", header = F, sep=",")
+PropAlpha<-PropAlpha[,1]
 
 #EquilibriumValues has 1046. Take one less\
-EqValues<-EqValues[1:10465]
+#EqValues<-EqValues[1:10465]
 
 AllMmoments<-data.table(ProductionMoments,Taxesproportionally,
                         TotalWorkersDemanded,InformalDemandProportion,
                         IncomeDistribution,InformalLaborSupplyProp,
-                        TotalLaborSupply,PropEntrepreneurs,EqValues)
+                        TotalLaborSupply,PropEntrepreneurs,PropAlpha,EqValues)
 
 #We need a column indicating if the equilibrium is successful or not. We will call it Indic. 
 #This will be if: 
@@ -983,15 +987,34 @@ sink()
 
 #Equilibrium
 EverythingEq<-subset(Everything,Indic!=0)
+EverythingEquilibrium<-EverythingEq
+
+
+
+
+#Exclude predictions that do not have positive labor supply informal
+#EverythingEq<-subset(EverythingEq,InformalLaborSupplyPropV1>0.2)
+
+#Exclude predictions that do not have positive informal labor demand
+#EverythingEq<-subset(EverythingEq,InformalDemandProportionV4>0.5)
+
+#Leave those with high entrepreneurs
+#EverythingEq<-subset(EverythingEq,PropEntrepreneurs>0.22)
+
+
+#Alpha more than 0.45
+EverythingEq<-subset(EverythingEq,aalpha>0.46)
+
+#Exclude those with very few informal demand
+EverythingEq<-subset(EverythingEq,InformalDemandProportionV1>0.5)
 
 #Sort by the distance
 EverythingEqDistance<-EverythingEq[order(Distance)]
 
 
 
-head(EverythingEqDistance)
-EverythingEq$InformalLaborSupplyPropV1
-EverythingEq$PropEntrepreneurs
+
+
 
 
 #------------------------------------------------#
@@ -1004,13 +1027,17 @@ Comparing<-data.table(as.factor(c(rep(1,9),rep(0,9))))
 colnames(Comparing)<-c("Sample")
 Comparing$Decile<-c(seq(1,9,1),seq(1,9,1))
 
-for(i in 2265:2265){
+
+#Doing the restrictions necessary in the data
+EverythingEq<-subset(EverythingEq,PropEntrepreneurs>0.25)
+
+for(i in 1:30){
   #Deciding which observation to be analyzed
   #i=1
 
   
   Folder=paste('Model',i, sep = "")
-  cd="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15_Initial/ModelFit/"
+  cd="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15Secondary/ModelFit/"
   setwd(cd)
   newcd=paste(cd,Folder,sep="")
   dir.create(Folder)
@@ -1175,8 +1202,11 @@ for(i in 2265:2265){
   #Plots#
   #-----#
   
+  
+  
+  
   #Set directory
-  #setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15_Initial/ModelFit')
+  #setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15Secondary/ModelFit')
   print("hahahahaha")
   #Size of line
   sizeline=10
@@ -1363,6 +1393,113 @@ for(i in 2265:2265){
   print(InformalDemand)
   dev.off()
   
+  
+  
+  #Informal proportion demand ALL IN THEORETICAL PREDICTION
+  InformalAll<-c(EverythingEqDistance$InformalDemandProportionV1[i],
+                 EverythingEqDistance$InformalDemandProportionV2[i],
+                 EverythingEqDistance$InformalDemandProportionV3[i],
+                 EverythingEqDistance$InformalDemandProportionV4[i],
+                 EverythingEqDistance$InformalDemandProportionV5[i],
+                 EverythingEqDistance$InformalDemandProportionV6[i],
+                 EverythingEqDistance$InformalDemandProportionV7[i],
+                 EverythingEqDistance$InformalDemandProportionV8[i],
+                 EverythingEqDistance$InformalDemandProportionV9[i])
+  InformalAll<-cbind(InformalAll,seq(1,9,1))
+  colnames(InformalAll)<-c("Informalidad","decile")
+  InformalAll<-as.data.frame(InformalAll)
+  PlotInformal<-ggplot(data=InformalAll,aes(y=Informalidad,x=decile))+geom_line()
+  
+  
+  dev.set()
+  png(file="InformalTheoAll.png",width=1600,height=850)  
+  print(PlotInformal)
+  dev.off()
+  
+  
+  #Informal proportion demand and data in various versions
+  Informal1<-ggplot(data=MOMENTO3A,aes(y=Informalidad1,x=`% acumulado del total de firmas`))+geom_line()
+  dev.set()
+  png(file="Informal1.png",width=1600,height=850)
+  print(Informal1)
+  dev.off()
+  
+  Informal2<-ggplot(data=MOMENTO3A,aes(y=Informalidad2,x=`% acumulado del total de firmas`))+geom_line()
+  dev.set()
+  png(file="Informal2.png",width=1600,height=850)
+  print(Informal2)
+  dev.off()
+  
+  Informal3<-ggplot(data=MOMENTO3A,aes(y=Informalidad3,x=`% acumulado del total de firmas`))+geom_line()
+  dev.set()
+  png(file="Informal3.png",width=1600,height=850)
+  print(Informal3)
+  dev.off()
+  
+  Informal4<-ggplot(data=MOMENTO3A,aes(y=Informalidad4,x=`% acumulado del total de firmas`))+geom_line()
+  dev.set()
+  png(file="Informal4.png",width=1600,height=850)
+  print(Informal4)
+  dev.off()
+  
+  Informal5<-ggplot(data=MOMENTO3A,aes(y=Informalidad5,x=`% acumulado del total de firmas`))+geom_line()
+  dev.set()
+  png(file="Informal5.png",width=1600,height=850)
+  print(Informal5)
+  dev.off()
+  
+  Informal6<-ggplot(data=MOMENTO3A,aes(y=Informalidad6,x=`% acumulado del total de firmas`))+geom_line()
+  dev.set()
+  png(file="Informal6.png",width=1600,height=850)
+  print(Informal6)
+  dev.off()
+  
+  Informal7<-ggplot(data=MOMENTO3A,aes(y=Informalidad7,x=`% acumulado del total de firmas`))+geom_line()
+  dev.set()
+  png(file="Informal7.png",width=1600,height=850)
+  print(Informal7)
+  dev.off()
+  
+  Informal8<-ggplot(data=MOMENTO3A,aes(y=Informalidad8,x=`% acumulado del total de firmas`))+geom_line()
+  dev.set()
+  png(file="Informal8.png",width=1600,height=850)
+  print(Informal8)
+  dev.off()
+  
+  
+  #Proportion of entrepreneurs
+  PropEntrep$Sample<-c("Model","Data")
+  PropEntrepGraph<-ggplot(data=PropEntrep,aes(y=V1,x=Sample))+geom_bar(stat="identity")
+  PropEntrepGraph<-PropEntrepGraph+ggtitle("Proportion entrepreneurs") +ylab("%")
+  dev.set()
+  png(file="PropEntrepGraph.png",width=1600,height=850)
+  print(PropEntrepGraph)
+  dev.off()
+  
+  
+  
+  #Informal proportion demand total
+
+  InformalDemand<-ggplot(data=InformalPROPDemand,aes(x=Decile,y=V1,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  InformalDemand<-InformalDemand+scale_colour_discrete(labels=c("Data","Model")  )
+  InformalDemand<-InformalDemand+ theme_bw()
+  InformalDemand<-InformalDemand+scale_x_continuous(breaks = seq(1,9,1))
+  InformalDemand<-InformalDemand + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  InformalDemand<-InformalDemand+ggtitle(" ") +ylab("#")
+  InformalDemand
+  
+  dev.set()
+  png(file="InformalLaborDemand.png",width=1600,height=850)
+  print(InformalDemand)
+  dev.off()
+  
   #Proportion of entrepreneurs
   PropEntrep$Sample<-c("Model","Data")
   PropEntrepGraph<-ggplot(data=PropEntrep,aes(y=V1,x=Sample))+geom_bar(stat="identity")
@@ -1378,16 +1515,16 @@ for(i in 2265:2265){
 #Plot relationship between moments and parameters#
 #------------------------------------------------#
 
-setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Naive2/ModelFit/ModelRelationships/ParametersAndEntrepreneurs')
+setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15Secondary/RelationshipParameters')
 
 #1.Parameters and entrepreneurs
-ParamPropentrep<-data.table(Parameters[1:10175],PropEntrepreneurs)
+ParamPropentrep<-data.table(Parameters,PropEntrepreneurs)
 setnames(ParamPropentrep,15,"Entrepreneurs")
 
 #Graphs with regressions
 
 #1. Aalpha
-p<-ggplot(data=ParamPropentrep,aes(x=aalpha,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=aalpha,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="Aalpha.png",width=1600,height=850)
@@ -1396,7 +1533,7 @@ dev.off()
 
 
 #2. Ggamma
-p<-ggplot(data=ParamPropentrep,aes(x=ggamma,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=ggamma,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="Ggama.png",width=1600,height=850)
@@ -1404,7 +1541,7 @@ p
 dev.off()
 
 #3. Ddelta
-p<-ggplot(data=ParamPropentrep,aes(x=ddelta,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=ddelta,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="Ddelta.png",width=1600,height=850)
@@ -1413,7 +1550,7 @@ dev.off()
 
 
 #4. Bbeta
-p<-ggplot(data=ParamPropentrep,aes(x=bbeta,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=bbeta,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="bbeta.png",width=1600,height=850)
@@ -1423,7 +1560,7 @@ dev.off()
 
 
 #5. ssigma
-p<-ggplot(data=ParamPropentrep,aes(x=ssigma,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=ssigma,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="ssigma.png",width=1600,height=850)
@@ -1432,7 +1569,7 @@ dev.off()
 
 
 #6. kkappa
-p<-ggplot(data=ParamPropentrep,aes(x=kkappa,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=kkappa,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="kkappa.png",width=1600,height=850)
@@ -1440,7 +1577,7 @@ p
 dev.off()
 
 #7. psi
-p<-ggplot(data=ParamPropentrep,aes(x=psi,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=psi,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="psi.png",width=1600,height=850)
@@ -1449,7 +1586,7 @@ dev.off()
 
 
 #8. chi
-p<-ggplot(data=ParamPropentrep,aes(x=chi,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=chi,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="chi.png",width=1600,height=850)
@@ -1458,7 +1595,7 @@ dev.off()
 
 
 #9. rho
-p<-ggplot(data=ParamPropentrep,aes(x=rho,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=rho,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="rho.png",width=1600,height=850)
@@ -1467,7 +1604,7 @@ dev.off()
 
 
 #10. mmu1
-p<-ggplot(data=ParamPropentrep,aes(x=mmu1,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=mmu1,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="mmu1.png",width=1600,height=850)
@@ -1476,7 +1613,7 @@ dev.off()
 
 
 #11. mmu2
-p<-ggplot(data=ParamPropentrep,aes(x=mmu2,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=mmu2,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="mmu2.png",width=1600,height=850)
@@ -1485,7 +1622,7 @@ dev.off()
 
 
 #12. ssigma1
-p<-ggplot(data=ParamPropentrep,aes(x=ssigma1,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=ssigma1,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="ssigma1.png",width=1600,height=850)
@@ -1494,7 +1631,7 @@ dev.off()
 
 
 #13. ssigma2
-p<-ggplot(data=ParamPropentrep,aes(x=ssigma2,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=ssigma2,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="ssigma2.png",width=1600,height=850)
@@ -1503,7 +1640,7 @@ dev.off()
 
 
 #14. rho12
-p<-ggplot(data=ParamPropentrep,aes(x=rho12,y=PropEntrepreneurs))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=rho12,y=PropEntrepreneurs))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="rho12.png",width=1600,height=850)
@@ -1514,7 +1651,7 @@ dev.off()
 
 
 
-lm( PropEntrepreneurs~ aalpha+bbeta+ddelta+ggamma+kkappa+ssigma+rho+ssigma1+ssigma2+rho12, ParamPropentrep)
+lm( PropEntrepreneurs~ aalpha+bbeta+ddelta+ggamma+kkappa+ssigma+rho+ssigma1+ssigma2+rho12, EverythingEquilibrium)
 
 
 mod <- lm(PropEntrepreneurs ~ aalpha + 
@@ -1531,7 +1668,7 @@ mod <- lm(PropEntrepreneurs ~ aalpha +
             ssigma1+
             ssigma2+
             rho12
-            ,ParamPropentrep)
+            ,EverythingEquilibrium)
 
 write(print(coef(summary(mod))),file="Regression.txt")
 
@@ -1540,13 +1677,13 @@ write(print(coef(summary(mod))),file="Regression.txt")
 #2. Moments of informality. 
 
 
-setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Naive2/ModelFit/ModelRelationships/ParametersAndInformality')
+setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15Secondary/Informality')
 
 
 #Graphs with regressions
 
 #1. Aalpha
-p<-ggplot(data=EverythingEqDistance,aes(x=aalpha,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=aalpha,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="Aalpha.png",width=1600,height=850)
@@ -1555,7 +1692,7 @@ dev.off()
 
 
 #2. Ggamma
-p<-ggplot(data=EverythingEqDistance,aes(x=ggamma,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=ggamma,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="Ggama.png",width=1600,height=850)
@@ -1563,7 +1700,7 @@ p
 dev.off()
 
 #3. Ddelta
-p<-ggplot(data=EverythingEqDistance,aes(x=ddelta,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=ddelta,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="Ddelta.png",width=1600,height=850)
@@ -1572,7 +1709,7 @@ dev.off()
 
 
 #4. Bbeta
-p<-ggplot(data=EverythingEqDistance,aes(x=bbeta,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=bbeta,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="bbeta.png",width=1600,height=850)
@@ -1582,7 +1719,7 @@ dev.off()
 
 
 #5. ssigma
-p<-ggplot(data=EverythingEqDistance,aes(x=ssigma,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=ssigma,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="ssigma.png",width=1600,height=850)
@@ -1591,7 +1728,7 @@ dev.off()
 
 
 #6. kkappa
-p<-ggplot(data=EverythingEqDistance,aes(x=kkappa,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=kkappa,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="kkappa.png",width=1600,height=850)
@@ -1599,7 +1736,7 @@ p
 dev.off()
 
 #7. psi
-p<-ggplot(data=EverythingEqDistance,aes(x=psi,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=psi,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="psi.png",width=1600,height=850)
@@ -1608,7 +1745,7 @@ dev.off()
 
 
 #8. chi
-p<-ggplot(data=EverythingEqDistance,aes(x=chi,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=chi,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="chi.png",width=1600,height=850)
@@ -1617,7 +1754,7 @@ dev.off()
 
 
 #9. rho
-p<-ggplot(data=EverythingEqDistance,aes(x=rho,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=rho,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="rho.png",width=1600,height=850)
@@ -1626,7 +1763,7 @@ dev.off()
 
 
 #10. mmu1
-p<-ggplot(data=EverythingEqDistance,aes(x=mmu1,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=mmu1,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="mmu1.png",width=1600,height=850)
@@ -1635,7 +1772,7 @@ dev.off()
 
 
 #11. mmu2
-p<-ggplot(data=EverythingEqDistance,aes(x=mmu2,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=mmu2,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="mmu2.png",width=1600,height=850)
@@ -1644,7 +1781,7 @@ dev.off()
 
 
 #12. ssigma1
-p<-ggplot(data=EverythingEqDistance,aes(x=ssigma1,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=ssigma1,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="ssigma1.png",width=1600,height=850)
@@ -1653,7 +1790,7 @@ dev.off()
 
 
 #13. ssigma2
-p<-ggplot(data=EverythingEqDistance,aes(x=ssigma2,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=ssigma2,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="ssigma2.png",width=1600,height=850)
@@ -1662,7 +1799,7 @@ dev.off()
 
 
 #14. rho12
-p<-ggplot(data=EverythingEqDistance,aes(x=rho12,y=InformalDemandProportionV4))+geom_point(color='blue')
+p<-ggplot(data=EverythingEquilibrium,aes(x=rho12,y=InformalDemandProportionV4))+geom_point(color='blue')
 p<-p+geom_smooth(method="lm")
 dev.set()
 png(file="rho12.png",width=1600,height=850)
@@ -1673,7 +1810,7 @@ dev.off()
 
 
 
-lm( InformalDemandProportionV4~ aalpha+bbeta+ddelta+ggamma+kkappa+ssigma+rho+ssigma1+ssigma2+rho12, EverythingEqDistance)
+lm( InformalDemandProportionV4~ aalpha+bbeta+ddelta+ggamma+kkappa+ssigma+rho+ssigma1+ssigma2+rho12, EverythingEquilibrium)
 
 
 mod <- lm(InformalDemandProportionV4 ~ aalpha + 
@@ -1690,7 +1827,7 @@ mod <- lm(InformalDemandProportionV4 ~ aalpha +
             ssigma1+
             ssigma2+
             rho12
-          ,EverythingEqDistance)
+          ,EverythingEquilibrium)
 
 write(print(coef(summary(mod))),file="Regression.txt")
 

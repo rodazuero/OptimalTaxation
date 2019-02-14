@@ -577,9 +577,19 @@ g++ mainTesla.cpp -std=gnu++0x -I/usr/include/c++/3.4.6/backward/  -I/usr/lib64/
 nohup ./main > nohupNLOPT.out&
 
 
+#Sobol with the “c” seems to be doing fine. 
+#Sobol without the “c” needs some work. Struggling with positive labor demand. It goes down really fast in the 
+theoretical as opposed to the empirical. 
 
 
-W
+#Tried with alpha being part of the parameters estimated and excluding C from the estimation. This is stored in /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15Secondary
+
+#I will try to generate a new sobol taking into account that entrepreneurs represent 5% of the population. 
+
+
+
+
+
 
 
 
