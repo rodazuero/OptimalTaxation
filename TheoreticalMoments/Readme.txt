@@ -558,14 +558,84 @@ Change:
 StandardizedDistanceEstimator now Parameters is a 15 elements. 15th is alpha.
 MinimizingDistance:  parameters also 15th should be alpha.  
 
+#Finally: need to recheck that sobol previous did not work effectively with 14 dimensions to see what was going going. 
+
+
+
+We will start a new branch to include alpha in the minimizer and to exclude c from the optimizer. First, exclude c from the minimizer and let it in the sobol situation. 
+
+The situation at the moment. The optimizer in Xcode running code in mac has alpha in the minimizer. In Tesla, it does not. I will prioritize for the moment to simply exclude c from the sobol in tesla. Need to fix upper bound/ and lower bound/ of optimizers.
+
+To change the optimizer to exclude c, we need:
+
+1. Change function MinimizingDistance so that the first input (parameter) no longer contains 
+
+
 #Running code:
 g++ mainTesla.cpp -std=gnu++0x -I/usr/include/c++/3.4.6/backward/  -I/usr/lib64/R/library/BH/include/  -I/home/razu/install/include/ -I/usr/lib64/R/library/RcppArmadillo/include/ -I/home/razu/boost_1_61_0/ -L/home/razu/install/lib/ -lnlopt   -fopenmp -Wall   -lgsl -lgslcblas  -o main
 
 nohup ./main > nohupNLOPT.out&
 
 
+#Sobol with the “c” seems to be doing fine. 
+#Sobol without the “c” needs some work. Struggling with positive labor demand. It goes down really fast in the 
+theoretical as opposed to the empirical. 
 
 
+#Tried with alpha being part of the parameters estimated and excluding C from the estimation. This is stored in /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/Dim15Secondary
+
+#I will try to generate a new sobol taking into account that entrepreneurs represent 5% of the population. 
+
+
+There is a typo that is fixed if we run sobolrun but not if we run eqwages. 
+Careful with this. 
+
+Pareciera ser que es entre distanceestimator y sobolrun en el valueworkers, entre el rho y el psi. En los otros hay cruce. Si no se corre sobolrun, hay cruce entre gamma y beta. Gamma y beta quedan bien en sobol run pero no en los otros. 
+
+#Three approaches possible
+1. Still try with a further sobol
+2. Try with a different distribution of skills
+3. Consider entrepreneurs as employers
+4. Include ‘c’ in the stuff/ 
+
+
+
+punta de pareto con las de sunat. y ver si son pareto. 
+
+Ir por el “c”
+
+Por el “c” 
+
+
+#Fixing the issue of inputs in the worker situation in the sobol. 
+rho, psi, chi, are inputed inadequately in the sobol. 
+rho should be psi
+psi should be chi
+chi should be rho. 
+
+In the sobol, it is :
+7->psi
+8-> chi
+9->rho
+
+It should be
+7->chi
+8->rho
+9->psi
+
+The arrangement was made in how the sobol was being uploaded, nothing in the 
+code. 
+
+To run the code now in parallel with what we need to do to run it with “c” 
+I will simply modify the code. 
+
+
+Precios AWS
+a1.4xlarge	16	N/A	32 GiB	EBS Only	$0.408 per Hour
+t3.2xlarge	8	Variable	32 GiB	EBS Only	$0.3328 per Hour
+m5.2xlarge	8	31	32 GiB	EBS Only	$0.384 per Hour
+m5.metal	96	345	384 GiB	EBS Only	$4.608 per Hour
+x1.32xlarge	128	349	1,952 GiB	2 x 1920 SSD	$13.338 per Hour
 
 
 

@@ -49,10 +49,14 @@ library(xtable)
 library(ggplot2)
 library(scales)
 library(gridExtra)
-setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/EmpiricalMoments')
+library(data.table)
+setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/EmpiricalMoments')
 ENAHO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/ENAHO/ENAHOARM/OptimaltaxationSubSampleENAHO.csv", header = T, sep=",")
+ENAHO<-as.data.table(ENAHO)
+
+
 CENSO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/Census/Modified/OptimaltaxationSubSampleCenso.csv", header = T, sep=",")
-graphdirectory<-"/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/EmpiricalMoments/Graphs"
+graphdirectory<-"/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/EmpiricalMoments/Graphs"
 ###### B. TRIMMING ----------------------------------------------------------------
 
 #A)Variable de interes (CENSO)
@@ -91,6 +95,106 @@ nq<-10
 #usar la variable "numero_trabajadores" en el group by.
 #Para cada tamaño de empresa se calcula la proporcion de trabajadores informales.
 
+
+
+#Multiples definiciones de informalidad:
+#--
+#1. INFORMAL1. Empleados que no tienen contrato. 
+#--
+
+
+#Se define como trabajador formal empleado si la persona tiene contrato y es 
+#empleado. 
+ENAHO$informal_empleado<-1-ENAHO$formal_empleado
+
+
+#--
+#2. INFORMAL2. Restringiendo la muestra de 1 sólo a empleados
+#--
+ENAHO$informal_empleado2<-ENAHO$informal_empleado
+ENAHO[categopri_ci!='Empleado',informal_empleado2:=NA]
+
+#--
+#3. INFORMAL3. 
+#--
+
+#Si no cotiza seguridad social. Los empleados están obligados
+#a cotizar en seguridad social esta pregunta es cotizando_ci y emp_ci==1
+ENAHO$informal_empleado3<-as.numeric(ENAHO$cotizando_ci=='No_cotiza' & ENAHO$emp_ci==1)
+
+#Those who are not workers should not be considered as informal. 
+ENAHO[emp_ci==0,informal_empleado3:=NA]
+
+
+#--
+#4. INFORMAL4. 
+#--
+
+#Si no cotiza a seguridad social y es empleado. En la anterior solo era si estava ocupado. 
+ENAHO$informal_empleado4<-as.numeric(ENAHO$cotizando_ci=='No_cotiza' & ENAHO$categopri_ci=='Empleado')
+#Those who are 'empleados' are not considered informal. 
+ENAHO[categopri_ci!='Empleado',informal_empleado4:=NA]
+
+
+
+
+#--
+#INFORMAL 5
+#--
+
+#Si no tiene acceso a salud y trabaja también. 
+ENAHO$informal_empleado5<-as.numeric(ENAHO$emp_ci==1 & 
+      (ENAHO$p4191=='essald (antes ipss)' | ENAHO$p4192=='seguro privado de salud' |
+      ENAHO$p4193=='entidad prestadora de salud' |
+      ENAHO$p4194=='seguro ffaa - pnp' |
+      ENAHO$p4195=='seguro integral de salud' |
+      ENAHO$p4196=='seguro universitario' |
+      ENAHO$p4197=='seguro escolar privado' | 
+      ENAHO$p4198=='otro'))
+
+ENAHO[emp_ci==0,informal_empleado5:=NA]
+
+
+#--
+#INFORMAL 6
+#--
+#Si no tiene acceso a salud y trabaja exclusivamente como empleado
+ENAHO$informal_empleado6<-ENAHO$informal_empleado5
+ENAHO[categopri_ci!='Empleado',informal_empleado6:=NA]
+
+
+#--
+#INFORMAL 7
+#--
+
+#Those who answer simply that they don't have health insurance at all. 
+#First, if they are working regardless of the category. 
+ENAHO$informal_empleado7<-as.numeric(ENAHO$emp_ci==1 & ENAHO$p4199=='no esta afiliado')
+ENAHO[emp_ci==0,informal_empleado7:=NA]
+
+
+#--
+#INFORMAL 8
+#--
+
+#Those who answer that they don't have health insurance but only considering those who are working
+#as employees. 
+ENAHO$informal_empleado8<-as.numeric(ENAHO$categopri_ci=='Empleado' & ENAHO$p4199=='no esta afiliado')
+ENAHO[categopri_ci!='Empleado',informal_empleado8:=NA]
+
+
+#deben estar cubiertos por seguro. 
+ENAHO$nn<-1
+ENAHO$NUMTRAB<-ENAHO$numero_trabajadores
+ENAHO$NUMTRAB[ENAHO$NUMTRAB>50]<-50
+informtotal<-round(mean(ENAHO$informal_empleado, na.rm = T)*100, 4)
+
+#Restringiendo la muestra a quienes son empleados
+ENAHOT<-ENAHO[which(ENAHO$categopri_ci=="Empleado"),]
+
+
+
+
 ENAHO$informal_empleado<-1-ENAHO$formal_empleado
 ENAHO$nn<-1
 ENAHO$NUMTRAB<-ENAHO$numero_trabajadores
@@ -108,6 +212,30 @@ MOMENTO1$informalidad<-MOMENTO1$informalidad*100
 names(MOMENTO1)<-c("Tamano de la empresa","Informalidad","Numero de trabajadores")
 M1<-as.matrix.data.frame(MOMENTO1,rownames.force = F)
 print(xtable(M1,digits = c(0,0,3,0)), include.rownames=F)
+
+
+
+
+
+
+MOMENTO1A<-ENAHO%>%
+  group_by(NUMTRAB)%>%
+  summarise(informalidad=mean(informal_empleado,na.rm=TRUE),
+            informalidad2=mean(informal_empleado2,na.rm = TRUE), 
+            informalidad3=mean(informal_empleado3,na.rm = TRUE), 
+            informalidad4=mean(informal_empleado4,na.rm = TRUE), 
+            informalidad5=mean(informal_empleado5,na.rm = TRUE), 
+            informalidad6=mean(informal_empleado6,na.rm = TRUE), 
+            informalidad7=mean(informal_empleado7,na.rm = TRUE), 
+            informalidad8=mean(informal_empleado8,na.rm = TRUE), 
+            trabajadores=sum(nn))
+
+MOMENTO1A$informalidad<-MOMENTO1A$informalidad*100
+names(MOMENTO1A)<-c("Tamano de la empresa","Informalidad1",
+                   "Informalidad2","Informalidad3","Informalidad4",
+                   "Informalidad5","Informalidad6","Informalidad7",
+                   "Informalidad8",
+                   "Numero de trabajadores")
 
 #MOMENTO1$`Tamano de la empresa`<- Tamaño de la empresa reportado por los trabajadores en la ENAHO
 #MOMENTO1$Informalidad<- Proporción de trabajadores informales en las firmas de tamaño x
@@ -159,6 +287,7 @@ MM3$propcum<-cumsum(MM3$proporcion)
 names(MM3)<-c("Tamano de la empresa","Numero de firmas","% del total de firmas", "% acumulado del total de firmas")
 
 MOMENTO3<-left_join(MM3,MOMENTO1,by=c("Tamano de la empresa","Tamano de la empresa"))
+MOMENTO3A<-left_join(MM3,MOMENTO1A,by=c("Tamano de la empresa","Tamano de la empresa"))
 T15<-MOMENTO3
 
 porctotal<-sum(MOMENTO3$`% del total de firmas`)
@@ -412,7 +541,7 @@ CENSO$decilesventast<-ntile(CENSO$VENTASTUSD,nq)
 
 DECILES_VENTAS<-CENSO%>%
   group_by(decilesventast)%>%
-  summarise(Ventas=mean(VENTASTUSD, na.rm = T), BeneficiosAntes=mean(PROFITSBEFOREUSD, na.rm = T), BeneficiosDespues=mean(PROFITSAFTERUSD, na.rm = T), Impuestos1=mean(CITAXUSD, na.rm = T), Impuestos2=mean(TAXTOTALUSD, na.rm = T))
+  summarise(Ventas=mean(VENTASTUSD, na.rm = TRUE), BeneficiosAntes=mean(PROFITSBEFOREUSD, na.rm = TRUE), BeneficiosDespues=mean(PROFITSAFTERUSD, na.rm = TRUE), Impuestos1=mean(CITAXUSD, na.rm = TRUE), Impuestos2=mean(TAXTOTALUSD, na.rm = TRUE))
 
 DECILES_VENTAS$TAX1_VENTAS<-DECILES_VENTAS$Impuestos1/DECILES_VENTAS$Ventas
 DECILES_VENTAS$TAX2_VENTAS<-DECILES_VENTAS$Impuestos2/DECILES_VENTAS$Ventas
@@ -428,7 +557,7 @@ CENSO$decilesbeneficios<-ntile(CENSO$PROFITSBEFOREUSD,nq)
 
 DECILES_BENEFICIOS<-CENSO%>%
   group_by(decilesbeneficios)%>%
-  summarise(Ventas=mean(VENTASTUSD, na.rm = T), BeneficiosAntes=mean(PROFITSBEFOREUSD, na.rm = T), BeneficiosDespues=mean(PROFITSAFTERUSD, na.rm = T), Impuestos1=mean(CITAXUSD, na.rm = T), Impuestos2=mean(TAXTOTALUSD, na.rm = T))
+  summarise(Ventas=mean(VENTASTUSD, na.rm = TRUE), BeneficiosAntes=mean(PROFITSBEFOREUSD, na.rm = TRUE), BeneficiosDespues=mean(PROFITSAFTERUSD, na.rm = TRUE), Impuestos1=mean(CITAXUSD, na.rm = TRUE), Impuestos2=mean(TAXTOTALUSD, na.rm = TRUE))
 
 DECILES_BENEFICIOS$TAX1_VENTAS<-DECILES_BENEFICIOS$Impuestos1/DECILES_BENEFICIOS$Ventas
 DECILES_BENEFICIOS$TAX2_VENTAS<-DECILES_BENEFICIOS$Impuestos2/DECILES_BENEFICIOS$Ventas
@@ -446,14 +575,14 @@ DECILES_BENEFICIOS$Beneficios_decil<-quantile(CENSO$PROFITSBEFOREUSD, c(seq(1/nq
 #ventas promedio en cada tamaño de empresa. 
 TS<-CENSO%>%
   group_by(NUMTRAB)%>%
-  summarise(firmas=sum(nn), ventas=mean(VENTASTUSD, na.rm = T))
+  summarise(firmas=sum(nn), ventas=mean(VENTASTUSD, na.rm = TRUE))
 
 #Sobre esta clasificación se calculan los deciles de ventas. 
 TS$decil<- ntile(TS$ventas,nq)
 
 #Se junta la información obtenida con la información (proporcion) de informalidad de la ENAHO (Momento 1).
-TS<-left_join(TS,MOMENTO1,by=c("NUMTRAB"="Tamano de la empresa"))
 
+TS<-left_join(TS,MOMENTO1,by=c("NUMTRAB"="Tamano de la empresa"))
 #Se aproxima el total de trabajadores en cada tamaño de empresa, multiplicando el número de firmas en cada
 #tamaño por el numero de trabajadores que reportan. Partiendo de esta aproximacion del numero de trabajadores
 #se calcula cuantos son formales e informales, con la informacion de la ENAHO.
