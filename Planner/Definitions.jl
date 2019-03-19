@@ -32,7 +32,7 @@ mutable struct Param
     hw::Function
     hh::Function
     gg::Function
-    weights::Array{Float64,1}
+    weights::Array{Float64,1} #añadir tamaño
     nodes::Array{Float64,1}
 
 end
@@ -42,6 +42,8 @@ mutable struct State
     uw::Float64 #Utility
     ϕ_e::Float64
     μ::Float64
+    λ::Float64
+    ω::Float64
 end
 
 mutable struct Control
@@ -78,20 +80,45 @@ function init_parameters()
     σ2_w = 1.0921; σ_w=σ2_w^0.5;
     σ2_e = 1.1675; σ_e=σ2_e^0.5;
     σ_we = 0.2782;
-    dist_marginal_w=Normal(μ_w,σ2_w)
-    dist_marginal_e=Normal(μ_e,σ2_e)
-    mean_w_given_e(e) = μ_w + σ_we*σ_w/σ_e*(e-μ_e)
-    var_w_given_e = (1-σ_we^2)σ2_w;
-    dist_w_given_e(e)=Normal(mean_w_given_e(e),var_w_given_e);
-    mean_e_given_w(θ) = μ_e + σ_we*σ_e/σ_w*(θ-μ_w);
-    var_e_given_w= (1-σ_we^2)σ2_e;
-    dist_e_given_w(θ)=Normal(mean_e_given_w(θ),var_e_given_w);
-    hw(θ,e)=  ( cdf(dist_e_given_w(θ),e) )*( pdf(dist_marginal_w,θ) ); # h_w(θ)= F_e|w(e|θ) fw(θ)
-    he(θ,e)=  ( cdf(dist_w_given_e(e),θ) )*( pdf(dist_marginal_e,e) ); # h_e(e)= F_w|e(θ|e) fe(e)
+
+    dist_marginal_w=Normal(μ_w,σ_w);
+    dist_marginal_e=Normal(μ_e,σ_e);
+    mean_w_given_e(x_e) = μ_w + σ_we*σ_w/σ_e*(x_e-μ_e);
+    var_w_given_e = (1.0-σ_we^2.0)*σ2_w;
+    dist_w_given_e(x_e)=Normal(mean_w_given_e(x_e),var_w_given_e^0.5);
+    mean_e_given_w(x_θ) = μ_e + σ_we*σ_e/σ_w*(x_θ-μ_w);
+    var_e_given_w= (1.0-σ_we^2.0)*σ2_e;
+    dist_e_given_w(x_θ)=Normal(mean_e_given_w(x_θ),var_e_given_w^0.5);
+    hw(θ,e)= (1/θ) * ( cdf(dist_e_given_w(log(θ)) ,log(e) )*( pdf(dist_marginal_w, log(θ)) ) ); # h_w(θ)= F_e|w(e|θ) fw(θ)
+    he(θ,e)= (1/e) * ( cdf(dist_w_given_e(log(e)), log(θ) )*( pdf(dist_marginal_e, log(e)) ) ); # h_e(e)= F_w|e(θ|e) fe(e)
     hh(θ,e,p)= hw(θ,e) + p*he(θ,e);
-    d=MvNormal([μ_w, μ_e], [σ2_w σ_we^2; σ_we^2 σ2_e]);
-    gg(θ,e) = pdf(d,[θ,e])
-    weights, nodes = gausslegendre(20);
+    cov= σ_we*σ_w*σ_e;
+    d=MvNormal([μ_w, μ_e], [σ2_w cov; cov σ2_e]);
+    gg(θ,e) = pdf(d,[log(θ),log(e)]) /(θ*e);
+    weights, nodes = gausslegendre(25);
 
     Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ϕ, G, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, nodes, weights);
+end
+
+function distr_hw(θ::Real, e::Real, pa::Param)
+    (N,)=size(pa.nodes);
+    b = e;
+    integral=0.0;
+    for i=1:N
+        x = (pa.nodes[i] +1.0)*b/2.0;
+        integral += pa.gg(θ,x)*pa.weights[i];
+    end
+    integral = integral*b/2.0;
+end
+
+
+function distr_he(θ::Real, e::Real, pa::Param)
+    (N,)=size(pa.nodes);
+    b = θ;
+    integral=0.0;
+    for i=1:N
+        x = (pa.nodes[i] +1.0)*b/2.0;
+        integral += pa.gg(x,e)*pa.weights[i];
+    end
+    integral = integral*b/2.0;
 end

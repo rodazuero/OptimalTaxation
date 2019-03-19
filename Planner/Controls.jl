@@ -1,84 +1,147 @@
 
 
 
-function find_controls!(ctrl::Array{Control}, θ, λ, ω, ss, pa)
-    h_e= pa.he( log(θ), log(ss.e));
-    h_w= pa.hw( log(θ), log(ss.e));
+function find_controls( θ, ss, pa)
+    h_e= pa.he(θ, ss.e);
+    h_w= pa.hw(θ, ss.e);
 
-    objective(z,n,l,p,κ) = ( ss.μ*pa.χ*l^(1+pa.ϕ)/θ + λ*( ss.e*n^pa.α*p*h_e - pa.β*z^(1+pa.σ)/(1+pa.σ)*p*h_e  - pa.χ*l^(1+pa.ϕ)*h_w/(1+pa.ϕ) ) + ω*( θ*l*h_w - n*p*h_e ) + ss.ϕ_e*p + κ*( pa.χ*l^(1+pa.ϕ)/θ  - p*n^pa.α*(1-pa.β*z^pa.σ) ) );
-    # The planner can always set everthing to zero.
-    mmaximum = 0.0;
+    nn = NaN;
+    zz = NaN;
+    ll = NaN;
+    pp = NaN;
 
-    # 1 - Look for candidate optimal controls with z=0
-    cnst1= pa.α*( λ*ss.uw*h_e - ss.uw^pa.ϕ*h_e - ss.ϕ_e) / (ω*h_e*(1-pa.α));
-    if cnst1 > 0
-        n = cnst1;
-        κ = λ*ss.e*pa.α*h_e - ω*n^(pa.α-1)*h_e;
+    A= ((ss.uw^pa.ϕ-ss.λ*ss.uw)*h_e + ss.ϕ_e) / (ss.λ*h_e);
 
-        if κ < 0
-            coeff = λ*pa.χ*h_w - (ss.μ + λ*κ)*(1+pa.ψ)*pa.χ/θ;
-            if coeff > 0
-                l = (ω*θ*h_w / coeff)^(1/pa.ψ);
-                p = (pa.χ*l^(1+pa.ψ)) / ( θ*n^pa.α );
-                mmaximum = objective(0.0,n,l,p,κ)
-                ctrl[1] = Control(n, p, 0.0, l);
+    aux(z,n) =  ss.λ*pa.χ*h_w - (ss.μ + z*ss.λ*h_e / (pa.σ* n^pa.α) )*(1+pa.ψ)*pa.χ/θ;
+    l(coef) = coef > 0.0 ? (ss.ω*θ*h_w/coef)^(1.0/pa.ψ) : Inf;
+    lz_extremum(coef) = coef > 0.0 ? (ss.ω*θ*h_w/(coef*pa.χ))^(1.0/pa.ψ) : Inf;
+    p(l,z,n) = pa.χ*l^(1.0+pa.ψ) / (θ*n^pa.α*(1.0-pa.β*z^pa.σ));
+    z_aux(n) = z(n,ss,pa, θ);
+    z_ub(n) =  z(n,ss,pa, θ) - (1.0 / pa.β)^(1.0/pa.σ);
+    zprime(n) = pa.α*pa.σ*ss.e*n^(pa.α-1.0) - ((pa.α*(1.0+pa.σ)-1.0)/pa.α)*ss.ω/ss.λ;
+    eq6_aux(n) = eq6(n,ss,pa, θ)
 
-            else
-                l = Inf;
-                p = Inf;
-                mmaximum = Inf;
-                ctrl[1] = Control(n, p, 0.0, l);
-            end
-        end # If κ>0, there is no solution with p=0.
+#Compute the bounds for n such that z(n) is positive and less beta z ^sigma < 1.
 
+
+    nub= ( (1.0/pa.β)^((1.0+pa.σ)/pa.σ)*(pa.β/(1.0+pa.σ)) - A )*(ss.λ*pa.α /(ss.ω*(1.0-pa.α))) ;
+    auxz1 = pa.χ*h_w-(1+pa.ψ)*(ss.μ + ss.λ/pa.σ*( (1/pa.β)^(1/pa.σ) - 1e-10)/nub^pa.α*h_e  )/θ - (1 + pa.ψ)/θ * (ss.λ*ss.e- ss.ω/pa.α *nub^(1-pa.α))*h_e;
+
+    if nub < 0.0
+        return     nn, zz, ll, pp;
+    elseif A > 0.0 # z(0)= (1+sigma)*A > 0 <=> A > 0
+        nlb= 0.0;
     else
-        cnst2 = θ*λ*h_w/(1+pa.ψ) - ss.μ;
-        if cnst2 < 0.0
-            p = Inf;
-            κ = cnst2;
-            n = eps();
-            l = Inf;
-            mmaximum = Inf;
-            ctrl[1] = Control(n, p, 0.0, l);
-        end # Else, complementary slackness for p=0 doesn't hold.
+        nlb = BigFloat(- A*ss.λ*pa.α / (ss.ω*(1.0-pa.α)));
+        auxz0 = pa.χ*h_w-(1+pa.ψ)*ss.μ/θ - (1 + pa.ψ)/θ * (ss.λ*ss.e- ss.ω/pa.α *nlb^(1-pa.α))*h_e;
     end
 
-    # 2 - Look for interior candidates
+    candidate_nn= my_find_zeros(eq6_aux, BigFloat(nlb), BigFloat(nub), 10);
 
-    cnst3 = 1.0 - pa.α*(1+pa.σ);
-    N(z) = (λ*z)/(pa.σ*(1+pa.σ)) * (1-pa.α - (pa.β*z^pa.σ)*( 1/(1+pa.σ) - pa.α ) ) - param1/h_e; #cf eq 21
+    if A < 0.0
+        append!(candidate_nn,nlb) # Case z=0
+    end
+    append!(candidate_nn,nub)
 
+    (K,)=size(candidate_nn)
 
+    if K==0
+        return nn, zz, ll, pp;
+    else
+        objective(z,n,l,p) = ss.uw^pa.ϕ*(h_w + p*h_e) + ss.μ*pa.χ*l^(1.0+pa.ψ)/θ + ss.λ*( ss.e*n^pa.α*p*h_e - pa.β*z^(1.0+pa.σ)/(1.0+pa.σ)*p*h_e - ss.uw*(h_w + p*h_e) - pa.χ*l^(1+pa.ψ)*h_w/(1+pa. ψ) ) + ss.ω*( θ*l*h_w - n*p*h_e ) + ss.ϕ_e*p ;
+        nn= candidate_nn[1];
 
+        zz= z_aux(nn);
 
-
-
-
-    vz=find_z( θ, λ, ω, ss, pa)
-    (Nz,) = size(vz);
-
-
-
-    for i=1:Nz
-        z = vz[i];
-        NN = λ*z/pa.σ * (1-pa.α - (pa.β*z^pa.σ)*( 1/(1+pa.σ) - pa.α ) ) - param1/h_e; #cf eq 21
-        n = (NN^(1/pa.α)) / ((1-pa.α)*λ*ss.e);
-        κ = λ*z*h_e/(n^pa.α);
-        coeff = (ss.μ + λ*κ)*(1+pa.ψ)*pa.χ/θ - λ*pa.χ*h_w;
-        if coeff > 0
-            l = (ω*θ*h_w / coeff)^(1/pa.ψ);
-            p = θ*n^pa.α / (pa.χ*l^(1+pa.ψ));
+        if zz == 0.0
+            ll = lz_extremum(auxz0);
+        elseif abs(zz^pa.σ*pa.β - 1.0) < 1e-14
+            println(1.0-pa.β*zz^pa.σ)
+            ll = lz_extremum(auxz1);
         else
-            l = Inf;
-            p = Inf;
+            ll = l(aux(zz, nn));
         end
+        pp= p(ll, zz, nn);
+        potential_value = objective(zz,nn,ll,pp)
+        current_max = isnan(potential_value) ? -Inf : potential_value;
+#        println("objetive = ", current_max)
+#        println("profits= ", Float64(ss.λ*ss.e*nn^pa.α-ss.ω*nn), " n = ", Float64(nn), " z = ", Float64(zz), " l = ", Float64(ll), " p= ", Float64(pp) )
 
-        candidate = objective(z,n,l,p,κ);
-        if candidate > mmaximum
-            mmaximum = candidate;
-            ctrl[1] = Control(n, p, z, l);
+        for j=2:K
+            potential_n=candidate_nn[j];
+            potential_z= z_aux(potential_n);
+            if potential_z==0.0
+                potential_l = lz_extremum(auxz0);
+            elseif abs((potential_z + 1e-10)^pa.σ*pa.β - 1.0) < 1e-14
+                potential_l = lz_extremum(auxz1);
+                println(1.0-pa.β*potential_z^pa.σ)
+            else
+                potential_l = l(aux(potential_z, potential_n));
+            end
+            potential_p= p(potential_l, potential_z, potential_n);
+
+            potential_value= objective(potential_z,potential_n,potential_l,potential_p);
+#            println("objetive = ", potential_value)
+#            println("profits= ", Float64(ss.λ*ss.e*potential_n^pa.α-ss.ω*potential_n), " n = ", Float64(potential_n), " z = ", Float64(potential_z), " l = ", Float64(potential_l), " p= ", Float64(potential_p) )
+
+            if isnan(potential_value)
+
+            elseif potential_value > current_max
+                current_max = potential_value;
+                nn= potential_n;
+                zz= potential_z;
+                ll= potential_l;
+                pp= potential_p
+            end
         end
     end
+    println(" A= ", A,  " he = ", h_e)
+    println("n= ", Float64(nn), " z= ", Float64(zz), " l= ",Float64(ll), " p= ",Float64(pp), " denominator= ", aux(zz,nn))
+    println("profits= ", Float64(ss.λ*ss.e*nn^pa.α-ss.ω*nn), " value = ", Float64(current_max))
+    nn, zz, ll, pp;
+end
 
-    nothing
+
+
+function init_controls( uw0, e0, ϕ_e0, λ0, ω0, pa)
+    θ      = exp(pa.μ_w-3*pa.σ2_w);
+    μ0     = 0.0;
+    y_agg0 = 0.0;
+    l_agg0 = 0.0;
+
+    ss = State(e0, uw0, ϕ_e0, μ0, λ0, ω0);
+    find_controls( θ, ss, pa);
+end
+
+
+function  eq6(n, ss, pa, θ)
+    if n == Inf
+        eq6 = Inf;
+    else
+        h_e = pa.he(θ, ss.e);
+        A= ((ss.uw^pa.ϕ-ss.λ*ss.uw)*h_e + ss.ϕ_e) / (ss.λ*h_e);
+        eq6= ss.e*n^pa.α - z(n, ss, pa, θ)/pa.σ + pa.β/((1+pa.σ)*pa.σ)*z(n, ss, pa, θ)^(pa.σ+1) - ss.ω/ss.λ*n + A;
+    end
+    if eq6 <0.0 && eq6>-1e-15
+        eq6 = 0.0
+    end
+    eq6
+ end
+
+
+function  z(n, ss, pa, θ)
+    h_e =  pa.he(θ, ss.e);
+    A= ((ss.uw^pa.ϕ-ss.λ*ss.uw)*h_e + ss.ϕ_e) / (ss.λ*h_e);
+
+    base_z = n*ss.ω*(1.0-pa.α)/pa.α/ss.λ + A
+
+    if base_z< 1e-15*n && base_z>-1e-15*n
+        return z=0.0
+    else
+        z = ( (1.0+pa.σ)/pa.β* base_z )^(1.0/(1.0+pa.σ))
+        if abs(z^(pa.σ)*pa.β - 1.0) < 1e-15*n
+            return z =(1.0/pa.β)^(1.0/pa.σ) - 1e-10
+        end
+    end
+    z
 end
