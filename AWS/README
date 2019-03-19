@@ -78,10 +78,16 @@ ssh -i /Users/rodrigoazuero/Documents/Parallelcomputing/amazoncomputing/rodazuer
 ssh -i /Users/rodrigoazuero/Documents/Parallelcomputing/amazoncomputing/rodazuero-key-pair-nvirginia.pem ubuntu@ec2-52-207-212-62.compute-1.amazonaws.com
 
 
-ssh -i /Users/rodrigoazuero/Dropbox/BACKUPRODRIGO/Parallelcomputing/amazoncomputing/RodrigoWashingtonDC.pem ec2-user@ec2-34-222-212-182.us-west-2.compute.amazonaws.com
+ssh -i /Users/rodrigoazuero/Dropbox/BACKUPRODRIGO/Parallelcomputing/amazoncomputing/RodrigoWashingtonDC.pem ec2-user@ec2-34-218-60-83.us-west-2.compute.amazonaws.com
+
+ssh -i /Users/rodrigoazuero/Dropbox/BACKUPRODRIGO/Parallelcomputing/amazoncomputing/RodrigoWashingtonDC.pem ec2-user@ec2-34-222-98-27.us-west-2.compute.amazonaws.com
+
+ssh -i /Users/rodrigoazuero/Dropbox/BACKUPRODRIGO/Parallelcomputing/amazoncomputing/RodrigoWashingtonDC.pem ec2-user@ec2-18-236-221-228.us-west-2.compute.amazonaws.com	
 
 
-
+ssh -i /Users/rodrigoazuero/Dropbox/BACKUPRODRIGO/Parallelcomputing/amazoncomputing/RodrigoWashingtonDC.pem ec2-user@ec2-34-211-29-255.us-west-2.compute.amazonaws.com	
+  
+ssh -i /Users/rodrigoazuero/Dropbox/BACKUPRODRIGO/Parallelcomputing/amazoncomputing/RodrigoWashingtonDC.pem ec2-user@ec2-54-212-22-209.us-west-2.compute.amazonaws.com
 
 
 

@@ -52,6 +52,7 @@ SOURCEHOPSPACK=main_hopspack.cpp
 SOURCENLOPT=main_nlopt.cpp
 SOURCESMOOTH=mainSmoothingDistribution.cpp
 SOURCEPARALLEL=mainTesla.cpp
+SOURCEOPTIMIZER=mainOptimizer.cpp
 
 #5. Home directory. in TESLA is /home/razu/
 HOME=/home/ec2-user/
@@ -66,9 +67,11 @@ export OMP_NUM_THREADS=4
 #3. Include directories:
 INCDIR1=/usr/lib64/R/library/RcppArmadillo/include/
 INCDIR2=$(HOME)install/include/
+INCDIR3=/home/ec2-user/R/x86_64-koji-linux-gnu-library/3.4/Rcpp/include
+INCDIR4=/usr/lib64/R/include
 
 #Generating the INC for all the paths ->this is for tesla
-INC=$(INCDIR1) $(INCDIR2)
+INC=$(INCDIR1) $(INCDIR2) $(INCDIR3) $(INCDIR4)
 #INC=$(INCDIR3)
 INC_PARAMS=$(foreach d, $(INC), -I$d)
 #-------------------------------------
@@ -125,6 +128,12 @@ parallel:
 	$(CC) $(SOURCEPARALLEL) $(INC_PARAMS) $(LNLOPT)   $(CFLAGS) $(DLIB)  -o $(OUTPUTPARALLEL)
 
 parallelrun: parallel
+	nohup ./$(OUTPUTPARALLEL)  > nohupPARALLR.out&
+
+optimizer: 
+	$(CC) $(SOURCEOPTIMIZER) $(INC_PARAMS) $(LNLOPT)   $(CFLAGS) $(DLIB)  -o $(OUTPUTPARALLEL)
+
+optimizerrun: optimizer
 	nohup ./$(OUTPUTPARALLEL)  > nohupPARALLR.out&
 
 

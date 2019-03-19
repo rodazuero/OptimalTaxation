@@ -75,10 +75,14 @@ chmod 400 /path/my-key-pair.pem
 *Access the server by:
 ssh -i /Users/rodrigoazuero/Documents/Parallelcomputing/amazoncomputing/rodazuero-key-pair-nvirginia.pem ec2-user@ec2-52-91-171-108.compute-1.amazonaws.com
 
+ssh -i /Users/rodrigoazuero/Documents/Parallelcomputing/amazoncomputing/rodazuero-key-pair-nvirginia.pem ec2-user@ec2-52-91-171-108.compute-1.amazonaws.com
+
 ssh -i /Users/rodrigoazuero/Documents/Parallelcomputing/amazoncomputing/rodazuero-key-pair-nvirginia.pem ubuntu@ec2-52-207-212-62.compute-1.amazonaws.com
 
 
-ssh -i /Users/rodrigoazuero/Dropbox/BACKUPRODRIGO/Parallelcomputing/amazoncomputing/RodrigoWashingtonDC.pem ec2-user@ec2-34-222-212-182.us-west-2.compute.amazonaws.com
+ssh -i /Users/rodrigoazuero/Dropbox/BACKUPRODRIGO/Parallelcomputing/amazoncomputing/RodrigoWashingtonDC.pem ec2-user@ec2-34-211-29-255.us-west-2.compute.amazonaws.com
+
+ssh -i /Users/rodrigoazuero/Dropbox/BACKUPRODRIGO/Parallelcomputing/amazoncomputing/RodrigoWashingtonDC.pem ec2-user@ec2-18-236-221-228.us-west-2.compute.amazonaws.com
 
 
 ssh -i /Users/rodrigoazuero/Dropbox/cons/attemptconsult.pem ubuntu@54.237.202.145

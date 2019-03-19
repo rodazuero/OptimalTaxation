@@ -8,7 +8,7 @@ library(reshape)
 library(Rcpp)
 library(RcppArmadillo)
 library(mvtnorm)
-Rcpp::sourceCpp('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/main.cpp')
+Rcpp::sourceCpp('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/main.cpp')
 GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments"
 
 
@@ -22,10 +22,10 @@ GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxati
   
   #Parameter definition
   aalpha=0.8
-  wi=1.38
-  wf=1.46
-  ni=2.3
-  nf=0.53*70
+  wi=8
+  wf=8
+  ni=10
+  nf=50
   ggamma=0.28
   ddelta=0.12
   bbeta=0.15
@@ -35,13 +35,37 @@ GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxati
   chi=1.5
   rrho=0.9
   z=24
-  li=2.1
-  lf=2.1
+  li=0.5
+  lf=0.5
   mmu1<-0.2
   mmu2<-1.3
   ssigma1<-0.1
   ssigma2<-0.9
   rho12<-0.08
+  
+  partest<-c(0.0682324, 6.82592, 647.281, 324.671, 8.25678, 263.156,
+             3.17603, 592.294, 3.01674, 0.420156, 3.92797,1.51879,4.14574,0.0519922,0.0519922)
+  
+  aalpha<-partest[1]
+  ggamma<-partest[2]
+  ddelta<-partest[3]
+  bbeta<-partest[4]
+  ssigma<-partest[5]
+  kkappa<-partest[6]
+  psi<-partest[7]
+  chi<-partest[8]
+  rrho<-partest[9]
+  mmu1<-partest[10]
+  mmu2<-partest[11]
+  ssigma1<-partest[12]
+  ssigma2<-partest[13]
+  rho12<-partest[14]
+
+  
+  
+ 
+
+  
   #Obtaining the mean ttheta:
   Sigma <- matrix(c(ssigma1,rho12,rho12,ssigma2),2,2)
   mu=c(mmu1,mmu2)
@@ -501,9 +525,11 @@ GRAPHS="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxati
   
   #Wages initial guess
   WagesInitialGuess=c(wi,wf)
-  WagesInitialGuess=c(wi,wf)
-  
+  WagesInitialGuess=c(8,8)
   #Trying the equilibrium function
+  ParamsDecisionExcessDemand[2]=ggamma
+  ParamsDecisionExcessDemand[3]=ddelta
+  
   WEq=EqWagesNumericVector(ParamsDecisionExcessDemand,WagesInitialGuess)
   wiEq=WEq[1]
   wfEq=WEq[2]

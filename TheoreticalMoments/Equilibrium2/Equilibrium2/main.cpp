@@ -132,20 +132,20 @@ long double TnActual(double nomina){
 
 //1.9. Production. C*0 to eliminate c
 long double production(double ni, double nf, double aalpha, double tthetae,double c){
-    double prod=tthetae*pow((c*0+ni+nf),aalpha);
+    double prod=tthetae*pow((c*1+ni+nf),aalpha);
     return(prod);
 }
 
 //2. Pre-tax profits.Checked. C*0 to eliminate c
 long double profm(double ni, double nf, double aalpha, double tthetae, double wi, double wf, double c){
-    double pi1=tthetae*pow((c*0+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
+    double pi1=tthetae*pow((c*1+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
     return(pi1);
     
 }
 
 //3. Corporate tax profits, marginal. C*0 to eliminate c
 long double Tc(double z, double ni, double nf, double aalpha,double tthetae, double wi, double wf,double c){
-    double profm=tthetae*pow((c*0+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
+    double profm=tthetae*pow((c*1+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
     double arg=profm-z;
     double firsterm=-exp(-arg);
     //If negative profits, set zero marginal rate
@@ -160,11 +160,11 @@ long double Tc(double z, double ni, double nf, double aalpha,double tthetae, dou
 // For instance. 189=5000*12*0.315/100 c*0 to eliminate c
 long double TcActual(double z, double ni, double nf, double aalpha, double tthetae, double wi, double wf,double c){
     
-    double profm=tthetae*pow((c*0+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
+    double profm=tthetae*pow((c*1+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
     double arg=profm-z;
     double ans=0;
     double tax=0;
-    double prod=tthetae*pow((c*0+ni+nf),aalpha);
+    double prod=tthetae*pow((c*1+ni+nf),aalpha);
     if(prod-z<=0){
         ans=0;
     }
@@ -235,6 +235,21 @@ long double FinProfits(const double *Args, double paramvec[9]){
     double tthetae=paramvec[7];
     double c=paramvec[8];//added
     
+    
+   // cout << ggamma << " ggamma "<< endl;
+   // cout << ddelta << " ddelta "<< endl;
+    
+    int test=2;
+    if(test==1){
+        cout << aalpha << " aalpha"<< endl;
+        cout << ddelta << " ddelta"<< endl;
+        cout << ggamma << " ggamma"<< endl;
+        cout << bbeta << " bbeta"<< endl;
+        cout << ssigma << " ssigma"<< endl;
+        cout << tthetae << " tthetae"<< endl;
+        cout << c << " c"<< endl;
+    }
+ 
     
     
     
@@ -330,7 +345,7 @@ vector<double> profitsFinMaxim(double InitialCond[3], double wi,
     
     //Finding optimal
     nlopt_optimize(optProfits, x3, &minf3);
-    nlopt_destroy(optProfits);
+    
     //if (nlopt_optimize(optProfits, x3, &minf3) < 0) {
     //    printf("nlopt failed!\n");
     //}
@@ -343,6 +358,8 @@ vector<double> profitsFinMaxim(double InitialCond[3], double wi,
     double nf=x3[1];
     double z=x3[2];
     double Args[3];
+    
+    
     Args[0]=ni;
     Args[1]=nf;
     Args[2]=z;
@@ -361,7 +378,7 @@ vector<double> profitsFinMaxim(double InitialCond[3], double wi,
     Ans[1]=nf;
     Ans[2]=z;
     Ans[3]=Prof;
-    
+    nlopt_destroy(optProfits);
     
     
     return(Ans);
@@ -383,6 +400,8 @@ double ValueWorkers(const double *Args, double ParamWorkers[7]){
     
     double li=Args[0];
     const double lf=Args[1];
+    
+
     
     //Term1 is total income
     double term1=(wf*lf+wi*li)*tthetaw;
@@ -528,6 +547,7 @@ vector<vector<double> > iDecision(vector<double> Ttheta,
     
     
     if(1==2){
+        cout << " inside of the idecision stuff "<< endl;
         cout << wi<< " wi "<< endl;
         cout <<  wf<< " wf "<< endl;
         cout <<  aalpha<< " aalpha "<< endl;
@@ -539,6 +559,7 @@ vector<vector<double> > iDecision(vector<double> Ttheta,
         cout <<  rrho<< " rrho "<< endl;
         cout <<  psi<< " psi "<< endl;
         cout <<  chi<< " chi "<< endl;
+        cout << c << " c " << endl;
         cout << tthetaw << " tthetaw "<< endl;
         cout << tthetae << " tthetae "<< endl;
         cout << InitialVworkers[0] << " InitialVworkers[0]"<< endl;
@@ -610,7 +631,7 @@ double ExcessDemandFunctions(vector<double>Wages,vector<double>Params,vector<dou
     
     
     
-    int M=10000;
+    int M=1000;
     double InformalDemand[M];
     double InformalSupply[M];
     double FormalDemand[M];
@@ -681,6 +702,8 @@ double ExcessDemandFunctions(vector<double>Wages,vector<double>Params,vector<dou
     double ssigma1=Params[11];
     double ssigma2=Params[12];
     double rho12=Params[13];
+    
+    
     
     
     double m2[] = {ssigma1, rho12,  rho12,  ssigma2};
@@ -798,6 +821,7 @@ double StandardizedExcessDemands(const double *Wages, double Others[21]){
     
     vector<double>Params;
     Params.resize(16);
+    
     for(int it=0;it<16;it++){
         Params[it]=Others[it];
     }
@@ -847,7 +871,7 @@ vector<double> EqWages(vector <double> Others, vector<double> WagesInit){
     //        Need to reconvert to double.
     
     double DOthers[21];
-    for(int it=0; it<21;it++){
+    for(int it=0; it<20;it++){
         DOthers[it]=Others[it];
     }
     
@@ -914,7 +938,7 @@ arma::vec EqWagesNumericVector(arma::vec Others, arma::vec WagesInit){
     //Others: Vector of parameters used to find equilibrium.
     //        Need to reconvert to double.
     cout << Others[15] << " Others[15] in "<< endl;
-    double DOthers[20];
+    double DOthers[21];
     for(int it=0; it<20;it++){
         DOthers[it]=Others[it];
         cout << it << " it "<< endl;
@@ -991,7 +1015,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
                                     arma::vec armaInitLWorkers,arma::vec armaInitProf){
     //Others: Vector of parameters used to determine equilibrium stuff.
     //It is used as arma::vec, translate it to a double vector;
-    double DOthers[20];
+    double DOthers[21];
     for(int it=0; it<20;it++){
         DOthers[it]=Others[it];
     }
@@ -1029,7 +1053,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
     InitProfdouble[2]=InitProf[2];
     
     //Generate how many draws to obtain the moments
-    int M=10000;
+    int M=1000;
     
     
     //Initialize vector of moments
@@ -1194,7 +1218,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
             TthetasEntreprenIndex[NumberEntrep]=Ttheta[1];
             EntreprenIndex[NumberEntrep]=it;
             NumberEntrep=NumberEntrep+1;
-            TotalProduction+=production(DecVector[0][1],  DecVector[1][1],  aalpha,  Ttheta[1], 0);
+            TotalProduction+=production(DecVector[0][1],  DecVector[1][1],  aalpha,  Ttheta[1], c);
         }
         
     }
@@ -1293,11 +1317,6 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         //2. Taxes payed;
         TaxesPayed[it]=TcActual(WsolTAXES[2],WsolTAXES[0],WsolTAXES[1],aalpha,EntreprenVecPair[it].first,wi,wf,c);
         TaxesPayedTotal+=TaxesPayed[it];
-        cout << " ----"<< endl;
-        cout << it << " it "<< endl;
-        cout << TaxesPayedTotal << "taxespayedtotal"<< endl;
-        cout <<EntreprenVecPair[it].first << " tthetae"<< endl;
-        cout << TaxesPayed[it] << " taxespayed it"<< endl;
     }
     
     //Now I will obtain the proportion of taxes payed in each decile
@@ -1307,115 +1326,61 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
     for(int it=0; it<decileEntrep[0]; it++){
         sumaimpuestos+=TaxesPayed[it]/TaxesPayedTotal;
         taxesCumulative[0]=sumaimpuestos;
-        cout << " ----- "<< endl;
-        cout << sumaimpuestos << " taxesCumulative[0] "<< endl;
-        cout << TaxesPayed[it]<< " taxespayedit"<< endl;
-        cout << it << " it en decil 1 "<< endl;
-        cout << decileEntrep[0] << " decileEntrep "<< endl;
-        cout << taxesCumulative[0] << " taxesCumulative[0]"<< endl;
+
     }
     
     //Decile 2.
     for(int it=decileEntrep[0]+1; it<decileEntrep[1]; it++){
         sumaimpuestos+=TaxesPayed[it]/TaxesPayedTotal;
         taxesCumulative[1]=sumaimpuestos;
-        cout << " ----- "<< endl;
-        cout << sumaimpuestos << " taxesCumulative[0] "<< endl;
-        cout << TaxesPayed[it]<< " taxespayedit"<< endl;
-        cout << it << " it en decil 2 "<< endl;
-        cout << decileEntrep[1] << " decileEntrep "<< endl;
-        cout << taxesCumulative[1] << " taxesCumulative[0]"<< endl;
+
     }
     
     //Decile 3.
     for(int it=decileEntrep[1]+1; it<decileEntrep[2]; it++){
         sumaimpuestos+=TaxesPayed[it]/TaxesPayedTotal;
         taxesCumulative[2]=sumaimpuestos;
-        cout << " ----- "<< endl;
-        cout << sumaimpuestos << " taxesCumulative[0] "<< endl;
-        cout << TaxesPayed[it]<< " taxespayedit"<< endl;
-        cout << it << " it en decil 3 "<< endl;
-        cout << decileEntrep[2] << " decileEntrep "<< endl;
-        cout << taxesCumulative[2] << " taxesCumulative[0]"<< endl;
+
     }
     
     //Decile 4.
     for(int it=decileEntrep[2]+1; it<decileEntrep[3]; it++){
         sumaimpuestos+=TaxesPayed[it]/TaxesPayedTotal;
         taxesCumulative[3]=sumaimpuestos;
-        cout << " ----- "<< endl;
-        cout << sumaimpuestos << " taxesCumulative[0] "<< endl;
-        cout << TaxesPayed[it]<< " taxespayedit"<< endl;
-        cout << it << " it en decil 4 "<< endl;
-        cout << decileEntrep[3] << " decileEntrep "<< endl;
-        cout << taxesCumulative[3] << " taxesCumulative[0]"<< endl;
+
     }
     //Decile 5.
     for(int it=decileEntrep[3]+1; it<decileEntrep[4]; it++){
         sumaimpuestos+=TaxesPayed[it]/TaxesPayedTotal;
         taxesCumulative[4]=sumaimpuestos;
-        cout << " ----- "<< endl;
-        cout << sumaimpuestos << " taxesCumulative[0] "<< endl;
-        cout << TaxesPayed[it]<< " taxespayedit"<< endl;
-        cout << it << " it en decil 5 "<< endl;
-        cout << decileEntrep[4] << " decileEntrep "<< endl;
-        cout << taxesCumulative[4] << " taxesCumulative[0]"<< endl;
+
     }
     //Decile 6.
     for(int it=decileEntrep[4]+1; it<decileEntrep[5]; it++){
         sumaimpuestos+=TaxesPayed[it]/TaxesPayedTotal;
         taxesCumulative[5]=sumaimpuestos;
-        cout << " ----- "<< endl;
-        cout << sumaimpuestos << " taxesCumulative[0] "<< endl;
-        cout << TaxesPayed[it]<< " taxespayedit"<< endl;
-        cout << it << " it en decil 6 "<< endl;
-        cout << decileEntrep[5] << " decileEntrep "<< endl;
-        cout << taxesCumulative[5] << " taxesCumulative[0]"<< endl;
+
     }
     //Decile 7.
     for(int it=decileEntrep[5]+1; it<decileEntrep[6]; it++){
         sumaimpuestos+=TaxesPayed[it]/TaxesPayedTotal;
         taxesCumulative[6]=sumaimpuestos;
-        cout << " ----- "<< endl;
-        cout << sumaimpuestos << " taxesCumulative[0] "<< endl;
-        cout << TaxesPayed[it]<< " taxespayedit"<< endl;
-        cout << it << " it en decil 7 "<< endl;
-        cout << decileEntrep[6] << " decileEntrep "<< endl;
-        cout << taxesCumulative[6] << " taxesCumulative[0]"<< endl;
+
     }
     //Decile 8.
     for(int it=decileEntrep[6]+1; it<decileEntrep[7]; it++){
         sumaimpuestos+=TaxesPayed[it]/TaxesPayedTotal;
         taxesCumulative[7]=sumaimpuestos;
-        cout << " ----- "<< endl;
-        cout << sumaimpuestos << " taxesCumulative[0] "<< endl;
-        cout << TaxesPayed[it]<< " taxespayedit"<< endl;
-        cout << it << " it en decil 8 "<< endl;
-        cout << decileEntrep[7] << " decileEntrep "<< endl;
-        cout << taxesCumulative[7] << " taxesCumulative[0]"<< endl;
+
     }
     //Decile 9.
     for(int it=decileEntrep[7]+1; it<decileEntrep[8]; it++){
         sumaimpuestos+=TaxesPayed[it]/TaxesPayedTotal;
         taxesCumulative[8]=sumaimpuestos;
-        cout << " ----- "<< endl;
-        cout << sumaimpuestos << " taxesCumulative[0] "<< endl;
-        cout << TaxesPayed[it]<< " taxespayedit"<< endl;
-        cout << it << " it en decil 9 "<< endl;
-        cout << decileEntrep[8] << " decileEntrep "<< endl;
-        cout << taxesCumulative[8] << " taxesCumulative[0]"<< endl;
-    }
-    cout << NumberEntrep << " numberentrepre"<< endl;
-    
-    //Let's see how are the taxes deciles behaving:
-    cout << " taxes cumulative!!! "<< endl;
-    for(int it=0; it<9; it++){
-        cout << " ------"<< endl;
-        cout << it << " it "<< endl;
-        cout <<taxesCumulative[it] << " taxes "<< endl;
+
     }
     
-    
+   
     
     
     
@@ -1433,8 +1398,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         Wsol=profitsFinMaxim(InitProfdouble,  wi,wf,aalpha,ddelta, ggamma,bbeta,
                              ssigma, Tthetae[it],c);
         
-        cout << ddelta << " ddelta"<< endl;
-        cout << ggamma << " ggamma "<< endl;
+  
         
         //Wsol contains: ni, nf, z, prof
         
@@ -1446,16 +1410,17 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         
         //3. Workers employed
         WorkersTotalDemanded[it]=Wsol[0]+Wsol[1];
-        cout <<  TaxesAbsolute[it] << " TaxesAbsolute[it] "<< endl;
-        cout << Wsol[0] << " Wsol[0] "<< endl;
-        cout << Wsol[0] << " Wsol[0] "<< endl;
-        cout << Wsol[1] << " Wsol[1] "<< endl;
-        cout << Wsol[0]+Wsol[1] << " Wsol[0]+Wsol[1] "<< endl;
+
         
         //4. Proportioninformaldemanded
         PropInformalDemanded[it]=Wsol[0]/(max(WorkersTotalDemanded[it],0.001));
-        cout << PropInformalDemanded[it] << "Wsol[0]/WorkersTotalDemanded[it]  "<< endl;
+        if(WorkersTotalDemanded[it]==0){
+            PropInformalDemanded[it]=1;
+        }
         
+        cout << " ----"<< endl;
+        cout <<Wsol[0] << " informaldemanded "<< endl;
+        cout <<  WorkersTotalDemanded[it] << " total labor demand  total"<< endl;
         
     }
     //Taxes payed proportionally
@@ -1490,24 +1455,12 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         //2. Informal labor supply proportion
         
         InformalLaborSupplyProp[it]=SolWorker[0]/max(SolWorker[0]+SolWorker[1],0.00001);
-        cout << InformalLaborSupplyProp[it] << " InformalLaborSupplyProp[it]"<< endl;
         
         //3. Total Labor Supply
         TotalLaborSupply[it]=SolWorker[0]+SolWorker[1];
-        cout << " ------"<< endl;
-        cout << InitLWorkersDouble[0] << " InitLWorkersDouble[0]"<< endl;
-        cout << InitLWorkersDouble[1] << " InitLWorkersDouble[1]"<< endl;
-        cout << wf << " wf "<< endl;
-        cout << wi << " wi "<< endl;
-        cout << kkappa << " kkappa "<< endl;
-        cout << rrho << " rrho"<< endl;
-        cout << psi << " psi "<< endl;
-        cout << chi << " chi"<< endl;
-        cout << Tthetaw[it] << " Tthetaw[it]"<< endl;
-        cout << it << " it "<< endl;
-        cout << SolWorker[0] <<" SolWorker[0] "<< endl;
-        cout << SolWorker[1] <<" SolWorker[1] "<< endl;
-        
+        cout << " ----"<< endl;
+        cout <<TotalLaborSupply[it] << " total labor supply "<< endl;
+        cout <<InformalLaborSupplyProp[it] << " total labor supply  informal"<< endl;
         
         
     }
@@ -1551,21 +1504,7 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
         answer[it][8]=propWages;
         
         
-        cout << " ------ "<< endl;
-        cout << it << " it "<< endl;
-        cout << Production[it]<< " production it"<< endl;
-        cout << TaxesProportionally[it] << " taxes it "<< endl;
-        cout << PropInformalDemanded[it] << " propinformaldemand "<< endl;
-        cout << answer[it][5] << " informal labor supply proportion "<< endl;
-        cout <<answer[it][7] << "Entrepreneurs proportion "<< endl;
-        cout << TotalLaborSupply[it]<< " TotalLaborSupply[it] "<< endl;
-        cout <<WorkersTotalDemanded[it]<< " workers total demanded[it]"<< endl;
-        cout << NumberEntrep << " number of entrepreneurs "<< endl;
-        cout << NumberWorkers << " Number of workers "<< endl;
         
-        cout << NumberEntrep+NumberWorkers << "workers+entre"<< endl;
-        cout << propWages << "propWages"<< endl;
-        cout << doubNumberEntrep/(doubNumberEntrep+doubNumberWorkers)<< " proportion manually"<< endl;
     }
     
     
@@ -1591,8 +1530,7 @@ vector<vector<double> > EquilibriumMoments(arma::vec Others, arma::vec WagesInit
     //1. Find the equilibrium wages
     //Testing the moment generating function
     arma::vec WagesEquilibrium=EqWagesNumericVector(Others, WagesInit);
-    cout << WagesEquilibrium[0]<< " wi "<< endl;
-    cout << WagesEquilibrium[1]<< " wf "<< endl;
+
     //2. Once we find the equilibrium wages, obtain the moments.
     vector<vector<double> >answ(9);
     for(int it=0;it<9;it++){
@@ -1612,33 +1550,13 @@ vector<vector<double> > EquilibriumMoments(arma::vec Others, arma::vec WagesInit
 
 
 //Computing distances from theoretical to empirical moments.
-int iteratMinimizeDistance=0;
+
 // [[Rcpp::export]]
 double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
                          arma::vec armaInitLWorkers,arma::vec armaInitProf){
     
     
-    arma::vec VOTHERS[20];
-    VOTHERS[0]=Others[0];
-    VOTHERS[1]=Others[1];
-    VOTHERS[2]=Others[2];
-    VOTHERS[3]=Others[3];
-    VOTHERS[4]=Others[4];
-    VOTHERS[5]=Others[5];
-    VOTHERS[6]=Others[6];
-    VOTHERS[7]=Others[7];
-    VOTHERS[8]=Others[8];
-    VOTHERS[9]=Others[9];
-    VOTHERS[10]=Others[10];
-    VOTHERS[11]=Others[11];
-    VOTHERS[12]=Others[12];
-    VOTHERS[13]=Others[13];
-    VOTHERS[14]=Others[14];
-    VOTHERS[15]=Others[15];
-    VOTHERS[16]=Others[16];
-    VOTHERS[17]=Others[17];
-    VOTHERS[18]=Others[18];
-    VOTHERS[19]=Others[19];
+    
     
     for(int it=0; it<20; it++){
         cout <<Others[it]<< " othersit in distance estimator"<< endl;
@@ -1675,28 +1593,34 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     //Total income
     vector<double> IncomeEmpirical(9);
-    IncomeEmpirical[0]=82.756;
-    IncomeEmpirical[1]=135.012;
-    IncomeEmpirical[2]=164.702;
-    IncomeEmpirical[3]=197.829;
-    IncomeEmpirical[4]=225.682;
-    IncomeEmpirical[5]=268.271;
-    IncomeEmpirical[6]=318.264;
-    IncomeEmpirical[7]=394.568;
-    IncomeEmpirical[8]=595.318;
+    IncomeEmpirical[0]=82.756/225.682;
+    IncomeEmpirical[1]=135.012/225.682;
+    IncomeEmpirical[2]=164.702/225.682;
+    IncomeEmpirical[3]=197.829/225.682;
+    IncomeEmpirical[4]=225.682/225.682;
+    IncomeEmpirical[5]=268.271/225.682;
+    IncomeEmpirical[6]=318.264/225.682;
+    IncomeEmpirical[7]=394.568/225.682;
+    IncomeEmpirical[8]=595.318/225.682;
+    
+    //Transforming theoretical income in proportion in terms of median:
+    for(int it=0; it<9; it++){
+        Theomoments[it][4]=Theomoments[it][4]/max(Theomoments[4][4],0.001);
+        Theomoments[it][0]=Theomoments[it][0]/max(Theomoments[4][0],0.001);
+    }
     
     //Production
     vector<double> Production(9);
     
-    Production[0]=900.900;
-    Production[1]=1653.750;
-    Production[2]=2520.000;
-    Production[3]=3698.415;
-    Production[4]=5246.640;
-    Production[5]=7257.600;
-    Production[6]=10584.000;
-    Production[7]=17050.950;
-    Production[8]=38690.505;
+    Production[0]=900.900/5246.640;
+    Production[1]=1653.750/5246.640;
+    Production[2]=2520.000/5246.640;
+    Production[3]=3698.415/5246.640;
+    Production[4]=5246.640/5246.640;
+    Production[5]=7257.600/5246.640;
+    Production[6]=10584.000/5246.640;
+    Production[7]=17050.950/5246.640;
+    Production[8]=38690.505/5246.640;
     
     
     //Taxes
@@ -1725,19 +1649,20 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     InformalSupplyProportion[7]=0.3731343;
     InformalSupplyProportion[8]=0.2298507;
     
-    //Total labor supply with respect to the median
+    //Total labor supply with respect to the median.
+    //TAKING THE VERSION CORRESPONDING TO
     vector<double> TotalLaborSupply(10);
-    TotalLaborSupply[0]=0.4659087;
-    TotalLaborSupply[1]=0.7894921;
-    TotalLaborSupply[2]=0.9340006;
-    TotalLaborSupply[3]=0.9634213;
+    TotalLaborSupply[0]=0.748;
+    TotalLaborSupply[1]=0.904;
+    TotalLaborSupply[2]=0.991;
+    TotalLaborSupply[3]=1.02;
     TotalLaborSupply[4]=1.0000000;
-    TotalLaborSupply[5]=0.9734178;
-    TotalLaborSupply[6]=0.9652412;
-    TotalLaborSupply[7]=0.9536791;
-    TotalLaborSupply[8]=0.9637087;
-    TotalLaborSupply[9]=0.9636364;
-    double test=0;
+    TotalLaborSupply[5]=1.03;
+    TotalLaborSupply[6]=1.05;
+    TotalLaborSupply[7]=1.04;
+    TotalLaborSupply[8]=1.02;
+    TotalLaborSupply[9]=0.997;
+    double test=1;
     
     //Open file where moments will be stored
     
@@ -1765,15 +1690,34 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
             
         }
         
+        
+        
         distance+=pow((Production[it]-Theomoments[it][0])/(max(0.0001,Production[it])),2);
+        
+        cout << "contribution distance production "<<pow((Production[it]-Theomoments[it][0])/(max(0.0001,Production[it])),2)<< endl;
+        
         distance+=pow((Taxes[it]-Theomoments[it][1])/(max(0.0001,Taxes[it])),2);
+        
+        cout << "contribution taxes  "<<pow((Taxes[it]-Theomoments[it][1])/(max(0.0001,Taxes[it])),2)<< endl;
+        
+        
         distance+=pow((IncomeEmpirical[it]-Theomoments[it][4])/(max(0.0001,IncomeEmpirical[it])),2);
+        cout << "contribution IncomeEmpirical  "<<pow((IncomeEmpirical[it]-Theomoments[it][4])/(max(0.0001,IncomeEmpirical[it])),2)<< endl;
+        
         distance+=pow((InformalSupplyProportion[it]-Theomoments[it][5])/(max(0.0001,InformalSupplyProportion[it])),2);
+        cout << "contribution InformalSupplyProportion  "<<pow((InformalSupplyProportion[it]-Theomoments[it][5])/(max(0.0001,InformalSupplyProportion[it])),2)<< endl;
+        
         distance+=pow((TotalLaborSupply[it]-Theomoments[it][6])/(max(0.0001,TotalLaborSupply[it])),2);
+        cout << "contribution TotalLaborSupply  "<<pow((TotalLaborSupply[it]-Theomoments[it][6])/(max(0.0001,TotalLaborSupply[it])),2)<< endl;
+        
         distance+=pow((PropEntrepEmpirical[it]-Theomoments[it][7])/(max(0.0001,PropEntrepEmpirical[it])),2);
+        
+        cout << "contribution PropEntrepEmpirical  "<<pow((PropEntrepEmpirical[it]-Theomoments[it][7])/(max(0.0001,PropEntrepEmpirical[it])),2)<< endl;
         
         //I will add a part corresponding to the 0.8 approximately retribution to work. Need to adapt.
         distance+=pow((0.75-Theomoments[it][8])/0.75,2);
+        
+        cout << "contribution pago a salarios  "<<pow((0.75-Theomoments[it][8])/0.75,2)<< endl;
         
     }
     
@@ -1792,6 +1736,12 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     distance+=pow((Theomoments[3][3]-0.996)/(0.996),2);
     distance+=pow((Theomoments[6][3]-0.97)/(0.912),2);
     distance+=pow((Theomoments[7][3]-0.912)/(0.912),2);
+    distance+=pow((Theomoments[8][3]-0.001)/(0.001),2);
+    
+    cout << " pow((Theomoments[3][3]-0.996)/(0.996),2) "<< pow((Theomoments[3][3]-0.996)/(0.996),2) << endl;
+    cout << " pow((Theomoments[6][3]-0.996)/(0.996),2) "<< pow((Theomoments[6][3]-0.97)/(0.97),2) << endl;
+    cout << " pow((Theomoments[7][3]-0.996)/(0.996),2) "<< pow((Theomoments[7][3]-0.91)/(0.91),2) << endl;
+    cout << " pow((Theomoments[8][3]-0.996)/(0.996),2) "<< pow((Theomoments[8][3]-0.01)/(0.01),2) << endl;
     
     
     //Writing the csv file of the moments
@@ -1905,27 +1855,38 @@ double StandardizedDistanceEstimator(const double *Parameters, double Additional
     double ssigma1=Parameters[10];
     double ssigma2=Parameters[11];
     double rho12=Parameters[12];
-    double c=0;
-    double aalpha=Parameters[13];
+    double c=Parameters[13];
+    double aalpha=Parameters[14];
+    
+    cout << aalpha << " aalpha in standardized distance"<< endl;
+    cout << ggamma << " ggamma in standardized distance"<< endl;
+    cout << ddelta << " ddelta in standardized distance"<< endl;
+    cout << mmu1 << " mmu1 in standardized distance"<< endl;
+    cout << c << " c in standardized distance"<< endl;
+    cout << psi << " psi in standardized distance"<< endl;
+    cout << chi << " chi in standardized distance"<< endl;
+    cout << rho12 << " rho12 in standardized distance"<< endl;
+    cout << ssigma1 << " ssigma1 in standardized distance"<< endl;
+    cout << kkappa << " kkappa in standardized distance"<< endl;
     
     //Now loading the remaining of the variables necessary for the analysis
     //double aalpha=AdditionalVars[0]; Loading before aalpha was a parameter
     
     //Wages
     arma::vec WagesVector=arma::zeros(2);
-    WagesVector[0]=AdditionalVars[1];
-    WagesVector[1]=AdditionalVars[2];
+    WagesVector[0]=AdditionalVars[0];
+    WagesVector[1]=AdditionalVars[1];
     
     //Initializing optimizers of workers and entrepreneurs
     arma::vec InitLWorkers=arma::zeros(2);
-    InitLWorkers[0]=AdditionalVars[3];
-    InitLWorkers[1]=AdditionalVars[4];
+    InitLWorkers[0]=AdditionalVars[2];
+    InitLWorkers[1]=AdditionalVars[3];
     
     //Initializing entrepreneurs moments
-    arma::vec InitProf=arma::zeros(2);
-    InitProf[0]=AdditionalVars[5];
-    InitProf[1]=AdditionalVars[6];
-    InitProf[2]=AdditionalVars[7];
+    arma::vec InitProf=arma::zeros(3);
+    InitProf[0]=AdditionalVars[4];
+    InitProf[1]=AdditionalVars[5];
+    InitProf[2]=AdditionalVars[6];
     
     
     //The necessary parameters to be estimated are:
@@ -1933,8 +1894,8 @@ double StandardizedDistanceEstimator(const double *Parameters, double Additional
     arma::vec Others=arma::zeros(20);
     
     Others[0]=aalpha;
-    Others[1]=ddelta;
-    Others[2]=ggamma;
+    Others[1]=ggamma;
+    Others[2]=ddelta;
     Others[3]=bbeta;
     Others[4]=ssigma;
     Others[5]=kkappa;
@@ -1969,18 +1930,20 @@ double StandardizedDistanceEstimator(const double *Parameters, double Additional
 
 
 //11. MinimizeExcessDemands
-
+int iteratMinimizeDistance=0;
 double MinimizeDistanceTranslate(unsigned n, const double *x, double *grad, void *MinimizeDistance_data){
     //Void to double
     //cout << profitsFinMaxim_data<< " this stuff"<< endl;
+    cout << " minimizedistance translate0000 "<< endl;
     double *Params = (double *)MinimizeDistance_data;
-    
+    cout << " minimizedistance translate "<< endl;
     
     
     double result=StandardizedDistanceEstimator(x,Params);
-    //cout << result << " evalF"<< endl;
+    cout << " minimizedistance translate1 "<< endl;
+    cout << result << " evalF"<< endl;
     iteratMinimizeDistance=iteratMinimizeDistance+1;
-    //printf("Iteration=(%d); Feval=%0.10g\n", iteratMinimizeDistance, result);
+    printf("Iteration=(%d); Feval=%0.10g\n", iteratMinimizeDistance, result);
     return(result);
 }
 
@@ -2007,11 +1970,25 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     double ssigma1=Parameters[10];
     double ssigma2=Parameters[11];
     double rho12=Parameters[12];
-    double c=0;
+    double c=Parameters[13];
     double aalpha=Parameters[14];
     
+    
+    cout << aalpha << " aaalpha in minimizingdistance"<< endl;
+    cout << ggamma << " ggamma in minimizingdistance"<< endl;
+    cout << c << " c in minimizingdistance"<< endl;
+    
+    cout << AdditionalVars[0]<< " AdditionalVars[0] "<< endl;
+    cout << AdditionalVars[1]<< " AdditionalVars[1] "<< endl;
+    cout << AdditionalVars[2]<< " AdditionalVars[2] "<< endl;
+    cout << AdditionalVars[3]<< " AdditionalVars[3] "<< endl;
+    cout << AdditionalVars[4]<< " AdditionalVars[4] "<< endl;
+    cout << AdditionalVars[5]<< " AdditionalVars[5] "<< endl;
+    cout << AdditionalVars[6]<< " AdditionalVars[6] "<< endl;
+    cout << AdditionalVars[7]<< " AdditionalVars[7] "<< endl;
+    
     //We also need to translate it to a double to use the minimizer
-    double ParamDoubles[15];
+    double ParamDoubles[15]={};
     ParamDoubles[0]=ggamma;
     ParamDoubles[1]=ddelta;
     ParamDoubles[2]=bbeta;
@@ -2025,45 +2002,52 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     ParamDoubles[10]=ssigma1;
     ParamDoubles[11]=ssigma2;
     ParamDoubles[12]=rho12;
-    ParamDoubles[13]=aalpha;
+    ParamDoubles[13]=c;
+    ParamDoubles[14]=aalpha;
+    
     
     //Establishing upper bounds
-    double ubParameters[14];
-    ubParameters[0]=5;
-    ubParameters[1]=5;
-    ubParameters[2]=5;
-    ubParameters[3]=5;
-    ubParameters[4]=5;
-    ubParameters[5]=5;
-    ubParameters[6]=5;
-    ubParameters[7]=5;
-    ubParameters[8]=5;
-    ubParameters[9]=5;
-    ubParameters[10]=5;
-    ubParameters[11]=5;
-    ubParameters[12]=5;
-    ubParameters[13]=1;
+    double ubParameters[15];
+    ubParameters[0]=10;
+    ubParameters[1]=700;
+    ubParameters[2]=700;
+    ubParameters[3]=10;
+    ubParameters[4]=500;
+    ubParameters[5]=10;
+    ubParameters[6]=600;
+    ubParameters[7]=10;
+    ubParameters[8]=4;
+    ubParameters[9]=4;
+    ubParameters[10]=4.5;
+    ubParameters[11]=4.5;
+    ubParameters[12]=1;
+    ubParameters[13]=100;
+    ubParameters[14]=1;
+    
     
     //Establishing the lower bounds
     double lbParameters[15];
     lbParameters[0]=0.01;
-    lbParameters[1]=0.01;
-    lbParameters[2]=0.01;
-    lbParameters[3]=0.01;
-    lbParameters[4]=0.01;
-    lbParameters[5]=0.01;
-    lbParameters[6]=0.01;
-    lbParameters[7]=0.01;
-    lbParameters[8]=0.01;
-    lbParameters[9]=0.01;
-    lbParameters[10]=0.01;
-    lbParameters[11]=0.01;
-    lbParameters[12]=0.01;
-    lbParameters[13]=0.01;
+    lbParameters[1]=0.1;
+    lbParameters[2]=0.000000001;
+    lbParameters[3]=0.000000001;
+    lbParameters[4]=0.000000001;
+    lbParameters[5]=0.000000001;
+    lbParameters[6]=0.000000001;
+    lbParameters[7]=0.00000001;
+    lbParameters[8]=0.00000001;
+    lbParameters[9]=0.00000001;
+    lbParameters[10]=0.00000001;
+    lbParameters[11]=0.00000001;
+    lbParameters[12]=0.00000001;
+    lbParameters[13]=0.00000001;
+    lbParameters[14]=0.5;
+    
+    
 
     
     //Putting the Other parameters in the double format
-    double doubAdditionalPar[9];
+    double doubAdditionalPar[8];
     doubAdditionalPar[0]=AdditionalVars[0];
     doubAdditionalPar[1]=AdditionalVars[1];
     doubAdditionalPar[2]=AdditionalVars[2];
@@ -2072,36 +2056,48 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     doubAdditionalPar[5]=AdditionalVars[5];
     doubAdditionalPar[6]=AdditionalVars[6];
     doubAdditionalPar[7]=AdditionalVars[7];
-    doubAdditionalPar[8]=AdditionalVars[8];
+
+
     
     
+    for(int it=0; it<9; it++){
+        cout <<doubAdditionalPar[it]<< " doubAdditionalPar[it]"<< endl;
+    }
     
     //Start creating the optimizer object
-    nlopt_opt MinDistance;
-    MinDistance = nlopt_create(NLOPT_LN_NELDERMEAD, 14);
+    nlopt_opt MinimizeDistance;
+    //MinimizeDistance = nlopt_create(NLOPT_LN_NELDERMEAD, 15);
+    MinimizeDistance = nlopt_create(NLOPT_LN_SBPLX, 15);
     
-    nlopt_set_lower_bounds(MinDistance, lbParameters);
-    nlopt_set_upper_bounds(MinDistance, ubParameters);
-    nlopt_set_min_objective(MinDistance, MinimizeDistanceTranslate,(void *)&doubAdditionalPar);
     
-    nlopt_set_ftol_abs(MinDistance,1.0e-8);
+    nlopt_set_lower_bounds(MinimizeDistance, lbParameters);
+    nlopt_set_upper_bounds(MinimizeDistance, ubParameters);
+    nlopt_set_min_objective(MinimizeDistance, MinimizeDistanceTranslate,(void *)&doubAdditionalPar);
+    
+    nlopt_set_ftol_abs(MinimizeDistance,0.1);
     double distanceValue;
     
     
-    nlopt_optimize(MinDistance, ParamDoubles, &distanceValue);
-    if (nlopt_optimize(MinDistance, ParamDoubles, &distanceValue) < 0) {
+    
+    
+    cout << " algo mas"<< endl;
+    nlopt_optimize(MinimizeDistance, ParamDoubles, &distanceValue); //Not running, why?
+    cout << " here trying hard"<< endl;
+    
+    cout <<nlopt_optimize(MinimizeDistance, ParamDoubles, &distanceValue) << "Exit code opt routine"<< endl;
+    if (nlopt_optimize(MinimizeDistance, ParamDoubles, &distanceValue) < 0) {
         printf("nlopt failed!\n");
     }
     else {
         printf("found minimum at f(%g) = %0.10g\n",ParamDoubles[0], distanceValue);
     }
-    nlopt_destroy(MinDistance);
+    nlopt_destroy(MinimizeDistance);
     vector<double> Parfinal(15);
     for(int it=0; it<14; it++){
         Parfinal[it]=ParamDoubles[it];
     }
     
-    //And loading the distance
+    //And loading the distance//Note: why did i do this?
     Parfinal[13]=distanceValue;
     
     
@@ -2119,7 +2115,7 @@ void SobolRun(arma::vec WagesVectorIn,
     
     std::ifstream theFile ("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/SobolDim15.csv");
     
-    int SIZEOBS=10000;
+    int SIZEOBS=20000;
     int NVAR=15;
     double MYARRAY[SIZEOBS][NVAR];
     // ...
@@ -2260,6 +2256,12 @@ int main(int argc, const char * argv[]) {
     
     //Testing functions
     //Setting parameters to test
+    
+    
+    
+    
+    
+    
     double aalpha=0.8;
     double tthetae=12.84209;
     double tthetaw=3.873585;
@@ -2289,6 +2291,11 @@ int main(int argc, const char * argv[]) {
     double rho12=0.08;
     double c=10;
     
+    
+    
+    
+
+    
     //These were the original parameters. Trying different combinations:
     
     aalpha=0.8;
@@ -2306,6 +2313,27 @@ int main(int argc, const char * argv[]) {
     ssigma2=1.16547;
     rho12=0.10219;
     c=0;
+    
+    
+    //Final definition
+    
+    aalpha=0.682324;
+    ggamma=6.82592;
+    ddelta=647.281;
+    bbeta=324.671;
+    ssigma=8.25678;
+    kkappa=263.156;
+    psi=3.17603;
+    chi=592.294;
+    rrho=3.01674;
+    mmu1=0.420156;
+    mmu2=3.92797;
+    ssigma1=1.51879;
+    ssigma2=4.14574;
+    rho12=0.0519922;
+    c=1;
+    
+    
     
     //0. Payroll taxes marginal
     double Payrolltest=Tn(nf);
@@ -2409,6 +2437,8 @@ int main(int argc, const char * argv[]) {
     InitialCond[1]=nf;
     InitialCond[2]=z;
     
+    cout << " before maxprof"<< endl;
+    
     MaxProf=profitsFinMaxim( InitialCond,  wi,wf,aalpha,ddelta,ggamma, bbeta,ssigma,tthetae,c);
     //Finding the actual optimal values found
     cout << MaxProf[0] << " Maxprof[0]"<< endl;
@@ -2468,8 +2498,8 @@ int main(int argc, const char * argv[]) {
     ParamsDecision[0]=wi;
     ParamsDecision[1]=wf;
     ParamsDecision[2]=aalpha;
-    ParamsDecision[3]=ddelta;
-    ParamsDecision[4]=ggamma;
+    ParamsDecision[3]=ggamma;
+    ParamsDecision[4]=ddelta;
     ParamsDecision[5]=bbeta;
     ParamsDecision[6]=ssigma;
     ParamsDecision[7]=kkappa;
@@ -2527,28 +2557,22 @@ int main(int argc, const char * argv[]) {
     EquilibriumValue.close();
     
     
-    cout << " running sobolrun "<< endl;
-    //SobolRun(Wages,InitLWorkersDecision,InitProfDecision);
+    vector<double> WagesInEqWages;
+    WagesInEqWages.resize(2);
+    double Winitial[2];
     
-    //Decision=iDecision(TthetaDecision,ParamsDecision,InitLWorkersDecision,InitProfDecision);
+    Winitial[0]=wi;
+    Winitial[1]=wf;
     
-    cout << Decision[0][0]<< " Decision "<< endl;
-    cout << Decision[0][1]<< " ni "<< endl;
-    cout << Decision[1][1]<< " nf "<< endl;
-    cout << Decision[2][1]<< " z "<< endl;
-    cout << Decision[3][1]<< " prof "<< endl;
-    cout << Decision[0][2]<< " li "<< endl;
-    cout << Decision[1][2]<< " lf "<< endl;
-    cout << Decision[2][2]<< " VWorker "<< endl;
-    
-    
+    WagesInEqWages[0]=Winitial[0];
+    WagesInEqWages[1]=Winitial[1];
     
     //Define vector for excessDemandFunctions
     vector<double> ParamsDecisionExcessDemand;
     ParamsDecisionExcessDemand.resize(15);
     ParamsDecisionExcessDemand[0]=aalpha;
-    ParamsDecisionExcessDemand[1]=ddelta;
-    ParamsDecisionExcessDemand[2]=ggamma;
+    ParamsDecisionExcessDemand[1]=ggamma;
+    ParamsDecisionExcessDemand[2]=ddelta;
     ParamsDecisionExcessDemand[3]=bbeta;
     ParamsDecisionExcessDemand[4]=ssigma;
     ParamsDecisionExcessDemand[5]=kkappa;
@@ -2561,11 +2585,6 @@ int main(int argc, const char * argv[]) {
     ParamsDecisionExcessDemand[12]=ssigma2;
     ParamsDecisionExcessDemand[13]=rho12;
     ParamsDecisionExcessDemand[14]=c;
-    
-    
-    
-    
-    
     
     double Others[21];
     for(int it=0;it<15;it++){
@@ -2588,8 +2607,24 @@ int main(int argc, const char * argv[]) {
     
     
     
+    vector<double> VOthers;
+    VOthers.resize(20);
+    for(int i=0;i<20;i++){
+        VOthers[i]=Others[i];
+    }
+    
+    //Vector of initial Wages
+    arma::vec WagesVectorIn=arma::zeros(2);
+    WagesVectorIn.resize(2);
+    
+    WagesVectorIn[0]=wi;
+    WagesVectorIn[1]=wf;
+    
+    WagesVectorIn[0]=8.18169;
+    WagesVectorIn[1]=8.53154;
     
     
+    //Vector of final answer
     vector<double> InitProf;
     InitProf.resize(3);
     InitProf[0]=Others[11];
@@ -2603,6 +2638,275 @@ int main(int argc, const char * argv[]) {
     
     Wages[0]=WageEx[0];
     Wages[1]=WageEx[1];
+    
+    WageEx[0]=6.9425;
+    WageEx[1]=7.69912;
+    
+    //cout << StandardizedExcessDemands(WageEx,  Others) << " Standardized1" << endl;
+    cout << " ---"<< endl;
+    WageEx[0]=6.9425;
+    WageEx[1]=7.69912;
+    //cout << StandardizedExcessDemands(WageEx,  Others) << " modified" << endl;
+    arma::vec WagesEquilibrium=arma::zeros(2);
+    
+    WageEx[0]=6.94398;
+    WageEx[1]=7.699953;
+    //cout << StandardizedExcessDemands(WageEx,  Others) << " modified2" << endl;
+    
+    
+    //Vector of others
+    arma::vec VecOthers=arma::zeros(20);
+    for(int it=0; it<20; it++){
+        VecOthers[it]=Others[it];
+    }
+    
+    
+    //cout << " running distance estimator "<< endl;
+    Decision=iDecision(TthetaDecision,ParamsDecision,InitLWorkersDecision,InitProfDecision);
+    //DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
+    
+    
+    
+    //Running the minimizing distance estimator
+    arma::vec MinimizeDistanceParameters(15);
+    arma::vec AdditionalVAriables(8);
+    
+    //Loading the parameters first. Modified to 15 elements to include aalpha.
+    double ParStandardDistance[15];
+    ParStandardDistance[0]=ggamma;
+    ParStandardDistance[1]=ddelta;
+    ParStandardDistance[2]=bbeta;
+    ParStandardDistance[3]=ssigma;
+    ParStandardDistance[4]=kkappa;
+    ParStandardDistance[5]=psi;
+    ParStandardDistance[6]=chi;
+    ParStandardDistance[7]=rrho;
+    ParStandardDistance[8]=mmu1;
+    ParStandardDistance[9]=mmu2;
+    ParStandardDistance[10]=ssigma1;
+    ParStandardDistance[11]=ssigma2;
+    ParStandardDistance[12]=rho12;
+    ParStandardDistance[13]=c;
+    ParStandardDistance[14]=aalpha;
+    
+    //Loading additional parameters
+    double AddPar[7];
+    AddPar[0]=wi;
+    AddPar[1]=wf;
+    AddPar[2]=InitLWorkersDecision[0];
+    AddPar[3]=InitLWorkersDecision[1];
+    AddPar[4]=InitProfDecision[0];
+    AddPar[5]=InitProfDecision[1];
+    AddPar[6]=InitProfDecision[2];
+    cout <<InitProfDecision[0] << " InitProfDecision[0]"<< endl;
+    cout <<InitProfDecision[1] << " InitProfDecision[1]"<< endl;
+    cout <<InitProfDecision[2] << " InitProfDecision[2]"<< endl;
+    //Loading the additional vectors
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    aalpha=0.682324;
+    ggamma=6.82592;
+    ddelta=647.281;
+    bbeta=324.671;
+    ssigma=8.25678;
+    kkappa=263.156;
+    psi=3.17603;
+    chi=532.294;
+    rrho=3.01674;
+    mmu1=0.420156;
+    mmu2=3.92797;
+    ssigma1=1.51879;
+    ssigma2=4.14574;
+    rho12=0.0519922;
+    c=1;
+    
+    aalpha=0.501622;
+    ggamma=5.79643;
+    ddelta=603.786;
+    bbeta=23.9608;
+    ssigma=8.90455;
+    kkappa=0.687957;
+    psi=6.69006;
+    chi=0.314609;
+    rho12=200.603;
+    mmu1=0.109005;
+    mmu2=3.9;
+    ssigma1=0.593445;
+    ssigma2=3.01949;
+    rho12=0.267894;
+    c=6.01291;
+    
+    
+    ParamsDecision[0]=wi;
+    ParamsDecision[1]=wf;
+    ParamsDecision[2]=aalpha;
+    ParamsDecision[3]=ggamma;
+    ParamsDecision[4]=ddelta;
+    ParamsDecision[5]=bbeta;
+    ParamsDecision[6]=ssigma;
+    ParamsDecision[7]=kkappa;
+    ParamsDecision[8]=rrho;
+    ParamsDecision[9]=psi;
+    ParamsDecision[10]=chi;
+    ParamsDecision[11]=c;
+    
+    ParamsDecisionExcessDemand.resize(15);
+    ParamsDecisionExcessDemand[0]=aalpha;
+    ParamsDecisionExcessDemand[1]=ggamma;
+    ParamsDecisionExcessDemand[2]=ddelta;
+    ParamsDecisionExcessDemand[3]=bbeta;
+    ParamsDecisionExcessDemand[4]=ssigma;
+    ParamsDecisionExcessDemand[5]=kkappa;
+    ParamsDecisionExcessDemand[6]=rrho;
+    ParamsDecisionExcessDemand[7]=psi;
+    ParamsDecisionExcessDemand[8]=chi;
+    ParamsDecisionExcessDemand[9]=mmu1;
+    ParamsDecisionExcessDemand[10]=mmu2;
+    ParamsDecisionExcessDemand[11]=ssigma1;
+    ParamsDecisionExcessDemand[12]=ssigma2;
+    ParamsDecisionExcessDemand[13]=rho12;
+    ParamsDecisionExcessDemand[14]=c;
+    
+    ParStandardDistance[0]=ggamma;
+    ParStandardDistance[1]=ddelta;
+    ParStandardDistance[2]=bbeta;
+    ParStandardDistance[3]=ssigma;
+    ParStandardDistance[4]=kkappa;
+    ParStandardDistance[5]=psi;
+    ParStandardDistance[6]=chi;
+    ParStandardDistance[7]=rrho;
+    ParStandardDistance[8]=mmu1;
+    ParStandardDistance[9]=mmu2;
+    ParStandardDistance[10]=ssigma1;
+    ParStandardDistance[11]=ssigma2;
+    ParStandardDistance[12]=rho12;
+    ParStandardDistance[13]=c;
+    ParStandardDistance[14]=aalpha;
+    
+    for(int it=0;it<15;it++){
+        Others[it]=ParamsDecisionExcessDemand[it];
+    }
+    
+    cout << ParamsDecisionExcessDemand[14] << " ParamsDecisionExcessDemand[14]=c; "<< endl;
+    
+    cout << InitProfDecision[2]<< "InitProfDecision[2] "<< endl;
+    Others[15]=InitLWorkersDecision[0];
+    Others[16]=InitLWorkersDecision[1];
+    Others[17]=InitProfDecision[0];
+    Others[18]=InitProfDecision[1];
+    Others[19]=InitProfDecision[2];
+    
+    
+    for(int it=0; it<20; it++){
+        VecOthers[it]=Others[it];
+    }
+    
+    for(int it=0; it<15; it++){
+        MinimizeDistanceParameters[it]=ParStandardDistance[it];
+    }
+    
+    
+    for(int it=0; it<8; it++){
+        AdditionalVAriables[it]=AddPar[it];
+    }
+    
+    
+    cout << c<< " ccccc"<< endl;
+    cout << ParamsDecisionExcessDemand[14]<< " ParamsDecisionExcessDemand[14]"<< endl;
+    cout << Others[14] << " others14"<< endl;
+    cout << VecOthers[14]<< " vecothers14"<< endl;
+    
+    cout << "theomomtn"<< endl;
+    
+    cout << " muajajajajajajaja"<< endl;
+    
+    //InitLWorkersDecision.resize(2);
+    //wi
+    //wf
+    //InitLWorkersDecision[0]=li;
+    //InitLWorkersDecision[1]=lf;
+    //InitProfDecision.resize(3);
+    //InitProfDecision[0]=ni;
+    //InitProfDecision[1]=nf;
+    //InitProfDecision[2]=z;
+    
+    
+    //DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
+    cout << " muajajajajajajaja222222"<< endl;
+    MinimizingDistance(MinimizeDistanceParameters,AdditionalVAriables);
+    cout << " muajajajajajajaja222222"<< endl;
+    //
+    //EquilibriumMoments(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
+    //EqWagesNumericVector(VecOthers, WagesVectorIn);
+    //StandardizedDistanceEstimator(ParStandardDistance,  AddPar);
+    
+    //StandardizedExcessDemands(WageEx,  Others);
+    
+    //ExcessDemandFunctions(Wages,ParamsDecisionExcessDemand, InitLWorkersDecision, InitProfDecision);
+    
+    cout << " changonorrea"<< endl;
+    //Decision=iDecision(TthetaDecision,ParamsDecision,InitLWorkersDecision,InitProfDecision);
+    
+    
+    SobolRun(Wages,InitLWorkersDecision,InitProfDecision);
+    //WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
+    //DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
+    //EquilibriumMoments(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
+    
+    
+    cout << "end of theomomtn"<< endl;
+    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
+    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
+    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
+    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
+    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
+    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
+    
+    
+    cout << MinimizeDistanceParameters[0] << " MinimizeDistanceParameters[0]"<< endl;
+    
+    
+    
+    
+    
+    //MinimizingDistance(MinimizeDistanceParameters,AdditionalVAriables);
+    //cout << " running sobolrun "<< endl;
+    //SobolRun(Wages,InitLWorkersDecision,InitProfDecision);
+    
+    //Decision=iDecision(TthetaDecision,ParamsDecision,InitLWorkersDecision,InitProfDecision);
+    
+    cout << Decision[0][0]<< " Decision "<< endl;
+    cout << Decision[0][1]<< " ni "<< endl;
+    cout << Decision[1][1]<< " nf "<< endl;
+    cout << Decision[2][1]<< " z "<< endl;
+    cout << Decision[3][1]<< " prof "<< endl;
+    cout << Decision[0][2]<< " li "<< endl;
+    cout << Decision[1][2]<< " lf "<< endl;
+    cout << Decision[2][2]<< " VWorker "<< endl;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     cout << " NONSTANDARD------------- "<< endl;
     //cout << ExcessDemandFunctions(Wages,ParamsDecisionExcessDemand, InitLWorkersDecision, InitProfDecision)<<  endl;
@@ -2631,10 +2935,7 @@ int main(int argc, const char * argv[]) {
     nlopt_set_xtol_rel(ExcessDemand, 1.0e-8);
     nlopt_set_ftol_abs(ExcessDemand,1.0e-8);
     double ExcessDemandValueFinal; /* the minimum objective value, upon return */
-    double Winitial[2];
     
-    Winitial[0]=wi;
-    Winitial[1]=wf;
     nlopt_destroy(ExcessDemand);
     
     
@@ -2669,18 +2970,8 @@ int main(int argc, const char * argv[]) {
     vector<double> EqWagesVector;
     EqWagesVector.resize(2);
     
-    //Vector of others
-    arma::vec VecOthers=arma::zeros(20);
-    for(int it=0; it<20; it++){
-        VecOthers[it]=Others[it];
-    }
     
-    //Vector of initial Wages
-    arma::vec WagesVectorIn=arma::zeros(2);
-    WagesVectorIn.resize(2);
     
-    WagesVectorIn[0]=wi;
-    WagesVectorIn[1]=wf;
     
     //Vector de ExcessDemandFunctions es diferente del vector de idecision.
     
@@ -2691,7 +2982,9 @@ int main(int argc, const char * argv[]) {
     cout << InitProfDecision[1] << "InitProfDecision[1]"<<endl;
     cout << InitProfDecision[2] << "InitProfDecision[2]"<<endl;
     InitProfDecision[2]=2;
-    Decision=iDecision(TthetaDecision,ParamsDecision,InitLWorkersDecision,InitProfDecision);
+    
+    
+    
     
     cout << Decision[0][0]<< " Decision "<< endl;
     cout << Decision[0][1]<< " ni "<< endl;
@@ -2702,38 +2995,13 @@ int main(int argc, const char * argv[]) {
     cout << Decision[1][2]<< " lf "<< endl;
     cout << Decision[2][2]<< " VWorker "<< endl;
     
-    //Vector of final answer
-    
-    WageEx[0]=6.9425;
-    WageEx[1]=7.69912;
-    //cout << StandardizedExcessDemands(WageEx,  Others) << " Standardized1" << endl;
-    cout << " ---"<< endl;
-    WageEx[0]=6.9425;
-    WageEx[1]=7.69912;
-    //cout << StandardizedExcessDemands(WageEx,  Others) << " modified" << endl;
-    arma::vec WagesEquilibrium=arma::zeros(2);
-    
-    WageEx[0]=6.94398;
-    WageEx[1]=7.699953;
-    //cout << StandardizedExcessDemands(WageEx,  Others) << " modified2" << endl;
     
     
-    vector<double> WagesInEqWages;
-    WagesInEqWages.resize(2);
-    WagesInEqWages[0]=Winitial[0];
-    WagesInEqWages[1]=Winitial[1];
+    cout << " obtaining equilibrium wages"<< endl;
     
-    vector<double> VOthers;
-    VOthers.resize(20);
-    for(int i=0;i<20;i++){
-        VOthers[i]=Others[i];
-    }
+    //WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
     
-    WagesVectorIn[0]=8.18169;
-    WagesVectorIn[1]=8.53154;
-    
-    
-    
+    cout << " end of obtaining equilibrium wages"<< endl;
     //Testing the moment generating function
     cout << "Testing theoretical moments "<< endl;
     //TheoMoments(ParamsDecisionExcessDemand, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
@@ -2749,7 +3017,7 @@ int main(int argc, const char * argv[]) {
     //DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
     
     cout << " initializing equilibrium moments "<< endl;
-    EquilibriumMoments(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
+    //EquilibriumMoments(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
     
     cout << " finalizing equilibrium moments "<< endl;
     
@@ -2757,70 +3025,20 @@ int main(int argc, const char * argv[]) {
     cout << " Testing standardized distance estimtor loading parameters"<< endl;
     cout << " HEEEREEEEEE      "<< endl;
     
-    //Loading the parameters first. Modified to 15 elements to include aalpha.
-    double ParStandardDistance[15];
-    ParStandardDistance[0]=ggamma;
-    ParStandardDistance[1]=ddelta;
-    ParStandardDistance[2]=bbeta;
-    ParStandardDistance[3]=ssigma;
-    ParStandardDistance[4]=kkappa;
-    ParStandardDistance[5]=psi;
-    ParStandardDistance[6]=chi;
-    ParStandardDistance[7]=rrho;
-    ParStandardDistance[8]=mmu1;
-    ParStandardDistance[9]=mmu2;
-    ParStandardDistance[10]=ssigma1;
-    ParStandardDistance[11]=ssigma2;
-    ParStandardDistance[12]=rho12;
-    ParStandardDistance[13]=c;
-    ParStandardDistance[14]=aalpha;
-    
-    //Loading additional parameters
-    double AddPar[8];
-    AddPar[0]=aalpha;
-    AddPar[1]=wi;
-    AddPar[2]=wf;
-    AddPar[3]=InitLWorkersDecision[0];
-    AddPar[4]=InitLWorkersDecision[1];
-    AddPar[5]=InitProfDecision[0];
-    AddPar[6]=InitProfDecision[1];
-    AddPar[7]=InitProfDecision[2];
-    cout <<InitProfDecision[0] << " InitProfDecision[0]"<< endl;
-    cout <<InitProfDecision[1] << " InitProfDecision[1]"<< endl;
-    cout <<InitProfDecision[2] << " InitProfDecision[2]"<< endl;
-    //Loading the additional vectors
-    
-    
-    
-    //StandardizedDistanceEstimator(ParStandardDistance,  AddPar);
-    
-    //Running the minimizing distance estimator
-    arma::vec MinimizeDistanceParameters(15);
-    arma::vec AdditionalVAriables(8);
-    
-    for(int it=0; it<14; it++){
-        MinimizeDistanceParameters[it]=ParStandardDistance[it];
-    }
-    MinimizeDistanceParameters[14]=aalpha;
-    
-    for(int it=0; it<8; it++){
-        AdditionalVAriables[it]=AddPar[it];
-    }
-    
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
-    
-    MinimizingDistance(MinimizeDistanceParameters,AdditionalVAriables);
     
     
     
     
     
-    WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     cout << WagesEquilibrium[0] << " WagesEquilibrium[0]"<< endl;
     cout << WagesEquilibrium[1] << " WagesEquilibrium[1]"<< endl;
