@@ -17,6 +17,7 @@ mutable struct Param
     γ::Float64 #Informal demand elasticity
     β::Float64 #Scale parameter for evasion
     σ::Float64 #Elasticity of evasion
+    ϵ::Float64 #self-employed labor supply
 
     #Planner parameters
     ϕ::Float64 #Concave utilitarian parameter
@@ -57,17 +58,18 @@ end
 #Constructor for the parameters
 function init_parameters()
     ##Workers parameters
-    χ= 2.0192;
-    ψ= 0.4528;
-    κ= 0.1021;
-    ρ= 0.0912;
+    χ= 45.49;
+    ψ= 5.73;
+    κ= 7.53;
+    ρ= 185.89;
 
     ## Entrepreneurs parameters
-    α= 0.8; #Garicano et al.
-    δ= 0.12873;
-    γ= 0.7341;
-    β= 0.2135;
-    σ= 0.1827;
+    α= 0.71;
+    δ= 147.75;
+    γ= 1.39;
+    β= 243.95;
+    σ= 3.77;
+    ϵ= 29.95;
 
     #Planner parameters
     ϕ=0.5;
@@ -75,11 +77,11 @@ function init_parameters()
 
     ## Distributions
     #Here I assume normality
-    μ_w = 1.7626;
-    μ_e = 1.2528;
-    σ2_w = 1.0921; σ_w=σ2_w^0.5;
-    σ2_e = 1.1675; σ_e=σ2_e^0.5;
-    σ_we = 0.2782;
+    μ_w = 2.89;
+    μ_e = 1.94;
+    σ2_w = 1.81; σ_w=σ2_w^0.5;
+    σ2_e = 1.54; σ_e=σ2_e^0.5;
+    σ_we = 0.48;
 
     dist_marginal_w=Normal(μ_w,σ_w);
     dist_marginal_e=Normal(μ_e,σ_e);
@@ -97,7 +99,7 @@ function init_parameters()
     gg(θ,e) = pdf(d,[log(θ),log(e)]) /(θ*e);
     weights, nodes = gausslegendre(25);
 
-    Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ϕ, G, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, nodes, weights);
+    Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ϵ, ϕ, G, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, nodes, weights);
 end
 
 function distr_hw(θ::Real, e::Real, pa::Param)
