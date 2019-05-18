@@ -1,3 +1,106 @@
+function new_find_controls( θ, ss, pa)
+    #INPUT: states and parameters
+    #OUTPUT: optimal contrals
+
+    #Recover ditributions
+    h_e= pa.he(θ, ss.e);
+    h_w= pa.hw(θ, ss.e);
+
+    #omega/lambda is often used
+    ww = ss.ω/ss.λ;
+
+
+    #Define A
+    A= ((ss.uw^pa.ϕ-ss.λ*ss.uw)*h_e + ss.ϕ_e) / (ss.λ*h_e);
+
+    #Define bounds for z, and make sure there exist feasible values for n and z
+    z_ub = (1.0/pa.β)^(1.0/pa.σ)
+    pa.β*(z_ub^(1.0+pa.σ))/(1.0+pa.σ) < A &&  error("n<0,adjust A downward")
+
+    if A<0.0
+        z_lb = 0.0
+    else
+        z_lb = ( (1.0+pa.σ)*A/pa.β )^(1/(1.0+pa.σ))
+    end
+    pa.β*(z_ub^(1.0+pa.σ))/(1.0+pa.σ) < A &&  error("no range for z, adjust A downward")
+
+
+    #Define grid for z
+    #grid size - defining the grid inside the function is inefficient, can be adjusted if need to speed up
+    Nz = 500;
+    zstep = (z_ub-z_lb)/(Nz-1);
+    zgrid = z_lb:zstep:z_ub;
+
+    #Define the hamiltonian as function of controls given states
+    objective(z,n,l,p) = ss.uw^pa.ϕ*(h_w + p*h_e) + ss.μ*pa.χ*l^(1.0+pa.ψ)/θ + ss.λ*( ss.e*n^pa.α*p*h_e - pa.β*z^(1.0+pa.σ)/(1.0+pa.σ)*p*h_e - ss.uw*(h_w + p*h_e) - pa.χ*l^(1+pa.ψ)*h_w/(1+pa. ψ) ) + ss.ω*( θ*l*h_w - n*p*h_e ) + ss.ϕ_e*p ;
+    #Define function n(z)
+    n_fun(z) = pa.α /( ww* (1.0 - pa.α) ) * ( pa.β*z^(1.0+pa.σ)/(1.0+pa.σ) - A );
+    #Define function l(z,n)
+    denominator_of_l(z,n) =  ss.λ*pa.χ*h_w - (ss.μ + z*ss.λ*h_e / (pa.σ* n^pa.α) )*(1+pa.ψ)*pa.χ/θ;
+    l_fun(denominator) = denominator > 0.0 ? (ss.ω*θ*h_w/denominator)^(1.0/pa.ψ) : Inf;
+    #Define function l(z,n,l)
+    p(l,z,n) = pa.χ*l^(1.0+pa.ψ) / (θ*n^pa.α*(1.0-pa.β*z^pa.σ));
+
+    #Itialize values for objective and potencial maximizers
+    current_max = -Inf
+    nn = NaN;
+    zz = NaN;
+    ll = NaN;
+    pp = NaN;
+
+    #loop over grid of z. Recover n, l and p, and compute hamiltonian value
+println(Nz)
+    for j=1:Nz
+        #println(j)
+        potential_z= zgrid[j];
+        potential_n= n_fun(potential_z);
+
+        denom = denominator_of_l(potential_z,potential_n)
+        if denom <= 0.0
+            potential_value = NaN;
+        else
+            potential_l = l_fun(denom);
+            potential_p= p(potential_l, potential_z, potential_n);
+            potential_value= objective(potential_z,potential_n,potential_l,potential_p);
+        end
+
+        if isnan(potential_value)
+            println("l is undefined for z = ", potential_z, " and n = ", potential_n)
+        elseif potential_value > current_max
+            current_max = potential_value;
+            nn= potential_n;
+            zz= potential_z;
+            ll= potential_l;
+            pp= potential_p
+        end
+        #println("z = ", potential_z, " n = ", potential_n, " l = ", potential_l, " p = ", potential_p, " value = ", potential_value)
+    end
+
+    zz, nn, ll, pp
+end
+
+function z_zero(θ, A, ss, pa)
+    A > 0.0 && ("No corner solution when A >0. Decrease A.")
+
+    h_e= pa.he(θ, ss.e);
+    h_w= pa.hw(θ, ss.e);
+    ww = ss.ω/ss.λ
+
+    nn =  -pa.α/(1.0-pa.α)*A/ww;
+    kkappa = ss.λ*h_e*( ss.e* (A/(1.0-pa.α)) * (-(1.0-pa.α)/pa.α*ww/A)^pa.α )
+
+    kkappa > 0.0 && ("Complementary slackness does not hold for z=0. Increase wage.")
+
+    denominator_l = ss.λ*pa.χ*h_w - (ss.μ + kappa )*(1+pa.ψ)*pa.χ/θ
+
+    denominator_l < 0.0 && ("Planner wants infinite labor. Decrease mu")
+
+    ll = (ss.ω*θ*h_w/denominator_l)^(1.0/pa.ψ)
+
+    pp= pa.χ*l^(1.0+pa.ψ) / (θ*n^pa.α*(1.0-pa.β*z^pa.σ));
+
+    (nn,0.0,ll,pp)
+end
 
 
 
@@ -101,17 +204,6 @@ function find_controls( θ, ss, pa)
     nn, zz, ll, pp;
 end
 
-
-
-function init_controls( uw0, e0, ϕ_e0, λ0, ω0, pa)
-    θ      = exp(pa.μ_w-3*pa.σ2_w);
-    μ0     = 0.0;
-    y_agg0 = 0.0;
-    l_agg0 = 0.0;
-
-    ss = State(e0, uw0, ϕ_e0, μ0, λ0, ω0);
-    find_controls( θ, ss, pa);
-end
 
 
 function  eq6(n, ss, pa, θ)

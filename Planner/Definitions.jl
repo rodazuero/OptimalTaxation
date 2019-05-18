@@ -36,6 +36,11 @@ mutable struct Param
     weights::Array{Float64,1} #añadir tamaño
     nodes::Array{Float64,1}
 
+    #Span of theta
+    θ_w_lb::Float64
+    θ_w_ub::Float64
+    θ_e_lb::Float64
+    θ_e_ub::Float64
 end
 
 mutable struct State
@@ -85,6 +90,26 @@ function init_parameters()
 
     dist_marginal_w=Normal(μ_w,σ_w);
     dist_marginal_e=Normal(μ_e,σ_e);
+
+    #theta_w_lb
+    quantile_theta_w_lb(k) = cdf(dist_marginal_w,k) - 0.01
+    x_w_lb = find_zero(quantile_theta_w_lb, (-100.0,100.0))
+    θ_w_lb= exp(x_w_lb)
+    #theta_w_ub
+    quantile_theta_w_ub(k) = cdf(dist_marginal_w,k) - 0.99
+    x_w_ub = find_zero(quantile_theta_w_ub, (-100.0,100.0))
+    θ_w_ub= exp(x_w_ub)
+
+
+    #theta_e_lb
+    quantile_theta_e_lb(k) = cdf(dist_marginal_e,k) - 0.01
+    x_e_lb = find_zero(quantile_theta_e_lb, (-100.0,100.0))
+    θ_e_lb= exp(x_e_lb)
+    #theta_e_ub
+    quantile_theta_e_ub(k) = cdf(dist_marginal_e,k) - 0.99
+    x_e_ub = find_zero(quantile_theta_e_ub, (-100.0,100.0))
+    θ_e_ub= exp(x_e_ub)
+
     mean_w_given_e(x_e) = μ_w + σ_we*σ_w/σ_e*(x_e-μ_e);
     var_w_given_e = (1.0-σ_we^2.0)*σ2_w;
     dist_w_given_e(x_e)=Normal(mean_w_given_e(x_e),var_w_given_e^0.5);
@@ -99,7 +124,7 @@ function init_parameters()
     gg(θ,e) = pdf(d,[log(θ),log(e)]) /(θ*e);
     weights, nodes = gausslegendre(25);
 
-    Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ϵ, ϕ, G, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, nodes, weights);
+    Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ϵ, ϕ, G, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, nodes, weights, θ_w_lb, θ_w_ub, θ_e_lb, θ_e_ub );
 end
 
 function distr_hw(θ::Real, e::Real, pa::Param)
