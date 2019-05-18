@@ -30,19 +30,24 @@ end
 function find_states!(du,u,pa,θ)
     println( "       ")
     println("iteration, theta=  ",θ )
-    uw    = BigFloat(u[1]);
-    μ     = BigFloat(u[2]);
-    e     = BigFloat(u[3]);
-    ϕ_e   = BigFloat(u[4]);
-    y_agg = BigFloat(u[5]);
-    λ     = BigFloat(u[6]);
-    l_agg = BigFloat(u[7]);
-    ω     = BigFloat(u[8]);
+    uw    = u[1];
+    μ     = u[2];
+    e     = u[3];
+    ϕ_e   = u[4];
+    y_agg = u[5];
+    λ     = u[6];
+    l_agg = u[7];
+    ω     = u[8];
 
+    #Construct state object
     ss = State(e, uw, ϕ_e, μ, λ, ω);
     println("States")
-    println("e =", Float64(ss.e)," uw= ", Float64(ss.uw)," ϕ_e= ", Float64(ss.ϕ_e),  " μ = ", Float64(ss.μ),  " L = ", Float64(l_agg), " Y = ", Float64(y_agg))
-    (n, z, l, p) = find_controls( θ, ss, pa);
+    println("e =", ss.e," uw= ", ss.uw," ϕ_e= ", ss.ϕ_e,  " μ = ", ss.μ,  " L = ", l_agg, " Y = ", y_agg)
+    #Find optimal controls
+    (z, n, l, p) = new_find_controls( θ, ss, pa);
+    println("Controls")
+    println("z =", Float64(z)," n = ", Float64(n)," l = ", Float64(l),  " p = ", p)
+
 
     h_e=  pa.he( θ, e);
     h_w=  pa.hw( θ, e);

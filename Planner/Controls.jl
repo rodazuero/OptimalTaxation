@@ -49,7 +49,6 @@ function new_find_controls( θ, ss, pa)
     pp = NaN;
 
     #loop over grid of z. Recover n, l and p, and compute hamiltonian value
-println(Nz)
     for j=1:Nz
         #println(j)
         potential_z= zgrid[j];
