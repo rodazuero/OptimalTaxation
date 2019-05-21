@@ -2,13 +2,14 @@ cd("C:\\Users\\d-wills\\Dropbox (Uniandes)\\1_5_TaxesAndInformality\\Codes\\Opti
 
 using Roots
 #using Plots
-using DifferentialEquations
+#using DifferentialEquations
 
 
 include("Definitions.jl")
 include("Controls.jl")
 include("States.jl")
-include("MyFindZeros.jl")
+#include("MyFindZeros.jl")
+include("MyRungeKutta.jl")
 
 #Parameters
 pa = init_parameters();
@@ -16,12 +17,12 @@ pa = init_parameters();
 
 #u0
 
-uw0    = 0.25
+uw0    = 0.000000926495
 μ0     = 0.0
 e0     =  pa.θ_e_lb;
 ϕ_e0   = -0.04
 y_agg0 =  0.0
-λ0     =  1.00
+λ0     =  1.0
 l_agg0 =  0.0
 ω0     =  5.0
 
@@ -49,6 +50,17 @@ u0[7] = l_agg0;
 u0[8] = ω0;
 
 find_states!(du0,u0,pa,θ0)
+
+#Test my runge kutta
+Nspan = 500
+#log-scale for the range of theta,
+xlb= log(pa.θ_w_lb);
+xub = log(pa.θ_w_ub);
+xstep = (xub - xlb)/(Nspan - 1);
+xspan = xlb:xstep:xub;
+solution = Array{Float64}(undef,Nspan,8);
+
+ my_runge_kutta!(solution,u0,xspan,xstep)
 
 
 

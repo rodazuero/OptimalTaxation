@@ -48,6 +48,9 @@ function new_find_controls( θ, ss, pa)
     ll = NaN;
     pp = NaN;
 
+    #Define a variable counting the number of gridpoints where no solution if found
+    nosol = 0;
+
     #loop over grid of z. Recover n, l and p, and compute hamiltonian value
     for j=1:Nz
         #println(j)
@@ -64,7 +67,7 @@ function new_find_controls( θ, ss, pa)
         end
 
         if isnan(potential_value)
-            println("l is undefined for z = ", potential_z, " and n = ", potential_n)
+            nosol = nosol + 1;
         elseif potential_value > current_max
             current_max = potential_value;
             nn= potential_n;
@@ -74,6 +77,8 @@ function new_find_controls( θ, ss, pa)
         end
         #println("z = ", potential_z, " n = ", potential_n, " l = ", potential_l, " p = ", potential_p, " value = ", potential_value)
     end
+
+    nosol == Nz  && error("no solution for, adjust mu downward")
 
     zz, nn, ll, pp
 end

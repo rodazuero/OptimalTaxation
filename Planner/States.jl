@@ -28,8 +28,6 @@ function integrate_dg_de(θ, e, pa)
 end
 
 function find_states!(du,u,pa,θ)
-    println( "       ")
-    println("iteration, theta=  ",θ )
     uw    = u[1];
     μ     = u[2];
     e     = u[3];
@@ -41,13 +39,8 @@ function find_states!(du,u,pa,θ)
 
     #Construct state object
     ss = State(e, uw, ϕ_e, μ, λ, ω);
-    println("States")
-    println("e =", ss.e," uw= ", ss.uw," ϕ_e= ", ss.ϕ_e,  " μ = ", ss.μ,  " L = ", l_agg, " Y = ", y_agg)
     #Find optimal controls
     (z, n, l, p) = new_find_controls( θ, ss, pa);
-    println("Controls")
-    println("z =", Float64(z)," n = ", Float64(n)," l = ", Float64(l),  " p = ", p)
-
 
     h_e=  pa.he( θ, e);
     h_w=  pa.hw( θ, e);
@@ -72,6 +65,6 @@ function find_states!(du,u,pa,θ)
     du[6] = 0.0;
     du[7] = θ*l*h_w - n*p*h_e;
     du[8] = 0.0;
-println("duw = ", du[1], " dmu = ", du[2]," de = ", du[3]," dphie = ", du[4]," dY = ", du[5]," dlambda = ", du[6]," dL = ", du[7] )
+
     nothing
 end
