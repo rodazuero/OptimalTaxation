@@ -96,3 +96,26 @@ function my_newton(f::Function, fprime::Function, x0::Float64)
     end
     x
 end
+
+
+
+
+function my_bisection(f::Function, lb::Real, ub::Real, tol:: Real )
+    #This funtion looks for roots in the interval (lb, ub)
+    f(lb)*f(ub) > 0.0 && error("No bracketing interval")
+
+    midpoint = (lb+ub)/2.0
+
+    while f(midpoint) > tol
+
+        if f(lb)*f(midpoint) <=0.0
+            ub = midpoint
+        else
+            lb = midpoint
+        end
+        midpoint = (lb+ub)/2.0
+    end
+
+    midpoint
+
+end

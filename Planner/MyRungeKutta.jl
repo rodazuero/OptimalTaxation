@@ -1,5 +1,5 @@
 
-function my_runge_kutta!(solution::Array{Float64},y0,xspan,step)
+function my_runge_kutta!(solution::Array{Float64},y0,xspan,step,pa)
 
     #
     solution[1,:] = y0
@@ -20,7 +20,7 @@ function my_runge_kutta!(solution::Array{Float64},y0,xspan,step)
         #Current value for theta
         x = xspan[i];
         θ = exp(xspan[i]);
-        println("it = ", i, " x = ", x, " theta = ", θ)
+        #println("it = ", i, " x = ", x, " theta = ", θ)
 
         #Convert state object into a vector
         y[1] = solution[i,1]  # uw
@@ -31,8 +31,8 @@ function my_runge_kutta!(solution::Array{Float64},y0,xspan,step)
         y[6] = solution[i,6]  # λ;
         y[7] = solution[i,7]  # l_agg;
         y[8] = solution[i,8]  # ω;
-        println(" uw = ", y[1], " mu = ", y[2], " e = ", y[3], " phie = ", y[4])
-        println(" Y = ", y[5], " lambda = ", y[6], " L = ", y[7], " omega = ", y[8])
+        #println(" uw = ", y[1], " mu = ", y[2], " e = ", y[3], " phie = ", y[4])
+        #println(" Y = ", y[5], " lambda = ", y[6], " L = ", y[7], " omega = ", y[8])
 
         #We save the approximation of the derivative of the states, according to the order 4 Runge-Kutta method
         find_states!(z1, y, pa, θ);
@@ -45,10 +45,10 @@ function my_runge_kutta!(solution::Array{Float64},y0,xspan,step)
         if i < Nspan
             solution[i+1,:] = solution[i,:] + step*dy;
         end
-        println(" duw = ", dy[1], " dmu = ", dy[2], " de = ", dy[3], " dphie = ", dy[4])
-        println(" dY = ", dy[5], " dlambda = ", dy[6], " dL = ", dy[7], " domega = ", dy[8])
+        #println(" duw = ", dy[1], " dmu = ", dy[2], " de = ", dy[3], " dphie = ", dy[4])
+        #println(" dY = ", dy[5], " dlambda = ", dy[6], " dL = ", dy[7], " domega = ", dy[8])
 
-        println("    ")
+        #println("    ")
 
     end
 end
