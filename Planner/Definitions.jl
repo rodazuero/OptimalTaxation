@@ -77,7 +77,7 @@ function init_parameters()
     ϵ= 29.95;
 
     #Planner parameters
-    ϕ=0.5;
+    ϕ=0.8;
     G=1.0;
 
     ## Distributions

@@ -1,6 +1,6 @@
 function new_find_controls( θ, ss, pa)
     #INPUT: states and parameters
-    #OUTPUT: optimal contrals
+    #OUTPUT: optimal controls
 
     #Recover ditributions
     h_e= pa.he(θ, ss.e);
@@ -81,6 +81,29 @@ function new_find_controls( θ, ss, pa)
     nosol == Nz  && error("no solution for, adjust mu downward")
 
     zz, nn, ll, pp
+end
+
+
+function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solvec::Array{Float64})
+    (Nspan,~)=size(solvec)
+
+    for j=1:Nspan
+      θ = θvec[j];
+      uw    = solvec[j,1];
+      μ     = solvec[j,2];
+      e     = solvec[j,3];
+      ϕ_e   = solvec[j,4];
+      λ     = solvec[j,6];
+      ω     = solvec[j,8];
+      ss = State(e, uw, ϕ_e, μ, λ, ω);
+
+      (zz, nn, ll, pp) = new_find_controls( θ, ss, pa)
+      ctrlvec[j,1] = zz;
+      ctrlvec[j,2] = nn;
+      ctrlvec[j,3] = ll;
+      ctrlvec[j,4] = pp;
+    end
+    nothing
 end
 
 function z_zero(θ, A, ss, pa)

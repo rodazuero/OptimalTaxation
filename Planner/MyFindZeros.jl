@@ -105,17 +105,21 @@ function my_bisection(f::Function, lb::Real, ub::Real, tol:: Real )
     f(lb)*f(ub) > 0.0 && error("No bracketing interval")
 
     midpoint = (lb+ub)/2.0
+    fmidpoint = f(midpoint)
 
-    while f(midpoint) > tol
+    while abs( fmidpoint )> tol
 
-        if f(lb)*f(midpoint) <=0.0
+        if f(lb)*fmidpoint <=0.0
             ub = midpoint
         else
             lb = midpoint
         end
         midpoint = (lb+ub)/2.0
+        fmidpoint = f(midpoint)
+        println(fmidpoint)
+
     end
 
-    midpoint
+    lb
 
 end
