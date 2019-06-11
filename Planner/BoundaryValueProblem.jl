@@ -22,7 +22,7 @@ function find_uw0(y0, uw0_low, uw0_up, Nspan, pa)
     #Convergence happens from below, and it is not defined from above
     #hence I need to adjust uw0 downwards a little bit
     uw0_adjusted = 0.9999999999*uw0;
-    abs(final_mu_aux(uw0_adjusted)) > 10.0^-3 && error("Final mu is not zero")
+    #abs(final_mu_aux(uw0_adjusted)) > 10.0^-3 && error("Final mu is not zero")
     y0[1]=uw0_adjusted;
 
     #Define grid to solve the differential equation
