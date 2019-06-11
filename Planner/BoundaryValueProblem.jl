@@ -60,20 +60,11 @@ function final_mu(y0::Array{Float64,1},Nspan::Int64, pa::Param)
     end
 end
 
+function final_e(y0::Array{Float64,1}, ϕ_e0_low, ϕ_e0_up ,Nspan::Int64, pa::Param)
 
-function final_e(y0::Array{Float64,1},Nspan::Int64, pa::Param)
-
-    uw0 = find_uw0(y0, uw0_low, uw0_up, Nspan, pa);
+    sol = find_uw0(y0, uw0_low, uw0_up, Nspan, pa);
 
 
-  #  abs(final_mu(y0 ,500, pa)) > 10.0^-3 && error("Final mu is not zero")
-
-    #Define grid to solve the differential equation
-    xlb= log(pa.θ_w_lb);
-    xub = log(pa.θ_w_ub);
-    xstep = (xub - xlb)/(Nspan - 1);
-    xspan = xlb:xstep:xub;
-    solution = Array{Float64}(undef,Nspan,8);
 
     #Solve the problem, return value of e at theta_ub
     #this value is consitent with mu(theta_ub)=0

@@ -22,11 +22,11 @@ pa = init_parameters();
 uw0    = 0.01 #0.000000926495
 μ0     = 0.0
 e0     =  pa.θ_e_lb;
-ϕ_e0   = -0.004
+ϕ_e0   = -0.00009
 y_agg0 =  0.0
-λ0     =  2.0
+λ0     =  1.0
 l_agg0 =  0.0
-ω0     =  20.0
+ω0     =  10.0
 
 
 #Test  new_find_controls
@@ -59,7 +59,7 @@ l_agg0 =  0.0
 Nspan = 100;
 y0= [uw0, μ0, e0, ϕ_e0, y_agg0, λ0, l_agg0, ω0];
 uw0_low=10.0^-10;
-uw0_up =0.01;
+uw0_up =1.0;
 sol = find_uw0(y0, uw0_low, uw0_up, Nspan, pa);
 
 xlb= log(pa.θ_w_lb);
@@ -68,5 +68,5 @@ xstep = (xub - xlb)/(Nspan - 1);
 xspan = xlb:xstep:xub;
 θspan = exp.(xspan);
 
-controls = Array{Float64}(undef,Nspan,4)
-ctrl = recover_controls(controls, θspan, sol);
+controls = Array{Float64}(undef,Nspan,4);
+recover_controls!(controls, θspan, sol);

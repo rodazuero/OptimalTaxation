@@ -1,5 +1,5 @@
 
-function my_runge_kutta!(solution::Array{Float64},y0,xspan,step,pa)
+function my_runge_kutta!(solution::Array{Float64},y0,xspan,step,pa; verbose = false)
 
     #
     solution[1,:] = y0
@@ -45,10 +45,9 @@ function my_runge_kutta!(solution::Array{Float64},y0,xspan,step,pa)
         if i < Nspan
             solution[i+1,:] = solution[i,:] + step*dy;
         end
-        #println(" duw = ", dy[1], " dmu = ", dy[2], " de = ", dy[3], " dphie = ", dy[4])
-        #println(" dY = ", dy[5], " dlambda = ", dy[6], " dL = ", dy[7], " domega = ", dy[8])
-
-        #println("    ")
+        verbose && println(" duw = ", dy[1], " dmu = ", dy[2], " de = ", dy[3], " dphie = ", dy[4])
+        verbose && println(" dY = ", dy[5], " dlambda = ", dy[6], " dL = ", dy[7], " domega = ", dy[8])
+        verbose && println("    ")
 
     end
 end

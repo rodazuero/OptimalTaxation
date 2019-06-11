@@ -63,7 +63,7 @@ function find_states!(du,u,pa,θ)
     du[4] = -( Vw*dhw_de + dVe_de*p*h_e + Ve*p*dhe_de );
     du[5] = ( e*(n^pa.α) - pa.β*(z^(1+pa.σ) )/(1+pa.σ) )*p*h_e - uw*h_tot - pa.χ*(l^(1+pa.ψ))/(1+pa.ψ)*h_w;
     du[6] = 0.0;
-    du[7] = θ*l*h_w - n*p*h_e;
+    du[7] = θ*l*h_w - (n-pa.ϵ)*p*h_e;
     du[8] = 0.0;
 
     nothing

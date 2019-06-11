@@ -18,7 +18,7 @@ function new_find_controls( θ, ss, pa)
     pa.β*(z_ub^(1.0+pa.σ))/(1.0+pa.σ) < A &&  error("n<0,adjust A downward")
 
     if A<0.0
-        z_lb = 0.0
+        z_lb = eps()
     else
         z_lb = ( (1.0+pa.σ)*A/pa.β )^(1/(1.0+pa.σ))
     end
@@ -51,6 +51,20 @@ function new_find_controls( θ, ss, pa)
     #Define a variable counting the number of gridpoints where no solution if found
     nosol = 0;
 
+    #Check corner solution at z=0
+    (potential_n,potential_z,potential_l,potential_p) = z_zero(θ, A, ss, pa);
+    potential_value= objective(potential_z,potential_n,potential_l,potential_p);
+
+    if isnan(potential_value)
+        nosol = nosol + 1;
+    elseif potential_value > current_max
+        current_max = potential_value;
+        nn= potential_n;
+        zz= potential_z;
+        ll= potential_l;
+        pp= potential_p
+    end
+
     #loop over grid of z. Recover n, l and p, and compute hamiltonian value
     for j=1:Nz
         #println(j)
@@ -78,7 +92,7 @@ function new_find_controls( θ, ss, pa)
         #println("z = ", potential_z, " n = ", potential_n, " l = ", potential_l, " p = ", potential_p, " value = ", potential_value)
     end
 
-    nosol == Nz  && error("no solution for, adjust mu downward")
+    nosol == Nz + 1 && error("no solution to hamiltonian for any z, adjust mu downward")
 
     zz, nn, ll, pp
 end
@@ -114,17 +128,17 @@ function z_zero(θ, A, ss, pa)
     ww = ss.ω/ss.λ
 
     nn =  -pa.α/(1.0-pa.α)*A/ww;
-    kkappa = ss.λ*h_e*( ss.e* (A/(1.0-pa.α)) * (-(1.0-pa.α)/pa.α*ww/A)^pa.α )
+    kkappa = ss.λ*h_e*( ss.e + (A/(1.0-pa.α)) * (-(1.0-pa.α)/pa.α*ww/A)^pa.α )
 
     kkappa > 0.0 && ("Complementary slackness does not hold for z=0. Increase wage.")
 
-    denominator_l = ss.λ*pa.χ*h_w - (ss.μ + kappa )*(1+pa.ψ)*pa.χ/θ
+    denominator_l = ss.λ*pa.χ*h_w - (ss.μ + kkappa )*(1+pa.ψ)*pa.χ/θ
 
     denominator_l < 0.0 && ("Planner wants infinite labor. Decrease mu")
 
     ll = (ss.ω*θ*h_w/denominator_l)^(1.0/pa.ψ)
 
-    pp= pa.χ*l^(1.0+pa.ψ) / (θ*n^pa.α*(1.0-pa.β*z^pa.σ));
+    pp= pa.χ*ll^(1.0+pa.ψ) / (θ*nn^pa.α);
 
     (nn,0.0,ll,pp)
 end
