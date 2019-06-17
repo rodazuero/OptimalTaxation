@@ -37,9 +37,9 @@ rm(list=ls(all=TRUE))
 
 
 #Obtaining the empirical moments#
-source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/EmpiricalMoments/Momentos.R')
+source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LastGitVersion/OptimalTaxation/EmpiricalMoments/Momentos.R')
 
-CD<-'/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/AWS/InAws/Sobol4/'
+CD<-'/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LastGitVersion/OptimalTaxation/AWS/InAws/Sobol4/'
 
 setwd(CD)
 
