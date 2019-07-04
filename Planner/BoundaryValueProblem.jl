@@ -15,7 +15,7 @@ function find_uw0(y0, uw0_low, uw0_up, Nspan, pa)
     #Make sure the function changes it sign in the inteval
     mu_low = final_mu_aux(uw0_low)
     mu_up = final_mu_aux(uw0_up)
-    mu_low*mu_up > 0.0  && error("Change range of uw0")
+    mu_low*mu_up > 0.0  && error("Change range of uw0. mu(uw_low) = ", mu_low, " and mu(uw_up ) = ", mu_up)
 
     #Solve for uw0 such that mu(theta_ub)=0
     uw0 = find_zero(final_mu_aux, (uw0_low, uw0_up))
@@ -60,15 +60,44 @@ function final_mu(y0::Array{Float64,1},Nspan::Int64, pa::Param)
     end
 end
 
-function final_e(y0::Array{Float64,1}, ϕ_e0_low, ϕ_e0_up ,Nspan::Int64, pa::Param)
+function final_delta_e(y0::Array{Float64,1}, uw0_low, uw0_up, Nspan::Int64, pa::Param)
+    # Given an initial state vector, returns e(theta_w_ub) - theta_e_ub that is consistent with mu(theta_ub)=0
+    # Notice that uw0=y0[1] is redundant because it will be replaced by the optimal one.
+    solution = find_uw0(y0, uw0_low, uw0_up, Nspan, pa);
 
+    solution[end,3] - pa.θ_e_ub
+end
+
+
+
+function find_ϕ_e(y0::Array{Float64,1}, ϕ_e0_low, ϕ_e0_up,uw0_low, uw0_up, Nspan::Int64, pa::Param)
+
+    #Give meaningful names to states
+    uw0guess  = y0[1];
+    μ0     = y0[2];
+    e0     = y0[3];
+    ϕ_e0_guess = y0[4];
+    y_agg0 = y0[5];
+    λ0     = y0[6];
+    l_agg0 = y0[7];
+    ω0     = y0[8];
+
+    #Define handle function to be minimized
+    final_e_aux(ϕ_e)= final_delta_e([uw0guess, μ0, e0, ϕ_e, y_agg0, λ0, l_agg0, ω0], uw0_low, uw0_up, Nspan, pa)
+
+    #Make sure the function changes it sign in the inteval
+    e_low = final_e_aux(ϕ_e0_low)
+    e_up = final_e_aux(ϕ_e0_up)
+    e_low*e_up > 0.0  && error("Change range of phie0")
+
+    #Solve for phie0 such that e(theta_w_ub)=theta_e_ub (and uw0 such that mu(theta_ub)=0)
+    @time ϕ_e0 = find_zero(final_e_aux, (ϕ_e0_low, ϕ_e0_up));
+
+    #Recover initial value for uw0 (this is very inefficient, but it works)
+    y0[4]=1.0000000001*ϕ_e0;
     sol = find_uw0(y0, uw0_low, uw0_up, Nspan, pa);
 
-
-
     #Solve the problem, return value of e at theta_ub
-    #this value is consitent with mu(theta_ub)=0
     my_runge_kutta!(solution,y0,xspan,xstep,pa)
 
-    solution[end,3] - pa.θ_e_ub, solution[end,2]
 end
