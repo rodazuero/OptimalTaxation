@@ -2,10 +2,10 @@ rm(list=ls(all=TRUE))
 #install.packages("randtoolbox")
 library(randtoolbox)
 #1. Run empirical moments:
-source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/EmpiricalMoments/Momentos.R')
+source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LastGitVersion/OptimalTaxation/EmpiricalMoments/Momentos.R')
 
 #2. Run functions needed to generate theoretical moments 
-source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium.R')
+source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LastGitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium.R')
 
 
 #3. Generating the theoretical moments. Function
