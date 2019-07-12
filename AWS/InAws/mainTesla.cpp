@@ -1363,7 +1363,9 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
             
             //4. Proportioninformaldemanded
             PropInformalDemanded[it]=Wsol[0]/(max(WorkersTotalDemanded[it],0.001));
-  
+            if(WorkersTotalDemanded[it]==0){
+                PropInformalDemanded[it]=1;
+            }
             
             
         }
@@ -1616,32 +1618,13 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     //Computing the final distance
     for(int it=0; it<9; it++){
-        if(test==1){
-            cout << " ------ Moments inside distance "<< endl;
-            cout << it << " it "<< endl;
-            cout << Production[it] << " Production[it] " << endl; //checked
-            cout << Theomoments[it][0] << " Theomoments[it][0] " << endl; //checked
-            cout << Taxes[it] << " Taxes[it] " << endl; //Checked
-            cout << Theomoments[it][1] << " Theomoments[it][1] " << endl;
-            cout << IncomeEmpirical[it] << " IncomeEmpirical[it] " << endl; // Checked
-            cout << Theomoments[it][3] << " Theomoments[it][3] demand informal prop" << endl;
-            cout << Theomoments[it][4] << " Theomoments[it][4] " << endl; //Checked
-            cout << InformalSupplyProportion[it] << " InformalSupplyProportion[it] " << endl; //Checked
-            cout << Theomoments[it][5] << " Theomoments[it][5] " << endl;//Checked
-            cout << TotalLaborSupply[it] << " TotalLaborSupply[it] " << endl; //Checked
-            cout << Theomoments[it][6] << " Theomoments[it][6],2 " << endl; //Labor supply theoretical with respect to median
-            cout << PropEntrepEmpirical[it] << " PropEntrepEmpirical[it] " << endl;
-            cout << Theomoments[it][7] << " Theomoments[it][7] " << endl; //Proportion entrepreneurs
-            
-            
-            
-        }
         
-        distance+=pow((Production[it]-Theomoments[it][0])/(max(0.0001,Production[it])),2);
+        
+        //distance+=pow((Production[it]-Theomoments[it][0])/(max(0.0001,Production[it])),2);
         distance+=pow((Taxes[it]-Theomoments[it][1])/(max(0.0001,Taxes[it])),2);
-        distance+=pow((IncomeEmpirical[it]-Theomoments[it][4])/(max(0.0001,IncomeEmpirical[it])),2);
-        distance+=pow((InformalSupplyProportion[it]-Theomoments[it][5])/(max(0.0001,InformalSupplyProportion[it])),2);
-        distance+=pow((TotalLaborSupply[it]-Theomoments[it][6])/(max(0.0001,TotalLaborSupply[it])),2);
+        //distance+=pow((IncomeEmpirical[it]-Theomoments[it][4])/(max(0.0001,IncomeEmpirical[it])),2);
+        //distance+=pow((InformalSupplyProportion[it]-Theomoments[it][5])/(max(0.0001,InformalSupplyProportion[it])),2);
+        //distance+=pow((TotalLaborSupply[it]-Theomoments[it][6])/(max(0.0001,TotalLaborSupply[it])),2);
         distance+=pow((PropEntrepEmpirical[it]-Theomoments[it][7])/(max(0.0001,PropEntrepEmpirical[it])),2);
         
         //I will add a part corresponding to the 0.8 approximately retribution to work. Need to adapt.
@@ -1649,6 +1632,27 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
         
         
     }
+    
+    
+    
+    distance+=3*pow((Production[0]-Theomoments[0][0])/(max(0.0001,Production[0])),2);
+    distance+=3*pow((Production[4]-Theomoments[4][0])/(max(0.0001,Production[4])),2);
+    distance+=3*pow((Production[8]-Theomoments[8][0])/(max(0.0001,Production[8])),2);
+    
+    distance+=3*pow((IncomeEmpirical[0]-Theomoments[0][4])/(max(0.0001,IncomeEmpirical[0])),2);
+    distance+=3*pow((IncomeEmpirical[4]-Theomoments[4][4])/(max(0.0001,IncomeEmpirical[4])),2);
+    distance+=3*pow((IncomeEmpirical[8]-Theomoments[8][4])/(max(0.0001,IncomeEmpirical[8])),2);
+    
+    
+    distance+=3*pow((InformalSupplyProportion[0]-Theomoments[0][5])/(max(0.0001,InformalSupplyProportion[0])),2);
+    distance+=3*pow((InformalSupplyProportion[4]-Theomoments[4][5])/(max(0.0001,InformalSupplyProportion[4])),2);
+    distance+=3*pow((InformalSupplyProportion[8]-Theomoments[8][5])/(max(0.0001,InformalSupplyProportion[8])),2);
+    
+    distance+=3*pow((TotalLaborSupply[0]-Theomoments[0][6])/(max(0.0001,TotalLaborSupply[0])),2);
+    distance+=3*pow((TotalLaborSupply[4]-Theomoments[4][6])/(max(0.0001,TotalLaborSupply[4])),2);
+    distance+=3*pow((TotalLaborSupply[8]-Theomoments[8][6])/(max(0.0001,TotalLaborSupply[8])),2);
+    
+
     
     
     

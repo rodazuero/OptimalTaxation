@@ -130,20 +130,21 @@ long double TnActual(double nomina){
     return(0.09*nomina);
 }
 
-//1.9. Production. C*0 to eliminate c
+//2. Production. C*0 to eliminate c
 long double production(double ni, double nf, double aalpha, double tthetae,double c){
     double prod=tthetae*pow((c*1+ni+nf),aalpha);
+    
     return(prod);
 }
 
-//2. Pre-tax profits.Checked. C*0 to eliminate c
+//3. Pre-tax profits.Checked. C*0 to eliminate c
 long double profm(double ni, double nf, double aalpha, double tthetae, double wi, double wf, double c){
     double pi1=tthetae*pow((c*1+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
-    return(pi1);
+        return(pi1);
     
 }
 
-//3. Corporate tax profits, marginal. C*0 to eliminate c
+//4. Corporate tax profits, marginal. C*0 to eliminate c
 long double Tc(double z, double ni, double nf, double aalpha,double tthetae, double wi, double wf,double c){
     double profm=tthetae*pow((c*1+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
     double arg=profm-z;
@@ -159,6 +160,8 @@ long double Tc(double z, double ni, double nf, double aalpha,double tthetae, dou
 //4. Tc Actual corporate taxes. In hundreds of dollars.
 // For instance. 189=5000*12*0.315/100 c*0 to eliminate c
 long double TcActual(double z, double ni, double nf, double aalpha, double tthetae, double wi, double wf,double c){
+    
+    
     
     double profm=tthetae*pow((c*1+ni+nf),aalpha)-wi*ni-wf*nf-TnActual(nf*wf);
     double arg=profm-z;
@@ -186,6 +189,7 @@ long double TcActual(double z, double ni, double nf, double aalpha, double tthet
             ans=0;
         }
     }
+
     return(ans);
     //double firsterm=-exp(-arg);
     //double tax=firsterm+1;
@@ -212,6 +216,7 @@ long double PIT(double tthetaw, double wf, double lf){
     }else if(x>=66000){
         ans=0.3*x;
     }
+
     return(ans);
 }
 
@@ -239,16 +244,7 @@ long double FinProfits(const double *Args, double paramvec[9]){
    // cout << ggamma << " ggamma "<< endl;
    // cout << ddelta << " ddelta "<< endl;
     
-    int test=2;
-    if(test==1){
-        cout << aalpha << " aalpha"<< endl;
-        cout << ddelta << " ddelta"<< endl;
-        cout << ggamma << " ggamma"<< endl;
-        cout << bbeta << " bbeta"<< endl;
-        cout << ssigma << " ssigma"<< endl;
-        cout << tthetae << " tthetae"<< endl;
-        cout << c << " c"<< endl;
-    }
+    
  
     
     
@@ -264,6 +260,7 @@ long double FinProfits(const double *Args, double paramvec[9]){
     double taxes=TcActual(z,ni,nf,aalpha,tthetae,wi,wf,c);
     
     //Cost of evacion
+    
     double evcost=pow(z,1+ssigma)*(bbeta/(1+ssigma));
     
     //Evasion costs
@@ -308,7 +305,11 @@ vector<double> profitsFinMaxim(double InitialCond[3], double wi,
                                double tthetae,
                                double c){
     
+    
+    //Modifying parameters to find internal solution to profits
+    
     double Params[9]={};
+    
     Params[0]=wi;
     Params[1]=wf;
     Params[2]=aalpha;
@@ -342,6 +343,33 @@ vector<double> profitsFinMaxim(double InitialCond[3], double wi,
     x3[0]=InitialCond[0];
     x3[1]=InitialCond[1];
     x3[2]=InitialCond[2];
+    
+    
+    //Obtaining the analytical solution to the problem using a linear tax system:
+    double d=0.2;
+    
+    //NI:
+    double ninumerator1=(wf*(1+c)-wi*(1-d));
+    double nifraction=ninumerator1/ddelta;
+    double niexponent=1/ggamma;
+    double niInitial=pow(nifraction,niexponent);
+    
+    
+    //NF
+    double nfnumerator1=(wf*(1+c)/(aalpha*tthetae));
+    double nf1=pow(nfnumerator1,(1/(aalpha-1)));
+    
+    double nfnumerator2=(wf*(1+c)-wi)*(1-d);
+    double nffraction2=nfnumerator2/ddelta;
+    double nf2=pow(nffraction2,1/ggamma);
+    double nfInitial=max(nf1-nf2,0.001);
+    
+    double zInitial=pow(d/bbeta,1/ssigma);
+    
+    x3[0]=niInitial;
+    x3[1]=nfInitial;
+    x3[2]=zInitial;
+    
     
     //Finding optimal
     nlopt_optimize(optProfits, x3, &minf3);
@@ -379,8 +407,7 @@ vector<double> profitsFinMaxim(double InitialCond[3], double wi,
     Ans[2]=z;
     Ans[3]=Prof;
     nlopt_destroy(optProfits);
-    
-    
+  
     return(Ans);
 }
 
@@ -400,6 +427,7 @@ double ValueWorkers(const double *Args, double ParamWorkers[7]){
     
     double li=Args[0];
     const double lf=Args[1];
+    
     
 
     
@@ -463,6 +491,7 @@ vector<double> valueWorkerFinMaxim(double InitialCond[2],
     lbWorker[0]=0;
     lbWorker[1]=0;
     
+
     
     nlopt_opt optWorkers;
     optWorkers = nlopt_create(NLOPT_LN_NELDERMEAD, 2);
@@ -477,6 +506,10 @@ vector<double> valueWorkerFinMaxim(double InitialCond[2],
     double x3Worker[2];
     x3Worker[0]=InitialCond[0];
     x3Worker[1]=InitialCond[1];
+    
+    //Optimal analytical solutions
+    double d=0.3;
+
     
     
     //memcpy(Params, (x3**)pointer, sizeof Params);
@@ -1664,66 +1697,46 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     TotalLaborSupply[9]=0.997;
     double test=1;
     
-    //Open file where moments will be stored
+    //Open file where moments w ill be stored
     
     
     //Computing the final distance
     for(int it=0; it<9; it++){
-        if(test==1){
-            cout << " ------ Moments inside distance "<< endl;
-            cout << it << " it "<< endl;
-            cout << Production[it] << " Production[it] " << endl; //checked
-            cout << Theomoments[it][0] << " Theomoments[it][0] " << endl; //checked
-            cout << Taxes[it] << " Taxes[it] " << endl; //Checked
-            cout << Theomoments[it][1] << " Theomoments[it][1] " << endl;
-            cout << IncomeEmpirical[it] << " IncomeEmpirical[it] " << endl; // Checked
-            cout << Theomoments[it][3] << " Theomoments[it][3] demand informal prop" << endl;
-            cout << Theomoments[it][4] << " Theomoments[it][4] " << endl; //Checked
-            cout << InformalSupplyProportion[it] << " InformalSupplyProportion[it] " << endl; //Checked
-            cout << Theomoments[it][5] << " Theomoments[it][5] " << endl;//Checked
-            cout << TotalLaborSupply[it] << " TotalLaborSupply[it] " << endl; //Checked
-            cout << Theomoments[it][6] << " Theomoments[it][6],2 " << endl; //Labor supply theoretical with respect to median
-            cout << PropEntrepEmpirical[it] << " PropEntrepEmpirical[it] " << endl;
-            cout << Theomoments[it][7] << " Theomoments[it][7] " << endl; //Proportion entrepreneurs
-            
-            
-            
-        }
         
         
-        
-        distance+=pow((Production[it]-Theomoments[it][0])/(max(0.0001,Production[it])),2);
-        
-        cout << "contribution distance production "<<pow((Production[it]-Theomoments[it][0])/(max(0.0001,Production[it])),2)<< endl;
-        
+        //distance+=pow((Production[it]-Theomoments[it][0])/(max(0.0001,Production[it])),2);
         distance+=pow((Taxes[it]-Theomoments[it][1])/(max(0.0001,Taxes[it])),2);
-        
-        cout << "contribution taxes  "<<pow((Taxes[it]-Theomoments[it][1])/(max(0.0001,Taxes[it])),2)<< endl;
-        
-        
-        distance+=pow((IncomeEmpirical[it]-Theomoments[it][4])/(max(0.0001,IncomeEmpirical[it])),2);
-        cout << "contribution IncomeEmpirical  "<<pow((IncomeEmpirical[it]-Theomoments[it][4])/(max(0.0001,IncomeEmpirical[it])),2)<< endl;
-        
-        distance+=pow((InformalSupplyProportion[it]-Theomoments[it][5])/(max(0.0001,InformalSupplyProportion[it])),2);
-        cout << "contribution InformalSupplyProportion  "<<pow((InformalSupplyProportion[it]-Theomoments[it][5])/(max(0.0001,InformalSupplyProportion[it])),2)<< endl;
-        
-        distance+=pow((TotalLaborSupply[it]-Theomoments[it][6])/(max(0.0001,TotalLaborSupply[it])),2);
-        cout << "contribution TotalLaborSupply  "<<pow((TotalLaborSupply[it]-Theomoments[it][6])/(max(0.0001,TotalLaborSupply[it])),2)<< endl;
-        
+        //distance+=pow((IncomeEmpirical[it]-Theomoments[it][4])/(max(0.0001,IncomeEmpirical[it])),2);
+        //distance+=pow((InformalSupplyProportion[it]-Theomoments[it][5])/(max(0.0001,InformalSupplyProportion[it])),2);
+        //distance+=pow((TotalLaborSupply[it]-Theomoments[it][6])/(max(0.0001,TotalLaborSupply[it])),2);
         distance+=pow((PropEntrepEmpirical[it]-Theomoments[it][7])/(max(0.0001,PropEntrepEmpirical[it])),2);
-        
-        cout << "contribution PropEntrepEmpirical  "<<pow((PropEntrepEmpirical[it]-Theomoments[it][7])/(max(0.0001,PropEntrepEmpirical[it])),2)<< endl;
-        
+
         //I will add a part corresponding to the 0.8 approximately retribution to work. Need to adapt.
         distance+=pow((0.75-Theomoments[it][8])/0.75,2);
-        
-        cout << "contribution pago a salarios  "<<pow((0.75-Theomoments[it][8])/0.75,2)<< endl;
+
         
     }
     
     
     
+    distance+=3*pow((Production[0]-Theomoments[0][0])/(max(0.0001,Production[0])),2);
+    distance+=3*pow((Production[4]-Theomoments[4][0])/(max(0.0001,Production[4])),2);
+    distance+=3*pow((Production[8]-Theomoments[8][0])/(max(0.0001,Production[8])),2);
     
+    distance+=3*pow((IncomeEmpirical[0]-Theomoments[0][4])/(max(0.0001,IncomeEmpirical[0])),2);
+    distance+=3*pow((IncomeEmpirical[4]-Theomoments[4][4])/(max(0.0001,IncomeEmpirical[4])),2);
+    distance+=3*pow((IncomeEmpirical[8]-Theomoments[8][4])/(max(0.0001,IncomeEmpirical[8])),2);
+    
+    
+    distance+=3*pow((InformalSupplyProportion[0]-Theomoments[0][5])/(max(0.0001,InformalSupplyProportion[0])),2);
+    distance+=3*pow((InformalSupplyProportion[4]-Theomoments[4][5])/(max(0.0001,InformalSupplyProportion[4])),2);
+    distance+=3*pow((InformalSupplyProportion[8]-Theomoments[8][5])/(max(0.0001,InformalSupplyProportion[8])),2);
+    
+    distance+=3*pow((TotalLaborSupply[0]-Theomoments[0][6])/(max(0.0001,TotalLaborSupply[0])),2);
+    distance+=3*pow((TotalLaborSupply[4]-Theomoments[4][6])/(max(0.0001,TotalLaborSupply[4])),2);
+    distance+=3*pow((TotalLaborSupply[8]-Theomoments[8][6])/(max(0.0001,TotalLaborSupply[8])),2);
+
+
     
     //ThMomentsCSV.open("ThMomentsCSV.csv", ios::out | ios::app);
     
@@ -1742,6 +1755,7 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     cout << " pow((Theomoments[6][3]-0.996)/(0.996),2) "<< pow((Theomoments[6][3]-0.97)/(0.97),2) << endl;
     cout << " pow((Theomoments[7][3]-0.996)/(0.996),2) "<< pow((Theomoments[7][3]-0.91)/(0.91),2) << endl;
     cout << " pow((Theomoments[8][3]-0.996)/(0.996),2) "<< pow((Theomoments[8][3]-0.01)/(0.01),2) << endl;
+    cout << Theomoments[3][3] << "Theomoments[3][3]"<<endl;
     
     
     //Writing the csv file of the moments
@@ -2013,9 +2027,9 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     ubParameters[2]=700;
     ubParameters[3]=10;
     ubParameters[4]=500;
-    ubParameters[5]=10;
+    ubParameters[5]=200;
     ubParameters[6]=600;
-    ubParameters[7]=10;
+    ubParameters[7]=70;
     ubParameters[8]=4;
     ubParameters[9]=4;
     ubParameters[10]=4.5;
@@ -2113,7 +2127,7 @@ void SobolRun(arma::vec WagesVectorIn,
     double a=2;
     cout << a << " a "<< endl;
     
-    std::ifstream theFile ("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/SobolDim15.csv");
+    std::ifstream theFile ("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LastGitVersion/OptimalTaxation/AWS/InAws/Sobol5/SobolDim15.csv");
     
     int SIZEOBS=20000;
     int NVAR=15;
@@ -2229,6 +2243,9 @@ int main(int argc, const char * argv[]) {
     myVec[2].first=-1.2;
     myVec[3].first=2.2;
     
+    
+    
+    
     cout <<myVec[0].second << " myVec[0].second"<< endl;
     cout <<myVec[1].second << " myVec[1].second"<< endl;
     cout <<myVec[2].second << " myVec[2].second"<< endl;
@@ -2337,26 +2354,29 @@ int main(int argc, const char * argv[]) {
     
     //0. Payroll taxes marginal
     double Payrolltest=Tn(nf);
-    cout << Payrolltest<< " Tn'(nf) "<< endl;
+    
+
     
     //1. Payroll taxes definition
     double PayrolltestActual=TnActual(nf);
     cout << PayrolltestActual<< " Tn(nf)"<< endl;
+
+    //2 prodution
+    double productiontest=production( ni,  nf,  aalpha,  tthetae, c);
+    cout << productiontest << " productiontest "<< endl;
     
-    //2. Pre-tax profits
+    //3. Pre-tax profits
+    cout << " ----testing profm ----"<<endl;
     double profmTest=profm( ni,  nf,  aalpha,  tthetae,  wi,  wf,c);
     cout << profmTest<< " profmTest"<< endl;
-    
-    //3. Corporate tax profits, marginal
-    double TcTest=Tc(z,ni,nf,aalpha,tthetae,wi,wf,c);
-    cout << TcTest << " TcTest " << endl;
-    
-    
+   
     //4. Tc Actual corporate taxes
+    cout << "----- testing TcActualTest ---"<< endl;
     double TcActualTest=TcActual(z,ni,nf,aalpha,tthetae,wi,wf,c);
     cout << TcActualTest << " TcActualtest "<< endl;
     
     //5. PIT
+    cout << " ---- testing PIT "<< endl;
     double PITtest=PIT(tthetaw,wf,lf);
     cout << PITtest << " PITtest " << endl;
     
@@ -2709,40 +2729,23 @@ int main(int argc, const char * argv[]) {
     
     
     
+    aalpha=0.73;
+    ggamma=2.69;
+    ddelta=509.86;
+    bbeta=284.73;
+    ssigma=6.25;
+    kkappa=0.93;
+    psi=127.7;
+    chi=9.16;
+    rrho=58.34;
+    mmu1=3.7;
+    mmu2=1.13;
+    ssigma1=1.33;
+    ssigma2=3.72;
+    rho12=0.53;
+    c=6.67;
     
     
-    
-    aalpha=0.682324;
-    ggamma=6.82592;
-    ddelta=647.281;
-    bbeta=324.671;
-    ssigma=8.25678;
-    kkappa=263.156;
-    psi=3.17603;
-    chi=532.294;
-    rrho=3.01674;
-    mmu1=0.420156;
-    mmu2=3.92797;
-    ssigma1=1.51879;
-    ssigma2=4.14574;
-    rho12=0.0519922;
-    c=1;
-    
-    aalpha=0.501622;
-    ggamma=5.79643;
-    ddelta=603.786;
-    bbeta=23.9608;
-    ssigma=8.90455;
-    kkappa=0.687957;
-    psi=6.69006;
-    chi=0.314609;
-    rho12=200.603;
-    mmu1=0.109005;
-    mmu2=3.9;
-    ssigma1=0.593445;
-    ssigma2=3.01949;
-    rho12=0.267894;
-    c=6.01291;
     
     
     ParamsDecision[0]=wi;
@@ -2841,9 +2844,14 @@ int main(int argc, const char * argv[]) {
     
     //DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
     cout << " muajajajajajajaja222222"<< endl;
+    
+    AdditionalVAriables[0]=2;
+    AdditionalVAriables[1]=3;
+    
     MinimizingDistance(MinimizeDistanceParameters,AdditionalVAriables);
-    cout << " muajajajajajajaja222222"<< endl;
-    //
+    
+    cout << " Distance minimization done"<< endl;
+  
     //EquilibriumMoments(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
     //EqWagesNumericVector(VecOthers, WagesVectorIn);
     //StandardizedDistanceEstimator(ParStandardDistance,  AddPar);
@@ -2852,26 +2860,22 @@ int main(int argc, const char * argv[]) {
     
     //ExcessDemandFunctions(Wages,ParamsDecisionExcessDemand, InitLWorkersDecision, InitProfDecision);
     
-    cout << " changonorrea"<< endl;
+    //cout << " changonorrea"<< endl;
     //Decision=iDecision(TthetaDecision,ParamsDecision,InitLWorkersDecision,InitProfDecision);
     
     
-    SobolRun(Wages,InitLWorkersDecision,InitProfDecision);
+    //----->   SobolRun(Wages,InitLWorkersDecision,InitProfDecision);
+    
+    
     //WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
     //DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
     //EquilibriumMoments(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
     
     
-    cout << "end of theomomtn"<< endl;
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
-    cout << " minimizing the distance!!!!!!!!! finally"<< endl;
     
     
-    cout << MinimizeDistanceParameters[0] << " MinimizeDistanceParameters[0]"<< endl;
+    
+    //cout << MinimizeDistanceParameters[0] << " MinimizeDistanceParameters[0]"<< endl;
     
     
     
@@ -2883,14 +2887,14 @@ int main(int argc, const char * argv[]) {
     
     //Decision=iDecision(TthetaDecision,ParamsDecision,InitLWorkersDecision,InitProfDecision);
     
-    cout << Decision[0][0]<< " Decision "<< endl;
-    cout << Decision[0][1]<< " ni "<< endl;
-    cout << Decision[1][1]<< " nf "<< endl;
-    cout << Decision[2][1]<< " z "<< endl;
-    cout << Decision[3][1]<< " prof "<< endl;
-    cout << Decision[0][2]<< " li "<< endl;
-    cout << Decision[1][2]<< " lf "<< endl;
-    cout << Decision[2][2]<< " VWorker "<< endl;
+    //cout << Decision[0][0]<< " Decision "<< endl;
+    //cout << Decision[0][1]<< " ni "<< endl;
+    //cout << Decision[1][1]<< " nf "<< endl;
+    //cout << Decision[2][1]<< " z "<< endl;
+    //cout << Decision[3][1]<< " prof "<< endl;
+    //cout << Decision[0][2]<< " li "<< endl;
+    //cout << Decision[1][2]<< " lf "<< endl;
+    //cout << Decision[2][2]<< " VWorker "<< endl;
     
     
     
@@ -2908,11 +2912,9 @@ int main(int argc, const char * argv[]) {
     
     
     
-    cout << " NONSTANDARD------------- "<< endl;
     //cout << ExcessDemandFunctions(Wages,ParamsDecisionExcessDemand, InitLWorkersDecision, InitProfDecision)<<  endl;
     
     
-    cout << " STANDARD------------- "<< endl;
     //cout << StandardizedExcessDemands(WageEx,  Others) << " Standardized1" << endl;
     //cout << ExcessDemandFunctions(Wages,ParamsDecisionExcessDemand, InitLWorkersDecision, InitProfDecision)<<  endl;
     //cout << ExcessDemandFunctions(Wages,ParamsDecisionExcessDemand, InitLWorkersDecision, InitProfDecision)<<  endl;
@@ -3071,5 +3073,16 @@ int main(int argc, const char * argv[]) {
     
     
     cout << "Hello, World!\n";
+    
+    
+    
+   
+    
+    //ArgWorkers
+    
+    
+
+    
+    
     return 0;
 }
