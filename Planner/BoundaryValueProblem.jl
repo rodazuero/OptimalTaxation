@@ -1,6 +1,6 @@
 function find_uw0(y0, uw0_low, uw0_up, Nspan, pa)
     #Give meaningful names to states
-    uw0guess    = y0[1];
+    uw0guess    = y0[1]
     μ0     = y0[2];
     e0     = y0[3];
     ϕ_e0   = y0[4];
