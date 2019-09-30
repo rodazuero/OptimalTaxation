@@ -75,7 +75,6 @@ function init_parameters()
     β= 0.2135;
     σ= 0.1827;
     ϵ= 0.0;
-    ς= 1.0;
 
     #Planner parameters
     ϕ=0.5;
