@@ -36,6 +36,8 @@ function find_states!(du,u,pa,θ)
     λ     = u[6];
     l_agg = u[7];
     ω     = u[8];
+    l_new = u[9];
+    y_new = u[10];
 
     #Construct state object
     ss = State(e, uw, ϕ_e, μ, λ, ω);
@@ -65,6 +67,9 @@ function find_states!(du,u,pa,θ)
     du[6] = 0.0;
     du[7] = θ*l*h_w - (n-pa.ϵ)*p*h_e;
     du[8] = 0.0;
+    du[9] = (θ*l*h_w + (n-pa.ϵ)*p*h_e);
+    du[10]= ((e^pa.ς)*(n^pa.α)*p*h_e)+pa.β*(z^(1+pa.σ) )/(1+pa.σ)*p*h_e + uw*h_tot + pa.χ*(l^(1+pa.ψ))/(1+pa.ψ)*h_w;
+
 
     nothing
 end
