@@ -1,3 +1,65 @@
+function distance!(x::Vector,grad::Vector, fixed_initial_states, Nspan, pa, solution::Array{Float64}, io::IOStream)
+    if length(grad) > 0
+        println("unknown gradient")
+    end
+
+    io = open("Results.txt", "a");
+    #1 Define initial states
+    #1.1 fixed initial states
+    μ0   = fixed_initial_states[1];
+    e0     = fixed_initial_states[2];
+    y_agg0 = fixed_initial_states[3];
+    l_agg0 = fixed_initial_states[4];
+    y_new0 = fixed_initial_states[5];
+    l_new0 = fixed_initial_states[6];
+    ystar0 = fixed_initial_states[7];
+    lstar0 = fixed_initial_states[8];
+    #1.2 initial states that are going to be moving for the shooting
+    uw0    = x[1];
+    ϕ_e0   = x[2];
+    λ0     = x[3];
+    ω0     = x[4];
+    println(" ")
+    println("uw0 = $uw0, ϕ_e0 = $ϕ_e0, λ0 = $λ0, ω0= $ω0, ")
+    #println(io," ")
+    #print(io, "$uw0, $ϕ_e0, $λ0, $ω0, ")
+
+    #2. Solve differential equation given inital states
+    #2.1 log-scale for the range of theta,
+    xlb= log(pa.θ_w_lb);
+    xub = log(pa.θ_w_ub);
+    xstep = (xub - xlb)/(Nspan - 1);
+    xspan = xlb:xstep:xub;
+    #2.2 Define vector for initial guess
+    y0= [uw0, μ0, e0, ϕ_e0, y_agg0, λ0, l_agg0, ω0, l_new0, y_new0, ystar0, lstar0]
+    try
+        #Solve the problem, return the euclidean distance from solution to the boundary conditions
+        my_runge_kutta!(solution,y0,xspan,xstep,pa)
+        #av_mu = mean(solution[end,2]);
+        rel_error_mu = (solution[end,2] - 0.0);
+        #av_e = mean(solution[end,3]);
+        rel_error_e = (solution[end,3] - pa.θ_e_ub)/pa.θ_e_ub;
+        #av_Y = mean(solution[end,5]);
+        rel_error_Y = ( solution[end,12] - pa.G) ;
+        #av_L = mean(solution[end,7]);
+        rel_error_L = ( solution[end,11] - 0.0 );
+
+        distance =   ( rel_error_mu )^2 +( rel_error_e )^2 +( rel_error_Y )^2 +(rel_error_L )^2
+
+        println("mu = $(solution[end,2]) , delta_e = $(solution[end,3] - pa.θ_e_ub), Y = $(solution[end,5]), L= $(solution[end,7]), dist= $distance ")
+        #print(io, "$(solution[end,2]) , $(solution[end,3] - pa.θ_e_ub) , $(solution[end,5]), $(solution[end,7]),  $distance \n")
+        #close(io)
+        return distance
+    catch
+        # When no solution, mu is positive, so I return any posutive value, e.g 1
+        print(io, " , , , , No solution \n")
+        close(io)
+        return distance= Inf
+    end
+end
+
+
+
 function find_uw0(y0, uw0_low, uw0_up, Nspan, pa)
     #Give meaningful names to states
     uw0guess    = y0[1]
