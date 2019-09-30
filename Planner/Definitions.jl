@@ -63,50 +63,53 @@ end
 #Constructor for the parameters
 function init_parameters()
     ##Workers parameters
-    χ= 45.49;
-    ψ= 5.73;
-    κ= 7.53;
-    ρ= 185.89;
+    χ= 2.0192;
+    ψ= 0.4528;
+    κ= 0.1021;
+    ρ= 0.0912;
 
     ## Entrepreneurs parameters
-    α= 0.71;
-    δ= 147.75;
-    γ= 1.39;
-    β= 243.95;
-    σ= 3.77;
-    ϵ= 29.95;
+    α= 0.73;
+    δ= 0.12873;
+    γ= 0.7341;
+    β= 0.2135;
+    σ= 0.1827;
+    ϵ= 0.0;
+    ς= 1.0;
 
     #Planner parameters
-    ϕ=0.8;
-    G=1.0;
+    ϕ=0.5;
+    G=0.15;
 
     ## Distributions
     #Here I assume normality
-    μ_w = 2.89;
-    μ_e = 1.94;
-    σ2_w = 1.81; σ_w=σ2_w^0.5;
-    σ2_e = 1.54; σ_e=σ2_e^0.5;
-    σ_we = 0.48;
+    μ_w = 1.7626;
+    μ_e = 1.2528;
+    #σ2_w = 1.0921; σ_w=σ2_w^0.5;
+    σ2_w = 5; σ_w=σ2_w^0.5;
+    #σ2_e = 1.1675; σ_e=σ2_e^0.5;
+    σ2_e = 5; σ_e=σ2_e^0.5;
+    σ_we = 0.0;
 
     dist_marginal_w=Normal(μ_w,σ_w);
     dist_marginal_e=Normal(μ_e,σ_e);
 
     #theta_w_lb
-    quantile_theta_w_lb(k) = cdf(dist_marginal_w,k) - 0.01
+    quantile_theta_w_lb(k) = cdf(dist_marginal_w,k) - 0.3
     x_w_lb = find_zero(quantile_theta_w_lb, (-100.0,100.0))
     θ_w_lb= exp(x_w_lb)
     #theta_w_ub
-    quantile_theta_w_ub(k) = cdf(dist_marginal_w,k) - 0.99
+    quantile_theta_w_ub(k) = cdf(dist_marginal_w,k) - 0.7
     x_w_ub = find_zero(quantile_theta_w_ub, (-100.0,100.0))
     θ_w_ub= exp(x_w_ub)
 
 
     #theta_e_lb
-    quantile_theta_e_lb(k) = cdf(dist_marginal_e,k) - 0.01
+    quantile_theta_e_lb(k) = cdf(dist_marginal_e,k) - 0.3
     x_e_lb = find_zero(quantile_theta_e_lb, (-100.0,100.0))
     θ_e_lb= exp(x_e_lb)
     #theta_e_ub
-    quantile_theta_e_ub(k) = cdf(dist_marginal_e,k) - 0.99
+    quantile_theta_e_ub(k) = cdf(dist_marginal_e,k) - 0.7
     x_e_ub = find_zero(quantile_theta_e_ub, (-100.0,100.0))
     θ_e_ub= exp(x_e_ub)
 
@@ -127,7 +130,7 @@ function init_parameters()
     Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ϵ, ϕ, G, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, nodes, weights, θ_w_lb, θ_w_ub, θ_e_lb, θ_e_ub );
 end
 
-function distr_hw(θ::Real, e::Real, pa::Param)
+#=function distr_hw(θ::Real, e::Real, pa::Param)
     (N,)=size(pa.nodes);
     b = e;
     integral=0.0;
@@ -148,4 +151,4 @@ function distr_he(θ::Real, e::Real, pa::Param)
         integral += pa.gg(x,e)*pa.weights[i];
     end
     integral = integral*b/2.0;
-end
+end=#
