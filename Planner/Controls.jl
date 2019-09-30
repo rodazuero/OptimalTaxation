@@ -144,7 +144,7 @@ function z_zero(θ, A, ss, pa)
 end
 
 
-
+#=
 function find_controls( θ, ss, pa)
     h_e= pa.he(θ, ss.e);
     h_w= pa.hw(θ, ss.e);
@@ -277,4 +277,4 @@ function  z(n, ss, pa, θ)
         end
     end
     z
-end
+end=#
