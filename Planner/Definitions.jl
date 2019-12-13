@@ -37,6 +37,10 @@ mutable struct Param
     nodes::Array{Float64,1}
 
     #Span of theta
+    θ_e_a::Float64
+    θ_e_b::Float64
+    θ_w_a::Float64
+    θ_w_b::Float64
     θ_w_lb::Float64
     θ_w_ub::Float64
     θ_e_lb::Float64
@@ -82,48 +86,49 @@ function init_parameters()
 
     ## Distributions
     #Here I assume normality
-    μ_w = 1.7626;
-    μ_e = 1.2528;
-    #σ2_w = 1.0921; σ_w=σ2_w^0.5;
-    σ2_w = 5; σ_w=σ2_w^0.5;
-    #σ2_e = 1.1675; σ_e=σ2_e^0.5;
-    σ2_e = 5; σ_e=σ2_e^0.5;
+    μ_w = 10;
+    μ_e = 10;
+    σ2_w = 6; σ_w=σ2_w^0.5;
+    σ2_e = 6; σ_e=σ2_e^0.5;
     σ_we = 0.0;
 
-    dist_marginal_w=Normal(μ_w,σ_w);
-    dist_marginal_e=Normal(μ_e,σ_e);
+#Uniform distribution
+    θ_e_a= μ_e-((12.0^0.5)/2)*(σ2_e^0.5);
+    θ_e_b= μ_e+((12.0^0.5)/2)*(σ2_e^0.5);
+
+    #theta_w_a
+    θ_w_a= μ_w-((12.0^0.5)/2)*(σ2_w^0.5);
+    θ_w_b= μ_w+((12.0^0.5)/2)*(σ2_w^0.5);
+
+    dist_marginal_w=Uniform(θ_w_a,θ_w_b);
+    dist_marginal_e=Uniform(θ_e_a,θ_e_b);
 
     #theta_w_lb
     quantile_theta_w_lb(k) = cdf(dist_marginal_w,k) - 0.3
-    x_w_lb = find_zero(quantile_theta_w_lb, (-100.0,100.0))
-    θ_w_lb= exp(x_w_lb)
+    θ_w_lb = find_zero(quantile_theta_w_lb, (-100.0,100.0))
+    θ_w_lb = quantile(dist_marginal_w,0.2)
+
     #theta_w_ub
     quantile_theta_w_ub(k) = cdf(dist_marginal_w,k) - 0.7
-    x_w_ub = find_zero(quantile_theta_w_ub, (-100.0,100.0))
-    θ_w_ub= exp(x_w_ub)
-
+    θ_w_ub = find_zero(quantile_theta_w_ub, (-100.0,100.0))
+    θ_w_ub = quantile(dist_marginal_w,0.8)
 
     #theta_e_lb
-    quantile_theta_e_lb(k) = cdf(dist_marginal_e,k) - 0.3
-    x_e_lb = find_zero(quantile_theta_e_lb, (-100.0,100.0))
-    θ_e_lb= exp(x_e_lb)
-    #theta_e_ub
-    quantile_theta_e_ub(k) = cdf(dist_marginal_e,k) - 0.7
-    x_e_ub = find_zero(quantile_theta_e_ub, (-100.0,100.0))
-    θ_e_ub= exp(x_e_ub)
+    quantile_theta_e_lb(k) = cdf(dist_marginal_e,k) - 0.1
+    θ_e_lb = find_zero(quantile_theta_e_lb, (-100.0,100.0))
+    θ_e_lb = quantile(dist_marginal_e,0.2)
 
-    mean_w_given_e(x_e) = μ_w + σ_we*σ_w/σ_e*(x_e-μ_e);
-    var_w_given_e = (1.0-σ_we^2.0)*σ2_w;
-    dist_w_given_e(x_e)=Normal(mean_w_given_e(x_e),var_w_given_e^0.5);
-    mean_e_given_w(x_θ) = μ_e + σ_we*σ_e/σ_w*(x_θ-μ_w);
-    var_e_given_w= (1.0-σ_we^2.0)*σ2_e;
-    dist_e_given_w(x_θ)=Normal(mean_e_given_w(x_θ),var_e_given_w^0.5);
-    hw(θ,e)= (1/θ) * ( cdf(dist_e_given_w(log(θ)) ,log(e) )*( pdf(dist_marginal_w, log(θ)) ) ); # h_w(θ)= F_e|w(e|θ) fw(θ)
-    he(θ,e)= (1/e) * ( cdf(dist_w_given_e(log(e)), log(θ) )*( pdf(dist_marginal_e, log(e)) ) ); # h_e(e)= F_w|e(θ|e) fe(e)
+    #theta_e_ub
+    quantile_theta_e_ub(k) = cdf(dist_marginal_e,k) - 0.9
+    θ_e_ub = find_zero(quantile_theta_e_ub, (-100.0,100.0))
+    θ_e_ub = quantile(dist_marginal_e,0.8)
+
+    hw(θ,e)= ((e-θ_e_a)/(θ_e_b-θ_e_a))*(1/(θ_w_b-θ_w_a)); # h_w(θ)= F_e|w(e|θ) fw(θ)
+    he(θ,e)= ((θ-θ_w_a)/(θ_w_b-θ_w_a))*(1/(θ_e_b-θ_e_a)); # h_e(e)= F_w|e(θ|e) fe(e)
     hh(θ,e,p)= hw(θ,e) + p*he(θ,e);
-    cov= σ_we*σ_w*σ_e;
-    d=MvNormal([μ_w, μ_e], [σ2_w cov; cov σ2_e]);
-    gg(θ,e) = pdf(d,[log(θ),log(e)]) /(θ*e);
+
+    gg(θ,e) = 0.0
+
     weights, nodes = gausslegendre(25);
 
     Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ϵ, ϕ, G, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, nodes, weights, θ_w_lb, θ_w_ub, θ_e_lb, θ_e_ub );
