@@ -2,44 +2,29 @@ function new_find_controls( θ, ss, pa)
     #INPUT: states and parameters
     #OUTPUT: optimal controls
 
-    #Recover ditributions
-    h_e= pa.he(θ, ss.e);
-    h_w= pa.hw(θ, ss.e);
-
-    #omega/lambda is often used
-    ww = ss.ω/ss.λ;
-
-
-    #Define A
-    A= ((ss.uw^pa.ϕ-ss.λ*ss.uw)*h_e + ss.ϕ_e) / (ss.λ*h_e);
-
     #Define bounds for z, and make sure there exist feasible values for n and z
     z_ub = (1.0/pa.β)^(1.0/pa.σ)
-    pa.β*(z_ub^(1.0+pa.σ))/(1.0+pa.σ) < A &&  error("n<0,adjust A downward")
 
-    if A<0.0
-        z_lb = eps()
-    else
-        z_lb = ( (1.0+pa.σ)*A/pa.β )^(1/(1.0+pa.σ))
-    end
-    pa.β*(z_ub^(1.0+pa.σ))/(1.0+pa.σ) < A &&  error("no range for z, adjust A downward")
-
+        z_lb = 0.0000016
+        #z_lb = ( (1.0+pa.σ)/pa.β )^(1/(1.0+pa.σ)) + eps() #I add a small number to avoid rounding mistakes)
 
     #Define grid for z
     #grid size - defining the grid inside the function is inefficient, can be adjusted if need to speed up
-    Nz = 500;
+    Nz = 100; #Number of Zs
     zstep = (z_ub-z_lb)/(Nz-1);
     zgrid = z_lb:zstep:z_ub;
 
     #Define the hamiltonian as function of controls given states
-    objective(z,n,l,p) = ss.uw^pa.ϕ*(h_w + p*h_e) + ss.μ*pa.χ*l^(1.0+pa.ψ)/θ + ss.λ*( ss.e*n^pa.α*p*h_e - pa.β*z^(1.0+pa.σ)/(1.0+pa.σ)*p*h_e - ss.uw*(h_w + p*h_e) - pa.χ*l^(1+pa.ψ)*h_w/(1+pa. ψ) ) + ss.ω*( θ*l*h_w - n*p*h_e ) + ss.ϕ_e*p ;
+    objective(z,n,l,p,κ) =  ss.μ*pa.χ*l^(1.0+pa.ψ)/θ + ss.λ*( ss.e*n^pa.α*p*h_e - pa.β*z^(1.0+pa.σ)/(1.0+pa.σ)*p*h_e - ss.uw*(h_w + p*h_e) - pa.χ*l^(1+pa.ψ)*h_w/(1+pa. ψ) ) + ss.ω*( θ*l*h_w - n*p*h_e ) + ss.ϕ_e*p + κ*z ;
     #Define function n(z)
-    n_fun(z) = pa.α /( ww* (1.0 - pa.α) ) * ( pa.β*z^(1.0+pa.σ)/(1.0+pa.σ) - A );
+        #Solver below in loop
+        #n_fun(z) = pa.α /( (ss.λ/ss.ω)* (1.0 - pa.α) ) * ( pa.β*z^(1.0+pa.σ)/(1.0+pa.σ)^(pa.σ));
     #Define function l(z,n)
     denominator_of_l(z,n) =  ss.λ*pa.χ*h_w - (ss.μ + z*ss.λ*h_e / (pa.σ* n^pa.α) )*(1+pa.ψ)*pa.χ/θ;
     l_fun(denominator) = denominator > 0.0 ? (ss.ω*θ*h_w/denominator)^(1.0/pa.ψ) : Inf;
     #Define function l(z,n,l)
     p(l,z,n) = pa.χ*l^(1.0+pa.ψ) / (θ*n^pa.α*(1.0-pa.β*z^pa.σ));
+
 
     #Itialize values for objective and potencial maximizers
     current_max = -Inf
@@ -49,27 +34,57 @@ function new_find_controls( θ, ss, pa)
     pp = NaN;
 
     #Define a variable counting the number of gridpoints where no solution if found
-    nosol = 0;
+    global nosol = 0;
 
     #Check corner solution at z=0
-    (potential_n,potential_z,potential_l,potential_p) = z_zero(θ, A, ss, pa);
-    potential_value= objective(potential_z,potential_n,potential_l,potential_p);
 
-    if isnan(potential_value)
-        nosol = nosol + 1;
-    elseif potential_value > current_max
-        current_max = potential_value;
-        nn= potential_n;
-        zz= potential_z;
-        ll= potential_l;
-        pp= potential_p
-    end
+         (potential_n,potential_z,potential_l,potential_p) = z_zero(θ, ss, pa);
+         potential_value= objective(potential_z,potential_n,potential_l,potential_p, 1.0);
+         if isnan(potential_value)
+             global nosol = nosol + 1;
+         else
+             current_max = potential_value;
+             nn= potential_n;
+             zz= potential_z;
+             ll= potential_l;
+             pp= potential_p;
+             #println("CORNER SOLUTION", "    n=", nn,"    z= ", zz,"   l= ", ll,"    p= ", pp, "   value", current_max)
+         end
+
+
+    #Check interior solution
+
+    #Define matrix to storage convergence results for n
+    convergence = Array{Float64}(undef,Nspan,Nz);
 
     #loop over grid of z. Recover n, l and p, and compute hamiltonian value
     for j=1:Nz
         #println(j)
         potential_z= zgrid[j];
-        potential_n= n_fun(potential_z);
+
+        #Solver for n
+
+        try
+            function n_solve!(F,x)
+                  F[1]=pa.α*ss.e*x[1]^(pa.α-1)-(ss.ω/ss.λ)-(potential_z/x[1])*pa.α*(1-pa.β*potential_z^(pa.σ))
+            end
+            results=nlsolve(n_solve!, [0.0+eps()], autodiff = :forward)
+            if results.f_converged
+                potential_n= results.zero[1];
+            #    convergence[position,j]= 1.0
+            else
+                potential_n= NaN;
+                #convergence[position,j]= 2.0
+            end
+            #println("z value  ",potential_z, "   n value  ", results.zero )
+
+        catch e
+            #println("z value  ",potential_z,"n value   ","Complex number?")        end
+            #potential_n= NaN;
+            #convergence[position,j]= 3.0
+        end
+
+        potential_n <0.0 && error("value of n is negative = ", potential_n)
 
         denom = denominator_of_l(potential_z,potential_n)
         if denom <= 0.0
@@ -77,21 +92,21 @@ function new_find_controls( θ, ss, pa)
         else
             potential_l = l_fun(denom);
             potential_p= p(potential_l, potential_z, potential_n);
-            potential_value= objective(potential_z,potential_n,potential_l,potential_p);
+            potential_value= objective(potential_z,potential_n,potential_l,potential_p, 0.0);
         end
 
         if isnan(potential_value)
-            nosol = nosol + 1;
+            global nosol = nosol + 1;
         elseif potential_value > current_max
             current_max = potential_value;
             nn= potential_n;
             zz= potential_z;
             ll= potential_l;
             pp= potential_p
+            #println(nn, zz, ll, pp)
         end
         #println("z = ", potential_z, " n = ", potential_n, " l = ", potential_l, " p = ", potential_p, " value = ", potential_value)
     end
-
     nosol == Nz + 1 && error("no solution to hamiltonian for any z, adjust mu downward")
 
     zz, nn, ll, pp
@@ -121,26 +136,23 @@ function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solve
 end
 
 function z_zero(θ, A, ss, pa)
-    A > 0.0 && ("No corner solution when A >0. Decrease A.")
-
     h_e= pa.he(θ, ss.e);
     h_w= pa.hw(θ, ss.e);
-    ww = ss.ω/ss.λ
 
-    nn =  -pa.α/(1.0-pa.α)*A/ww;
-    kkappa = ss.λ*h_e*( ss.e + (A/(1.0-pa.α)) * (-(1.0-pa.α)/pa.α*ww/A)^pa.α )
+    #ss = State(1e, 2uw, 3ϕ_e, 4μ, 5λ, 6ω);
 
-    kkappa > 0.0 && ("Complementary slackness does not hold for z=0. Increase wage.")
+    nn = ((ss.λ*pa.α*ss.e)/ss.ω)^(1.0/(1.0-pa.α))
 
-    denominator_l = ss.λ*pa.χ*h_w - (ss.μ + kkappa )*(1+pa.ψ)*pa.χ/θ
+    l_den= ss.λ*pa.χ*h_w-((ss.μ*pa.χ*(1.0+pa.ψ))/θ)
+    l_den < 0.0 && error("Planner wants infinite labor. Decrease mu")
 
-    denominator_l < 0.0 && ("Planner wants infinite labor. Decrease mu")
+    ll = ((ss.ω*θ*h_w)/l_den)^(1/pa.ψ)
 
-    ll = (ss.ω*θ*h_w/denominator_l)^(1.0/pa.ψ)
+    pp = pa.χ*(ll^(1.0+pa.ψ))/(θ*nn^pa.α)
 
-    pp= pa.χ*ll^(1.0+pa.ψ) / (θ*nn^pa.α);
 
     (nn,0.0,ll,pp)
+
 end
 
 
