@@ -8,17 +8,16 @@ using Statistics
 using PyPlot
 using DataFrames
 using CSV
+using NLsolve
 #using Plots
 #using DifferentialEquations
 
 #Old parameters
-include("Definitions.jl")
-#New parameters
-#include("Definitions_new.jl")
-include("Controls.jl")
-include("States.jl")
+include("Definitions.jl") #Definitions2.jl
+include("Controls.jl") #NewControls.jl
+include("States.jl") #States_Ralwsian.jl
 #include("MyFindZeros.jl")
-include("MyRungeKutta.jl")
+include("MyRungeKutta.jl") #NewMyRungeKutta.jl
 include("BoundaryValueProblem.jl")
 
 #Define values for the model parameters
@@ -26,15 +25,15 @@ pa = init_parameters();
 
 #Define initial state vector
 
-uw0    = 0.000422813 #guess
-μ0     = 0.0
+uw0    = 1 #guess
+μ0     =-1
 e0     =  pa.θ_e_lb;
-ϕ_e0   =  -0.0993742 #guess
+ϕ_e0   =  -3.2 #guess
 #ϕ_e0   =  -1.233e-5 #Min- e=1.07
 y_agg0 =  0.0
-λ0     =  4.42628 #guess
+λ0     =  1 #guess
 l_agg0 =  0.0
-ω0     =  4.09641 #guess=#
+ω0     =  1.6 #guess=#
 l_new0 =  0.0
 y_new0 =  0.0
 ystar0 = 0.0
@@ -58,40 +57,57 @@ lstar0 = 0.0 #n=#
 ##find_states!(du0,u0,pa,θ0)
 
 #Test my runge kutta
+
 Nspan = 500
 y0= [uw0, μ0, e0, ϕ_e0, y_agg0, λ0, l_agg0, ω0, l_new0, y_new0, 0, 0 ];
-xlb= log(pa.θ_w_lb);
-xub = log(pa.θ_w_ub);
+xlb= pa.θ_w_lb;
+xub = pa.θ_w_ub;
 xstep = (xub - xlb)/(Nspan - 1);
 xspan = xlb:xstep:xub;
 solution = Array{Float64}(undef,Nspan,12);
 agg = Array{Float64}(undef,Nspan,4);
-slope=((pa.θ_e_ub-pa.θ_e_lb)*(Nspan-1))/((log(pa.θ_w_ub)-log(pa.θ_w_lb))*Nspan)
 my_runge_kutta!(solution,y0,xspan,xstep,pa)
 #my_runge_kutta!(solution,[uw0, μ0, e0, ϕ_e0, y_agg0, λ0, l_agg0, ω0],xspan,xstep,pa)
 
 solution[end,:]
 using DelimitedFiles
-writedlm("Solution.csv",solution,';')
+writedlm("SolutionNew.csv",solution,';')
 
-xlb= log(pa.θ_w_lb);
+#=xlb= log(pa.θ_w_lb);
 xub = log(pa.θ_w_ub);
 xstep = (xub - xlb)/(Nspan - 1);
 xspan = xlb:xstep:xub;
-θspan = exp.(xspan);
+θspan = exp.(xspan);=#
+
+θspan = Array{Float64,1}
+θspan = collect(xspan)
+
 
 controls = Array{Float64}(undef,Nspan,4);
 recover_controls!(controls, θspan, solution);
 controls
 
+#FINAL BOUNDARY CONDITIONS
+
+#Boundary for μ
+    #Utilitarian planner
+    #bound_μ= (pa.φ*solution[end,1]^(pa.φ-1)-solution[end,6])*integral
+    #Ralwsian planner
+    bound_μ= (pa.φ*solution[end,1]^(pa.φ-1)-solution[end,6])*integral
+    dd_μ= solution[end,2]-bound_μ=
+#Boundary for e
+    bound_e= -((solution[end,1]^pa.ϕ+solution[end,6]*((solution[end,3]*controls[end,2]^pa.α)-((pa.β*(controls[end,1])^(1+pa.σ))/(1+pa.σ))-solution[end,1])-solution[end,8]*controls[end,2])*pa.he(xub, solution[end,3]))
+    dd=bound_e-solution[end,4]
+
+
 C= DataFrame(controls)
 names!(C,[:z, :n, :l, :p] )
 RungeKutta=hcat(DataFrame(solution),C, DataFrame(theta=θspan))
-CSV.write("RungeKutta.csv",RungeKutta)
+CSV.write("RungeKuttaNew.csv", RungeKutta)
 
 # Test distance
 
-#fixed_initial_states= [μ0, e0, y_agg0, l_agg0]
+#fixed_initial_states= [μ0, e0, y_agg0, l_agg0]ju
 fixed_initial_states= [μ0, e0, y_agg0, l_agg0, y_new0, l_new0, ystar0, lstar0 ]
 x = [uw0, ϕ_e0, λ0, ω0]
 grad = [];
@@ -160,7 +176,9 @@ uw0 = minx[1];
 Nspan = 500
 y0= [uw0, μ0, e0, ϕ_e0, y_agg0, λ0, l_agg0, ω0, l_new0, y_new0, 0, 0 ];
 xlb= log(pa.θ_w_lb);
+xlb= pa.θ_w_lb;
 xub = log(pa.θ_w_ub);
+xub = pa.θ_w_ub;
 xstep = (xub - xlb)/(Nspan - 1);
 xspan = xlb:xstep:xub;
 solution = Array{Float64}(undef,Nspan,12);
@@ -168,18 +186,13 @@ agg = Array{Float64}(undef,Nspan,4);
 slope=((pa.θ_e_ub-pa.θ_e_lb)*(Nspan-1))/((log(pa.θ_w_ub)-log(pa.θ_w_lb))*Nspan)
 my_runge_kutta!(solution,y0,xspan,xstep,pa)
 
-solution[end,:]
-
-
-xlb= log(pa.θ_w_lb);
-xub = log(pa.θ_w_ub);
-xstep = (xub - xlb)/(Nspan - 1);
-xspan = xlb:xstep:xub;
-θspan = exp.(xspan);
+θspan = Array{Float64,1}
+θspan = collect(xspan)
 
 controls = Array{Float64}(undef,Nspan,4);
 recover_controls!(controls, θspan, solution);
 controls
+bound_e= - (solution[end,1]^pa.ϕ+solution[end,6]*((solution[end,3]*controls[end,2]^pa.α)-((pa.β*(controls[end,1])^(1+pa.σ))/(1+pa.σ))-solution[end,1])-solution[end,8]*controls[end,2])*pa.he(xub, solution[end,3])
 
 
 ##GRAPHS
@@ -196,7 +209,7 @@ end=#
 #States
 estados=subplot(421)
 suptitle("Optimal states")
-estados=plot(θspan, solution[:,1])
+estados=plot(θspan[1:500], solution[1:500,1])
 ylabel("u_w")
 estados=subplot(422)
 estados[1,2]=plot(θspan, solution[:,2])
@@ -208,6 +221,8 @@ plot(θspan,repeat([pa.θ_e_ub],500),color="lime")
 ylabel("e")
 estados=subplot(424)
 estados[2,2]=plot(θspan, solution[:,4])
+#plot(θspan,repeat([bound_e],500),color="lime")
+plot(θspan,repeat([0],500),color="lime")
 ylabel("φe")
 estados=subplot(425)
 estados[3,1]=plot(θspan, solution[:,5])
