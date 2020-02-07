@@ -1,0 +1,15 @@
+Package: Calibration
+Type: Package
+Title: Calibration of Azuero, Hernandez, Wills.
+Version: 1.0
+Date: 2020-02-07
+Author: Rodrigo Azuero
+Maintainer: Rodrigo Azuero <rodazuero@gmail.com>
+Description: Computes the calibration and replication for Azuero, Hernandez, Wills.
+License: GPL-3
+Imports: Rcpp (>= 1.0.3)
+LinkingTo: Rcpp, RcppArmadillo, nleqslv, lattice, ggplot2, reshape,
+        mvtnorm
+NeedsCompilation: yes
+Packaged: 2020-02-07 21:44:59 UTC; razuero
+Built: R 3.6.0; x86_64-apple-darwin15.6.0; 2020-02-07 21:54:20 UTC; unix
