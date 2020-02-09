@@ -17,7 +17,8 @@ include("Definitions.jl") #Definitions2.jl
 include("Controls.jl") #NewControls.jl
 include("States.jl") #States_Ralwsian.jl
 #include("MyFindZeros.jl")
-include("MyRungeKutta.jl") #NewMyRungeKutta.jl
+include("MyRungeKutta.jl")
+#include("NewMyRungeKutta.jl") #NewMyRungeKutta.jl
 include("BoundaryValueProblem.jl")
 
 #Define values for the model parameters
