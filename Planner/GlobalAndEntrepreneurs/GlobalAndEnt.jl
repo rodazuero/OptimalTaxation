@@ -23,8 +23,12 @@ include("ControlsAlgorithmE.jl")
 include("States_NewRungeKuttaE.jl")
 include("NewMyRungeKuttaE.jl")
 
+include("ProblemFunction.jl")
+
+
 #Marginal taxes plot
 include("marginal_taxes.jl")
+
 
 #Define values for the model parameters
 pa = init_parameters();
@@ -37,6 +41,7 @@ pa = init_parameters();
     μ0     = -1
     e0     = pa.θ_e_lb;
     ϕ_e0   = 1 #guess
+    ϕ_e0   = 0.01 #guess
     #ϕ_e0   =  -1.233e-5 #Min- e=1.07
     y_agg0 = 0.0
     λ0     = 1 #guess
@@ -47,11 +52,11 @@ pa = init_parameters();
     ystar0 = 0.0
     lstar0 = 0.0
 
-    #Cierra pero no coinciden los estados (Hamiltoniano vs Residuales)
+    #Cierra ϕ_e pero no coinciden los estados (Hamiltoniano vs Residuales)
     uw0    = 10.0 #guess
     μ0     = -1.0
     e0     = pa.θ_e_lb;
-    ϕ_e0   = 6.0 #guess
+    ϕ_e0   = 1.0 #guess
     #ϕ_e0   =  -1.233e-5 #Min- e=1.07
     y_agg0 = 0.0
     λ0     = 1.0 #guess
@@ -62,19 +67,34 @@ pa = init_parameters();
     ystar0 = 0.0
     lstar0 = 0.0
 
-        uw0    = 10.0 #guess
-        μ0     = -1.0
-        e0     = pa.θ_e_lb;
-        ϕ_e0   = 25.45 #guess
-        #ϕ_e0   =  -1.233e-5 #Min- e=1.07
-        y_agg0 = 0.0
-        λ0     = 1.0 #guess
-        l_agg0 = 0.0
-        ω0     = 1.0 #guess=#
-        l_new0 = 0.0
-        y_new0 = 0.0
-        ystar0 = 0.0
-        lstar0 = 0.0
+    #Cierra L pero no   ϕ_e
+    uw0    = 100.0 #guess
+    μ0     = -1.0
+    e0     = pa.θ_e_lb;
+    ϕ_e0   = 12.0 #guess
+    #ϕ_e0   =  -1.233e-5 #Min- e=1.07
+    y_agg0 = 0.0
+    λ0     = 1.0 #guess
+    l_agg0 = 0.0
+    ω0     = 3.365 #guess=#
+    l_new0 = 0.0
+    y_new0 = 0.0
+    ystar0 = 0.0
+    lstar0 = 0.0
+
+    uw0    = 100.32552083333333#guess
+    μ0     = -1.0
+    e0     = pa.θ_e_lb;
+    ϕ_e0   = 10.026041666666666 #guess
+    #ϕ_e0   =  -1.233e-5 #Min- e=1.07
+    y_agg0 = 0.0
+    λ0     = 1.0 #guess
+    l_agg0 = 0.0
+    ω0     = 3.37157226562500 #guess=#
+    l_new0 = 0.0
+    y_new0 = 0.0
+    ystar0 = 0.0
+    lstar0 = 0.0
 
     #2. Utilitarian problem:
     #Define initial state vector
@@ -102,7 +122,6 @@ pa = init_parameters();
         θ = pa.θ_w_lb
 
 #Test my runge kutta
-
     #Global Problem
         Nspan = 500
         y0= [uw0, μ0, e0, ϕ_e0, y_agg0, λ0, l_agg0, ω0, l_new0, y_new0, 0, 0 ];
@@ -112,7 +131,6 @@ pa = init_parameters();
         xspan = xlb:xstep:xub;
         solution = Array{Float64}(undef,Nspan,12);
         my_runge_kutta!(solution,y0,xspan,xstep,pa)
-        solution[end,:]
 
         using DelimitedFiles
         writedlm("SolutionNew.csv",solution,';')
@@ -141,6 +159,21 @@ pa = init_parameters();
         bound_e= -(pa.indicator*solution[end,1]^pa.ϕ*he_ub+solution[end,6]*(solution[end,3]*controls[end,2]^pa.α -(pa.β/(1.0+pa.σ))*controls[end,1]^(1.0+pa.σ)
                 - solution[end,1])*he_ub - solution[end,8]*controls[end,2]*he_ub + solution[end,2]*controls[end,2]^pa.α*(1.0-pa.β*controls[end,1]^pa.σ))
         dist_e= bound_e - solution[end,4]
+
+        #Define Hamiltonian:
+        Hamiltonian = Array{Float64}(undef,Nspan,1);
+
+        for i = 1:Nspan
+            h_w = pa.hw(θspan[i],solution[i,3]);
+            h_e = pa.he(θspan[i],solution[i,3]);
+            term1 = pa.indicator*solution[i,1]^pa.ϕ*(h_w+h_e*controls[i,4]);
+            term2 = solution[i,2]*pa.χ/θspan[i]*controls[i,3]^(1.0+pa.ψ);
+            term3 = solution[i,6]*(solution[i,3]*controls[i,2]^pa.α*controls[i,4]*h_e-pa.β/(1.0+pa.σ)*controls[i,1]^(1.0+pa.σ)*controls[i,4]*h_e-
+                    solution[i,1]*(h_w+h_e*controls[i,4])-pa.χ/(1.0+pa.ψ)*controls[i,3]^(1.0+pa.ψ)*h_w);
+            term4 = solution[i,8]*(θspan[i]*controls[i,3]*h_w-controls[i,2]*controls[i,4]*h_e)+solution[i,4]*controls[i,4];
+            Hamiltonian[i,1] = term1 + term2 + term3 + term4;
+        end
+        plot(θspan, Hamiltonian[:,1])
 
     #Entrepreneurs Problem
 
@@ -185,8 +218,88 @@ pa = init_parameters();
         RungeKuttaE=hcat(DataFrame(solutione),E, DataFrame(thetae=θespan))
         CSV.write("RungeKuttaNewE.csv", RungeKuttaE)
 
+        #Define Hamiltonian:
+        HamiltonianE = Array{Float64}(undef,Nspan,1);
+
+        for i = 1:Nspan
+            h_e = pa.he(θspan[end],θespan[i]);
+            term1 = pa.indicator*solutione[i,1]^pa.ϕ*h_e;
+            term2 = solutione[i,4]*(θespan[i]*controlse[i,2]^pa.α-pa.β/(1.0+pa.σ)*controlse[i,1]^(1.0+pa.σ)-
+                    solutione[i,1])*h_e;
+            term3 = solutione[i,6]*controlse[i,2]*h_e;
+            term4 = solutione[i,2]*controlse[i,2]^pa.α*(1.0-pa.β*controlse[i,1]^pa.σ);
+            HamiltonianE[i,1] = term1 + term2 - term3 + term4;
+        end
+
+        plot(θespan, HamiltonianE[:,1])
+
+#Complete Problem
+    uw0    = 100.0 #guess
+    uw0    = 1.0 #guess
+    #uw0    = 88.1143 #guess
+    μ0     = -1.0
+    e0     = pa.θ_e_lb;
+    ϕ_e0   = 12.0 #guess
+    ϕ_e0   = 0.1143
+    ϕ_e0   = -0.0007
+    y_agg0 = 0.0
+    λ0     = 1.0 #guess
+    l_agg0 = 0.0
+    ω0     = 3.365 #guess=#
+    l_new0 = 0.0
+    y_new0 = 0.0
+    ystar0 = 0.0
+    lstar0 = 0.0
+
+    Nspan = 500
+    y0= [uw0, μ0, e0, ϕ_e0, y_agg0, λ0, l_agg0, ω0, l_new0, y_new0, 0, 0 ];
+    xlb= pa.θ_w_lb;
+    xub = pa.θ_w_ub;
+    xstep = (xub - xlb)/(Nspan - 1);
+    xspan = xlb:xstep:xub;
+    solution = Array{Float64}(undef,Nspan,12);
+    controls = Array{Float64}(undef,Nspan,4);
+    solutione = Array{Float64}(undef,Nspan,10);
+    controlse = Array{Float64}(undef,Nspan,2);
+    complete_problem!(solution,solutione,controls,controlse,y0,xspan,xstep,pa)
+
+    θspan = Array{Float64,1}
+    θspan = collect(xspan)
+    elb= solution[end,3];
+    eub = pa.θ_e_ub;
+    estep = (eub - elb)/(Nspan - 1);
+    espan = elb:estep:eub;
+    θespan = Array{Float64,1}
+    θespan = collect(espan)
+
+    he_ub= pa.he(pa.θ_w_ub,solution[end,3])
+    bound_e= -(pa.indicator*solution[end,1]^pa.ϕ*he_ub+solution[end,6]*(solution[end,3]*controls[end,2]^pa.α -(pa.β/(1.0+pa.σ))*controls[end,1]^(1.0+pa.σ)
+            - solution[end,1])*he_ub - solution[end,8]*controls[end,2]*he_ub + solution[end,2]*controls[end,2]^pa.α*(1.0-pa.β*controls[end,1]^pa.σ))
+    dist_e= bound_e - solution[end,4]
+
+    #Marginal taxes:
+    τ_prime = Array{Float64}(undef,Nspan,3);
+    marginal_taxes(controls, θspan, solution, pa)
+
+    τ_prime_e = Array{Float64}(undef,Nspan,2);
+    marginal_taxese(controlse, θespan, solutione, pa)
+
+    #Plots:
+    graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub, bound_e,τ_prime,τ_prime_e)
 
 
+    #Uniform distribution
+        θ_e_a= pa.μ_e-((12.0^0.5)/2)*(pa.σ2_e^0.5);
+        θ_e_b= pa.μ_e+((12.0^0.5)/2)*(pa.σ2_e^0.5);
+
+        #theta_w_a
+        θ_w_a= pa.μ_w-((12.0^0.5)/2)*(pa.σ2_w^0.5);
+        θ_w_b= pa.μ_w+((12.0^0.5)/2)*(pa.σ2_w^0.5);
+
+        dist_marginal_w=Uniform(θ_w_a,θ_w_b);
+        dist_marginal_e=Uniform(θ_e_a,θ_e_b);
+
+dist_marginal_w*dist_marginal_e
 
 #GRAPHS
 
@@ -254,7 +367,6 @@ pa = init_parameters();
 
         #Marginal taxes:
         τ_prime = Array{Float64}(undef,Nspan,3);
-
         marginal_taxes(controls, θspan, solution, pa)
 
         taxes = DataFrame(τ_prime)

@@ -36,10 +36,16 @@ function new_find_controls( θ, ss, pa)
 
     end
 
-    Nz = 500; #Number of Zs
+    println(z_upbar)
+
+    #Try with a fixed grid:
+    #z_upbar = z_max;
+
+    Nz = 1000; #Number of Zs
     #zstep = (z_upbar-z_lwbar)/(Nz-1);
     #zgrid = z_lwbar:zstep:z_upbar;
     zgrid = range(z_lwbar, stop = z_upbar, length = Nz);
+    println(zgrid)
     #println("z_grid = ", size(zgrid), "z_lwbar = ", z_lwbar, "z_upbar = ", z_upbar)
 
     #Defining globals for loops --> If not defined the loops do not run:
@@ -54,6 +60,8 @@ function new_find_controls( θ, ss, pa)
     global zz_res = NaN;
     global ll_res = NaN;
     global pp_res = NaN;
+    global distance_f_n_g_z = NaN;
+
 
     #Finding the solutions for the equations:
     for j = 1:Nz
@@ -66,16 +74,20 @@ function new_find_controls( θ, ss, pa)
 
         fun_n(n) = pa.α*ss.e*n^pa.α - ss.ω/ss.λ*n - fun_z_grid;
 
+        #Check distance from functions:
+        distance_f_n_g_z = fun_n(n_lwbar);
+        #if distance_f_n_g_z < 0
+        #    println("distance_f_n_g_z = ", distance_f_n_g_z)
+        #end
+
         if fun_n(n_lwbar)*fun_n(n_upbar)>0
             potential_n=NaN;
+            #println("No bisection: ", "distance_f_n_g_z = ", distance_f_n_g_z)
         else
             potential_n = find_zero(fun_n, (n_lwbar,n_upbar), Bisection());
         end
 
         potential_n <0.0 && error("N Global is negative.")
-
-        potentialresidual = ss.λ*(ss.e*potential_n^pa.α-ss.ω/ss.λ*potential_n-potential_z/pa.σ*(1.0-pa.β/(1.0+pa.σ)*potential_z^pa.σ))*h_e +
-                            (pa.indicator*ss.uw^pa.ϕ-ss.λ*ss.uw)*h_e + ss.ϕ_e;
 
         #Solution for l and p:
         den_l = (ss.λ*pa.χ*h_w-pa.χ/θ*(1.0+pa.ψ)*(ss.μ+ss.λ/pa.σ*potential_z/(potential_n^pa.α)*h_e));
@@ -90,9 +102,17 @@ function new_find_controls( θ, ss, pa)
 
             potential_l = ((ss.ω*θ*h_w)/den_l)^(1.0/pa.ψ);
             den_p       = θ*potential_n^pa.α*(1.0-pa.β*potential_z^pa.σ);
-            potential_p = (pa.χ*potential_l^(1.0-pa.ψ))/den_p;
+            potential_p = (pa.χ*potential_l^(1.0+pa.ψ))/den_p;
             potential_value = objective(potential_z,potential_n,potential_l,potential_p,0.0);
         end
+
+        #Residual:
+        term_n = pa.α*ss.e*potential_n^(pa.α-1.0) - ss.ω/ss.λ-pa.α/pa.σ*potential_z/potential_n*(1.0-pa.β*potential_z^pa.σ);
+        term_p = ss.λ*(ss.e*potential_n^pa.α-ss.ω/ss.λ*potential_n-potential_z/pa.σ*(1.0-pa.β/(1.0+pa.σ)*potential_z^pa.σ))*h_e +
+                            (pa.indicator*ss.uw^pa.ϕ-ss.λ*ss.uw)*h_e + ss.ϕ_e;
+        term_l = ss.μ*(1.0+pa.ψ)*pa.χ*potential_l^pa.ψ/θ-ss.λ*pa.χ*potential_l^pa.ψ*h_w+ss.ω*θ*h_w+
+                 ss.λ*pa.χ*(1.0+pa.ψ)*potential_l^pa.ψ*potential_z*h_e/(pa.σ*potential_n^pa.α*θ);
+        potentialresidual = abs(term_n)+abs(term_p)+abs(term_l);
 
         #Evaluating the value of the Hamiltonian:
         if isnan(potential_value)
@@ -137,7 +157,8 @@ function new_find_controls( θ, ss, pa)
 
     #Check solutions for Z, N, L and P are the same in Hamiltonian and residual:
     if zz_res != zz
-        println("zz = ", zz, "zz_res = ", zz_res)
+        println("Residual = ", current_res)
+        #println("zz = ", zz, "zz_res = ", zz_res)
         #println("nn = ", nn, "nn_res = ", nn_res)
         #println("ll = ", ll, "ll_res = ", ll_res)
         #println("pp = ", pp, "pp_res = ", pp_res)

@@ -70,8 +70,8 @@ function my_runge_kuttae!(solution::Array{Float64},y0,xspan,step,pa,θw; verbose
             solution[i,11]=agg[i,1]./agg[i,3] #L*
             solution[i,12]=agg[i,3]./agg[i,4] #Y*=#
 
-            solution[i,9]=z1[5]./z1[8]
-            solution[i,10]=z1[3]./z1[7]
+            solution[i,9]=solution[i,5]./solution[i,8]
+            solution[i,10]=solution[i,3]./solution[i,7]
 
         end
 

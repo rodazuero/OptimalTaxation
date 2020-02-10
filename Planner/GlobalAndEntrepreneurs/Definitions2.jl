@@ -93,6 +93,7 @@ function init_parameters()
     γ= 0.7341;
     β= 0.2135;
     σ= 0.1827;
+    #σ= 0.01;
     ϵ= 0.0;
     ς= 1.0;
 
@@ -102,13 +103,20 @@ function init_parameters()
     indicator = 0; #The Rawlsian case
     #indicator = 1; #The Utilitarian case
 
-    ## Distributions
+    ## Distributions:
+    #μ_w = 1.7626;
+    #μ_e = 1.2528;
+    #σ2_w = 1.0921; σ_w=σ2_w^0.5;
+    #σ2_e = 1.1675; σ_e=σ2_e^0.5;
+    #σ_we = 0.0;
 
-    μ_w = 10;
-    μ_e = 10;
-    σ2_w = 6; σ_w=σ2_w^0.5;
-    σ2_e = 6; σ_e=σ2_e^0.5;
+    μ_w = 10.0;
+    μ_e = 10.0;
+    σ2_w = 6.0; σ_w=σ2_w^0.5;
+    σ2_e = 6.0; σ_e=σ2_e^0.5;
     σ_we = 0.0;
+    constant = 5.0;
+    constant_e = 3.0;
 
 #Uniform distribution
     θ_e_a= μ_e-((12.0^0.5)/2)*(σ2_e^0.5);
@@ -124,22 +132,23 @@ function init_parameters()
     #theta_w_lb
     #quantile_theta_w_lb(k) = cdf(dist_marginal_w,k) - 0.2
     #θ_w_lb = find_zero(quantile_theta_w_lb, (-100.0,100.0))
-    θ_w_lb = quantile(dist_marginal_w,1.0e-2)
+    θ_w_lb = quantile(dist_marginal_w,1.0e-2)-constant;
 
     #theta_w_ub
     #quantile_theta_w_ub(k) = cdf(dist_marginal_w,k) - 0.8
     #θ_w_ub = find_zero(quantile_theta_w_ub, (-100.0,100.0))
-    θ_w_ub = quantile(dist_marginal_w,1.0-1.0e-2)
+    θ_w_ub = quantile(dist_marginal_w,1.0-1.0e-2) - constant;
 
     #theta_e_lb
     #quantile_theta_e_lb(k) = cdf(dist_marginal_e,k) - 0.2
     #θ_e_lb = find_zero(quantile_theta_e_lb, (-100.0,100.0))
-    θ_e_lb = quantile(dist_marginal_e,1.0e-2)
+    θ_e_lb = quantile(dist_marginal_e,1.0e-2)-constant_e;
 
     #theta_e_ub
     #quantile_theta_e_ub(k) = cdf(dist_marginal_e,k) - 0.8
     #θ_e_ub = find_zero(quantile_theta_e_ub, (-100.0,100.0))
-    θ_e_ub = quantile(dist_marginal_e,1.0-1.0e-2)
+    θ_e_ub = quantile(dist_marginal_e,1.0-1.0e-2)-constant_e;
+    #θ_e_ub = θ_e_b-constant;
 
     hw(θ,e)= ((e-θ_e_a)/(θ_e_b-θ_e_a))*(1/(θ_w_b-θ_w_a)); # h_w(θ)= F_e|w(e|θ) fw(θ)
     he(θ,e)= ((θ-θ_w_a)/(θ_w_b-θ_w_a))*(1/(θ_e_b-θ_e_a)); # h_e(e)= F_w|e(θ|e) fe(e)

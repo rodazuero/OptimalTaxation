@@ -49,15 +49,16 @@ function find_states!(du,u,pa,θ,ini)
 
     #Find optimal controls
     (z, n, l, p) = new_find_controls( ini[11], ss, pa);
+    println("z = ", z, "n = ", n, "l = ", l, "p = ", p)
     any(isnan,(z, n, l, p)) && error("Function find_states gets NaN controls")
 
     h_e=  pa.he( θ, e);
     h_w=  pa.hw( θ, e);
     h_tot= h_w + p*h_e;
 
-    Vw = pa.indicator*uw^pa.ϕ + (θ*l*ω - λ*(uw + pa.χ*(l^(1+pa.ψ))/(1+pa.ψ) ));
+    Vw = pa.indicator*uw^pa.ϕ + θ*l*ω - λ*uw - λ*pa.χ*l^(1.0+pa.ψ)/(1.0+pa.ψ);
     #Ve = uw^pa.ϕ + λ*e*n^pa.α - λ*pa.β*(z^(1+pa.σ))/(1+pa.σ) - ω*n - λ*uw;
-    Ve = pa.indicator*uw^pa.ϕ + λ*(e^pa.ς)*n^pa.α - λ*pa.β*(z^(1+pa.σ))/(1+pa.σ) - ω*n - λ*uw;
+    Ve = pa.indicator*uw^pa.ϕ + λ*e*n^pa.α - λ*pa.β*z^(1.0+pa.σ)/(1.0+pa.σ) - ω*n - λ*uw;
     #Non independent distributions
     #dhw_de = pa.gg( θ , e);
     #dhe_de=  integrate_dg_de(θ,e,pa); #Non independent distributions
@@ -66,26 +67,25 @@ function find_states!(du,u,pa,θ,ini)
     dhw_de= (pdf(Normal(pa.μ_e,((pa.σ2_e)^0.5)), log(e))*(1/e))*((pdf(Normal(pa.μ_w,((pa.σ2_w)^0.5)), log(θ)))*(1/θ))
     #dVe_de= λ*n^pa.α;=#
     #Uniform distribution
-    dhe_de= 0
-    dhw_de=1/((pa.θ_w_b-pa.θ_w_a)*(pa.θ_e_b-pa.θ_e_a))
+    ∂he_de = 0.0;
+    ∂hw_de = 1.0/((pa.θ_w_b-pa.θ_w_a)*(pa.θ_e_b-pa.θ_e_a));
 
-    dVe_de= pa.ς*λ*n^pa.α*(e^(pa.ς-1));
-
-    du[1] = pa.χ*(l^(1+pa.ψ))/θ
+    du[1] = pa.χ*l^(1.0+pa.ψ)/θ;
     if uw > 0.0
-        du[2] = (λ - pa.indicator*pa.ϕ*uw^(pa.ϕ-1))*h_tot;
+        du[2] = (λ - pa.indicator*pa.ϕ*uw^(pa.ϕ-1.0))*h_tot;
     else
         du[2] = Inf;
     end
     du[3] = p;
-    du[4] = -( Vw*dhw_de + dVe_de*p*h_e + Ve*p*dhe_de );
-    #du[5] = ( e*(n^pa.α) - pa.β*(z^(1+pa.σ) )/(1+pa.σ) )*p*h_e - uw*h_tot - pa.χ*(l^(1+pa.ψ))/(1+pa.ψ)*h_w;
-    du[5] = ( (e^pa.ς)*(n^pa.α) - pa.β*(z^(1+pa.σ) )/(1+pa.σ) )*p*h_e - uw*h_tot - pa.χ*(l^(1+pa.ψ))/(1+pa.ψ)*h_w;
+    du[4] = -( Vw*∂hw_de + Ve*p*∂he_de + λ*n^pa.α*p*h_e);
+    du[5] = ( e*n^pa.α - pa.β*z^(1.0+pa.σ)/(1.0+pa.σ) )*p*h_e - uw*h_tot - pa.χ*l^(1.0+pa.ψ)/(1.0+pa.ψ)*h_w;
     du[6] = 0.0;
     du[7] = θ*l*h_w - (n-pa.ϵ)*p*h_e;
     du[8] = 0.0;
-    du[9] = (θ*l*h_w + (n-pa.ϵ)*p*h_e);
-    du[10]= ((e^pa.ς)*(n^pa.α)*p*h_e)+pa.β*(z^(1+pa.σ) )/(1+pa.σ)*p*h_e + uw*h_tot + pa.χ*(l^(1+pa.ψ))/(1+pa.ψ)*h_w;
+    du[9] = θ*l*h_w + (n-pa.ϵ)*p*h_e;
+    du[10]= e*n^pa.α*p*h_e - pa.β*z^(1+pa.σ)/(1+pa.σ)*p*h_e; #Production - evasion
+
+    println("ϕ_e' =", du[4], "u_w' =", du[1])
 
     nothing
 end

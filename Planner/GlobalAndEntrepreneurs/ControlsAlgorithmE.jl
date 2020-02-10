@@ -33,7 +33,9 @@ function new_find_controlse( θ, θe, sse, pa)
 
     end
 
-    Nz = 500; #Number of Zs
+    #println(z_upbar)
+
+    Nz = 1000; #Number of Zs
     zstep = (z_upbar - z_lwbar)/(Nz-1);
     #zgrid = z_lwbar:zstep:z_upbar;
     zgrid = range(z_lwbar, stop = z_upbar, length = Nz);
@@ -67,6 +69,8 @@ function new_find_controlse( θ, θe, sse, pa)
 
         if fun_n(n_lwbar)*fun_n(n_upbar)>0
             potential_ne = NaN;
+            distance_f_n_g_ze = fun_n(n_lwbar);
+            #println("distance_f_n_g_ze = ", distance_f_n_g_ze)
         else
             potential_ne = find_zero(fun_n, (n_lwbar,n_upbar), Bisection());
         end
@@ -123,10 +127,10 @@ function new_find_controlse( θ, θe, sse, pa)
     end
 
     #Check solutions for N and Z are the same in Hamiltonian and residual:
-    if zze_res != zze
-        println("zze = ", zze, "zze_res = ", zze_res)
+    #if zze_res != zze
+        #println("zze = ", zze, "zze_res = ", zze_res)
         #println("nne = ", nne, "nne_res = ", nne_res)
-    end
+    #end
     #zze_res != zze && error("Solutions for z do not match.")
     #nne_res != nne && error("Solutions for n do not match.")
 
