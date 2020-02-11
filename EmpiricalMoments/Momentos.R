@@ -50,13 +50,14 @@ library(ggplot2)
 library(scales)
 library(gridExtra)
 library(data.table)
-setwd('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/EmpiricalMoments')
-ENAHO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/ENAHO/ENAHOARM/OptimaltaxationSubSampleENAHO.csv", header = T, sep=",")
+
+setwd('/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/EmpiricalMoments')
+ENAHO<-read.csv("/Users/razuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/ENAHO/ENAHOARM/OptimaltaxationSubSampleENAHO.csv", header = T, sep=",")
 ENAHO<-as.data.table(ENAHO)
 
 
-CENSO<-read.csv("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/Census/Modified/OptimaltaxationSubSampleCenso.csv", header = T, sep=",")
-graphdirectory<-"/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/EmpiricalMoments/Graphs"
+CENSO<-read.csv("/Users/razuero/Dropbox/OptmalTaxationShared/Data/DataAnalysis/All/Census/Modified/OptimaltaxationSubSampleCenso.csv", header = T, sep=",")
+graphdirectory<-"/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/EmpiricalMoments/Graphs"
 ###### B. TRIMMING ----------------------------------------------------------------
 
 #A)Variable de interes (CENSO)

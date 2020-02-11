@@ -37,14 +37,14 @@ rm(list=ls(all=TRUE))
 
 
 #Obtaining the empirical moments#
-source('/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/EmpiricalMoments/Momentos.R')
+source('/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/EmpiricalMoments/Momentos.R')
 
 
 
 #In this section we modify the directory to specify where are we going to extract the parameters and theoretical
 #moments that will be compared with the empircal ones. 
 
-CD<-'/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/'
+CD<-'/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/'
 setwd(CD)
 
 
@@ -259,7 +259,7 @@ Comparing$Decile<-c(seq(1,9,1),seq(1,9,1))
 
 
 
-for(i in 1:90){
+for(i in 1:1){
   #Deciding which observation to be analyzed
   #i=1
 
