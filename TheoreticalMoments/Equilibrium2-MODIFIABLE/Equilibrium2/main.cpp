@@ -1760,7 +1760,7 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     distance+=3*pow((Production[0]-Theomoments[0][0])/(max(0.0001,Production[0])),2);
     distance+=3*pow((Production[4]-Theomoments[4][0])/(max(0.0001,Production[4])),2);
     distance+=3*pow((Production[8]-Theomoments[8][0])/(max(0.0001,Production[8])),2);
-    
+    a
     //1. Taxes done inside of the loop.
     //2. Labor demanded
     distance+=3*pow((WorkersDemanded[0]-Theomoments[0][2])/(max(0.0001,WorkersDemanded[0])),2);
@@ -1792,7 +1792,7 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     distance+=3*pow((TotalLaborSupply[8]-Theomoments[8][6])/(max(0.0001,TotalLaborSupply[8])),2);
     
     
-    //7 Entrepreneurs and 8, aalpha, are done inside of the previous loop. 
+    //7 Entrepreneurs and 8, aalpha, are done inside of the previous loop.
     
     
 
