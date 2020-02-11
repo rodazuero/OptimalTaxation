@@ -275,7 +275,7 @@ MOMENTO2$`Numero de trabajadores`<-QuantCorr
 M2<-as.matrix.data.frame(MOMENTO2,rownames.force = F)
 M2[,2]<-t(QuantCorr) 
 print(xtable(M2), include.rownames=F)
-
+as
 
 
 
