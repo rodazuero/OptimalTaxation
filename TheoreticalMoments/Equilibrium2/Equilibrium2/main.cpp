@@ -43,22 +43,21 @@ using std::vector;
 using namespace std;
 using namespace Rcpp;
 
-ofstream ThMoments0CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments0CSV.csv");
-ofstream ThMoments1CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments1CSV.csv");
-ofstream ThMoments2CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments2CSV.csv");
-ofstream ThMoments3CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments3CSV.csv");
-ofstream ThMoments4CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments4CSV.csv");
-ofstream ThMoments5CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments5CSV.csv");
-ofstream ThMoments6CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments6CSV.csv");
-ofstream ThMoments7CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments7CSV.csv");
 
-ofstream ThMoments8CSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments8CSV.csv");
 
-ofstream ParametersCSV("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ParametersCSV.csv");
-
-ofstream DistanceMoments("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/DistanceMoments.csv");
-
-ofstream EquilibriumValue("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/EquilibriumValue.csv");
+//These files are where the predicted moments will be stored. Make sure to change the directory.
+ofstream ThMoments0CSV("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments0CSV.csv");
+ofstream ThMoments1CSV("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments1CSV.csv");
+ofstream ThMoments2CSV("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments2CSV.csv");
+ofstream ThMoments3CSV("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments3CSV.csv");
+ofstream ThMoments4CSV("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments4CSV.csv");
+ofstream ThMoments5CSV("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments5CSV.csv");
+ofstream ThMoments6CSV("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments6CSV.csv");
+ofstream ThMoments7CSV("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments7CSV.csv");
+ofstream ThMoments8CSV("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments8CSV.csv");
+ofstream ParametersCSV("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ParametersCSV.csv");
+ofstream DistanceMoments("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/DistanceMoments.csv");
+ofstream EquilibriumValue("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/EquilibriumValue.csv");
 
 
 typedef std::pair<double,double> mypair;
@@ -344,6 +343,7 @@ vector<double> profitsFinMaxim(double InitialCond[3], double wi,
     x3[1]=InitialCond[1];
     x3[2]=InitialCond[2];
     
+    if(1==2){
     
     //Obtaining the analytical solution to the problem using a linear tax system:
     double d=0.2;
@@ -369,7 +369,7 @@ vector<double> profitsFinMaxim(double InitialCond[3], double wi,
     x3[0]=niInitial;
     x3[1]=nfInitial;
     x3[2]=zInitial;
-    
+    }
     
     //Finding optimal
     nlopt_optimize(optProfits, x3, &minf3);
@@ -1023,7 +1023,7 @@ arma::vec EqWagesNumericVector(arma::vec Others, arma::vec WagesInit){
         printf("found minimum at f(%g) = %0.10g\n",Winitial[0], ExcessDemandValueFinal);
     }
     
-    EquilibriumValue.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/EquilibriumValue.csv", ios::out | ios::app);
+    EquilibriumValue.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/EquilibriumValue.csv", ios::out | ios::app);
     
     EquilibriumValue<<ExcessDemandValueFinal << " , " ;
     EquilibriumValue << endl;
@@ -1032,6 +1032,11 @@ arma::vec EqWagesNumericVector(arma::vec Others, arma::vec WagesInit){
     nlopt_destroy(ExcessDemand);
     
     arma::vec WagesVector=arma::zeros(3);
+    cout << " -------------------------"<< endl;
+    cout << " Equilibrium found "<< endl;
+    cout <<Winitial[0] << " Winitial[0] "<< endl;
+    cout <<Winitial[1] << " Winitial[1] "<< endl;
+    cout <<ExcessDemandValueFinal << " ExcessDemandValueFinal "<< endl;
     WagesVector[0]=Winitial[0];
     WagesVector[1]=Winitial[1];
     WagesVector[2]=ExcessDemandValueFinal;
@@ -1697,7 +1702,7 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     TotalLaborSupply[9]=0.997;
     double test=1;
     
-    //Open file where moments w ill be stored
+    //Open file where moments will be stored
     
     
     //Computing the final distance
@@ -1759,15 +1764,15 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     
     //Writing the csv file of the moments
-    ThMoments0CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments0CSV.csv", ios::out | ios::app);
-    ThMoments1CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments1CSV.csv", ios::out | ios::app);
-    ThMoments2CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments2CSV.csv", ios::out | ios::app);
-    ThMoments3CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments3CSV.csv", ios::out | ios::app);
-    ThMoments4CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments4CSV.csv", ios::out | ios::app);
-    ThMoments5CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments5CSV.csv", ios::out | ios::app);
-    ThMoments6CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments6CSV.csv", ios::out | ios::app);
-    ThMoments7CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments7CSV.csv", ios::out | ios::app);
-    ThMoments8CSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments8CSV.csv", ios::out | ios::app);
+    ThMoments0CSV.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments0CSV.csv", ios::out | ios::app);
+    ThMoments1CSV.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments1CSV.csv", ios::out | ios::app);
+    ThMoments2CSV.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments2CSV.csv", ios::out | ios::app);
+    ThMoments3CSV.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments3CSV.csv", ios::out | ios::app);
+    ThMoments4CSV.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments4CSV.csv", ios::out | ios::app);
+    ThMoments5CSV.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments5CSV.csv", ios::out | ios::app);
+    ThMoments6CSV.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments6CSV.csv", ios::out | ios::app);
+    ThMoments7CSV.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments7CSV.csv", ios::out | ios::app);
+    ThMoments8CSV.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ThMoments8CSV.csv", ios::out | ios::app);
     for(int it=0; it<9; it++){
         ThMoments0CSV<<Theomoments[it][0] << " , " ;
         ThMoments1CSV<<Theomoments[it][1] << " , " ;
@@ -1824,7 +1829,7 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     
     
-    ParametersCSV.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ParametersCSV.csv", ios::out | ios::app);
+    ParametersCSV.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/ParametersCSV.csv", ios::out | ios::app);
     cout << " loading parameters in the csv file0"<< endl;
     //Printing the parameters
     for(int it=0; it<15; it++){
@@ -1841,7 +1846,7 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     
     
-    DistanceMoments.open("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/DistanceMoments.csv", ios::out | ios::app);
+    DistanceMoments.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/DistanceMoments.csv", ios::out | ios::app);
     
     DistanceMoments<<distance << " , " ;
     DistanceMoments << endl;
@@ -2035,7 +2040,7 @@ arma::vec MinimizingDistance(arma::vec Parameters, arma::vec AdditionalVars){
     ubParameters[10]=4.5;
     ubParameters[11]=4.5;
     ubParameters[12]=1;
-    ubParameters[13]=100;
+    ubParameters[13]=200;
     ubParameters[14]=1;
     
     
@@ -2127,7 +2132,7 @@ void SobolRun(arma::vec WagesVectorIn,
     double a=2;
     cout << a << " a "<< endl;
     
-    std::ifstream theFile ("/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LastGitVersion/OptimalTaxation/AWS/InAws/Sobol5/SobolDim15.csv");
+    std::ifstream theFile ("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LastGitVersion/OptimalTaxation/AWS/InAws/Sobol5/SobolDim15.csv");
     
     int SIZEOBS=20000;
     int NVAR=15;
@@ -2219,58 +2224,6 @@ int main(int argc, const char * argv[]) {
     
     
     
-    
-    vector<double> A(3);
-    vector<double> V(3);
-    V[0]=0;
-    V[1]=1;
-    V[2]=2;
-    A[0]=50;
-    A[1]=40;
-    A[2]=30;
-    pair <double, double> make_pair(920, 12); ;
-    
-    
-    int N=10;
-    vector<pair<double, double> > myVec (N, std::make_pair(0, 0));
-    myVec[0].second=-10;
-    myVec[1].second=0.9;
-    myVec[2].second=10.8;
-    myVec[3].second=1.8;
-    
-    myVec[0].first=19.2;
-    myVec[1].first=-0.2;
-    myVec[2].first=-1.2;
-    myVec[3].first=2.2;
-    
-    
-    
-    
-    cout <<myVec[0].second << " myVec[0].second"<< endl;
-    cout <<myVec[1].second << " myVec[1].second"<< endl;
-    cout <<myVec[2].second << " myVec[2].second"<< endl;
-    cout <<myVec[3].second << " myVec[3].second"<< endl;
-    
-    cout <<myVec[0].first << " myVec[0].first"<< endl;
-    cout <<myVec[1].first << " myVec[1].first"<< endl;
-    cout <<myVec[2].first << " myVec[2].first"<< endl;
-    cout <<myVec[3].first << " myVec[3].first"<< endl;
-    
-    std::sort(myVec.begin(), myVec.end());
-    
-    cout <<myVec[0].second << " myVec[0].second"<< endl;
-    cout <<myVec[1].second << " myVec[1].second"<< endl;
-    cout <<myVec[2].second << " myVec[2].second"<< endl;
-    cout <<myVec[3].second << " myVec[3].second"<< endl;
-    
-    cout <<myVec[0].first << " myVec[0].first"<< endl;
-    cout <<myVec[1].first << " myVec[1].first"<< endl;
-    cout <<myVec[2].first << " myVec[2].first"<< endl;
-    cout <<myVec[3].first << " myVec[3].first"<< endl;
-    
-    
-    int x=0;
-    
     //Testing functions
     //Setting parameters to test
     
@@ -2332,7 +2285,7 @@ int main(int argc, const char * argv[]) {
     c=0;
     
     
-    //Final definition
+    //Second definition
     
     aalpha=0.682324;
     ggamma=6.82592;
@@ -2352,10 +2305,89 @@ int main(int argc, const char * argv[]) {
     
     
     
-    //0. Payroll taxes marginal
-    double Payrolltest=Tn(nf);
+    //Third attempt
     
-
+    aalpha=0.682324;
+    ggamma=6.82592;
+    ddelta=647.281;
+    bbeta=324.671;
+    ssigma=8.25678;
+    kkappa=263.156;
+    psi=3.17603;
+    chi=592.294;
+    rrho=3.01674;
+    mmu1=0.420156;
+    mmu2=3.92797;
+    ssigma1=1.51879;
+    ssigma2=4.14574;
+    rho12=0.0519922;
+    c=1;
+    
+    //Trying again
+    aalpha=0.505664;
+    ggamma=8.13167;
+    ddelta=127.133;
+    bbeta=23.168;
+    ssigma=6.08206;
+    kkappa=233.343;
+    psi=0.366272;
+    chi=178.087;
+    rrho=8.98245;
+    mmu1=0.323633;
+    mmu2=3.12637;
+    ssigma1=0.911768;
+    ssigma2=4.5519;
+    rho12=0.285791;
+    c=1;
+    
+    //Initial small parameters
+    aalpha=0.6124;
+    ggamma=0.7341;
+    ddelta=0.12873;
+    bbeta=0.2315;
+    ssigma=0.1827;
+    kkappa=0.1021;
+    psi=0.4528;
+    chi=2.0192;
+    rrho=0.0912;
+    mmu1=1.2528;
+    mmu2=1.7627;
+    ssigma1=1.0921;
+    ssigma2=1.1675;
+    rho12=0.2782;
+    c=0.01;
+    
+    
+    //Initial small parameters
+    aalpha=0.6124;
+    ggamma=0.05341;
+    ddelta=0.12873;
+    bbeta=0.2315;
+    ssigma=0.1827;
+    kkappa=0.31021;
+    psi=0.24528;
+    chi=2.8192;
+    rrho=0.10912;
+    mmu1=0.8;
+    mmu2=1.9;
+    ssigma1=0.37921;
+    ssigma2=0.9675;
+    rho12=0.42;
+    c=8;
+    wi=2;
+    wf=2;
+    ni=10;
+    nf=50;
+    z=50;
+    lf=50;
+    li=50; 
+    
+    //Defining tthetae and tthetaw to the mean:
+    tthetaw=exp(mmu1+0.5*pow(ssigma1,2));
+    tthetae=exp(mmu2+0.5*pow(ssigma2,2));
+    
+    cout << tthetaw << " mean tthetaw "<< endl;
+    cout << tthetae << " mean tthetae "<< endl;
     
     //1. Payroll taxes definition
     double PayrolltestActual=TnActual(nf);
@@ -2396,10 +2428,7 @@ int main(int argc, const char * argv[]) {
     Params[6]=ssigma;
     Params[7]=tthetae;
     Params[8]=c;
-    //int v=0;
-    //void value = *(double *)Params;
-    //void *p=&Params;
-    //static_cast<void*>(&a)
+
     
     double Args[3]={};
     Args[0]=ni;
@@ -2410,64 +2439,8 @@ int main(int argc, const char * argv[]) {
     double FinProfitsTest=FinProfits(Args, Params);
     cout << FinProfitsTest << " FinProfitsTest "<< endl;
     
-    //8-9. Maximize profits
-    double lb[3];
-    lb[0]=0;
-    lb[1]=0;
-    lb[2]=0;
     
-    cout << " p0"<< endl;
-    nlopt_opt optProfits;
-    optProfits = nlopt_create(NLOPT_LN_NELDERMEAD, 3);
-    
-    nlopt_set_lower_bounds(optProfits, lb);
-    nlopt_set_max_objective(optProfits, profitsFinMaxim,(void *)&Params);
-    
-    
-    nlopt_set_xtol_rel(optProfits, 1.0e-8);
-    nlopt_set_ftol_abs(optProfits,1.0e-8);
-    double minf3; /* the minimum objective value, upon return */
-    double x3[3];
-    x3[0]=ni;
-    x3[1]=nf;
-    x3[2]=z;
-    
-    //memcpy(Params, (x3**)pointer, sizeof Params);
-    
-    //cout <<FinProfits(x3,Params)<< " test inicial"<< endl;
-    //cout << x3[2]<< " x[2]"<< endl;
-    nlopt_optimize(optProfits, x3, &minf3);
-    if (nlopt_optimize(optProfits, x3, &minf3) < 0) {
-        printf("nlopt failed!\n");
-    }
-    else {
-        printf("found minimum at f(%g) = %0.10g\n", x3[0], minf3);
-    }
-    
-    nlopt_destroy(optProfits);
-    //cout << x3[0]<< " optimal ni"<< endl;
-    //cout << x3[1]<< " optimal nf "<< endl;
-    //cout << x3[2]<< " optimal z"<< endl;
-    
-    //Testing maximum functino of profits
-    vector <double> MaxProf;
-    MaxProf.resize(4);
-    double InitialCond[3];
-    InitialCond[0]=ni;
-    InitialCond[1]=nf;
-    InitialCond[2]=z;
-    
-    cout << " before maxprof"<< endl;
-    
-    MaxProf=profitsFinMaxim( InitialCond,  wi,wf,aalpha,ddelta,ggamma, bbeta,ssigma,tthetae,c);
-    //Finding the actual optimal values found
-    cout << MaxProf[0] << " Maxprof[0]"<< endl;
-    cout << MaxProf[1] << " Maxprof[1]"<< endl;
-    cout << MaxProf[2] << " Maxprof[2]"<< endl;
-    cout << MaxProf[3] << " Maxprof[3]"<< endl;
-    
-    
-    //10. Value of workers
+    //Value of workers
     double ParamWorkers[7]={};
     
     ParamWorkers[0]=wf;
@@ -2477,17 +2450,74 @@ int main(int argc, const char * argv[]) {
     ParamWorkers[4]=psi;
     ParamWorkers[5]=chi;
     ParamWorkers[6]=tthetaw;
-    
-    //int v=0;
-    //void value = *(double *)Params;
-    //void *p=&Params;
-    //static_cast<void*>(&a)
-    
+
     double ArgWorkers[2]={};
     ArgWorkers[0]=li;
     ArgWorkers[1]=lf;
+    
     double ValWorkersT=ValueWorkers(ArgWorkers, ParamWorkers);
-    cout << ValWorkersT << " ValWorkersT "<< endl;
+       cout << ValWorkersT << " ValWorkersT "<< endl;
+    
+    
+    //-------------------------------------------------------------------
+    cout << " Block of testing the Value of Workers and Profits to be balanced "<< endl;
+    // Block PW.
+    // Block of testing that VAlue workers and profits are balanced.
+    //Testing maximize profits and value of workers. Trying in minimum, median and other value.
+    
+    
+    //mean: tthetae=tthetae, tthetaw=tthetaw
+    
+    //We compute the variance of the distributions
+    
+    double VarMmu1=(exp(ssigma1*ssigma1)-1)*exp(2*mmu1+ssigma1*ssigma1);
+    double VarMmu2=(exp(ssigma2*ssigma2)-1)*exp(2*mmu2+ssigma2*ssigma2);
+    
+    
+    double tthetawmedian=exp(mmu1);
+    double tthetaemedian=exp(mmu2);
+    
+    double tthetawmedianLow=tthetaw-2*VarMmu1;
+    double tthetaemedianLow=tthetae-2*VarMmu2;
+    
+    
+    double tthetawmedianHigh=tthetaw+2*VarMmu1;
+    double tthetaemedianHigh=tthetae+2*VarMmu2;
+    
+    //Defining the corresponding ttheta's that we use to test. tthetae is already set for the mean.
+    
+    
+    //Getting ready profits
+    
+    
+    
+    
+    vector <double> MaxProf;
+    MaxProf.resize(4);
+    double InitialCond[3];
+    InitialCond[0]=ni;
+    InitialCond[1]=nf;
+    InitialCond[2]=z;
+    
+    //Getting ready the value of workers.
+    
+    
+    //Finding the actual optimal values found
+    
+    
+    //1. Median:
+    cout << " -------------------------------------------------------------------- " << endl;
+    cout << " Testing at the mean profits and value of workers " << endl;
+    
+    
+    MaxProf=profitsFinMaxim( InitialCond,  wi,wf,aalpha,ddelta,ggamma, bbeta,ssigma,tthetaemedian,c);
+    
+    cout << MaxProf[0] << " ni optimal (profits) "<< endl;
+    cout << MaxProf[1] << " nf optimal (profits)"<< endl;
+    cout << MaxProf[2] << " z optimal (profits)"<< endl;
+    cout << MaxProf[3] << " profits "<< endl;
+    
+
     
     //Testing maximization of value of workers
     vector <double> ValAnsWorker;
@@ -2497,10 +2527,41 @@ int main(int argc, const char * argv[]) {
     InitialCond[1]=lf;
     
     
-    ValAnsWorker=valueWorkerFinMaxim(InitialCondWorker,wf,wi, kkappa,rrho,psi, chi, tthetaw);
-    cout << ValAnsWorker[0] << " Valansworker0"<< endl;
-    cout << ValAnsWorker[1] << " Valansworker1"<< endl;
-    cout << ValAnsWorker[2] << " Valansworker2"<< endl;
+    ValAnsWorker=valueWorkerFinMaxim(InitialCondWorker,wf,wi, kkappa,rrho,psi, chi, tthetawmedian);
+    cout << ValAnsWorker[0] << " li (workers)"<< endl;
+    cout << ValAnsWorker[1] << " lf (workers) "<< endl;
+    cout << ValAnsWorker[2] << " Value of workers"<< endl;
+    
+    
+    //2. Testing at the low level
+    cout << " -------------------------------------------------------------------- " << endl;
+    cout << " Testing at the low level "<< endl;
+    MaxProf=profitsFinMaxim( InitialCond,  wi,wf,aalpha,ddelta,ggamma, bbeta,ssigma,tthetaemedianLow,c);
+    cout << MaxProf[0] << " ni optimal (profits) "<< endl;
+    cout << MaxProf[1] << " nf optimal (profits)"<< endl;
+    cout << MaxProf[2] << " z optimal (profits)"<< endl;
+    cout << MaxProf[3] << " profits "<< endl;
+    
+    ValAnsWorker=valueWorkerFinMaxim(InitialCondWorker,wf,wi, kkappa,rrho,psi, chi, tthetawmedianLow);
+    cout << ValAnsWorker[0] << " li (workers)"<< endl;
+    cout << ValAnsWorker[1] << " lf (workers) "<< endl;
+    cout << ValAnsWorker[2] << " Value of workers"<< endl;
+    
+    
+    //3. Testing at the high level
+    cout << " -------------------------------------------------------------------- " << endl;
+    cout << " Testing at the high level "<< endl;
+    MaxProf=profitsFinMaxim( InitialCond,  wi,wf,aalpha,ddelta,ggamma, bbeta,ssigma,tthetaemedianHigh,c);
+    cout << MaxProf[0] << " ni optimal (profits) "<< endl;
+    cout << MaxProf[1] << " nf optimal (profits)"<< endl;
+    cout << MaxProf[2] << " z optimal (profits)"<< endl;
+    cout << MaxProf[3] << " profits "<< endl;
+    
+    ValAnsWorker=valueWorkerFinMaxim(InitialCondWorker,wf,wi, kkappa,rrho,psi, chi, tthetawmedianHigh);
+    cout << ValAnsWorker[0] << " li (workers)"<< endl;
+    cout << ValAnsWorker[1] << " lf (workers) "<< endl;
+    cout << ValAnsWorker[2] << " Value of workers"<< endl;
+    
     
     
     
@@ -2559,6 +2620,8 @@ int main(int argc, const char * argv[]) {
     Wages[0]=wi;
     Wages[1]=wf;
     
+    //At this point we finish testing all the functions
+    
     
     cout << "-----------" << endl;
     
@@ -2575,6 +2638,9 @@ int main(int argc, const char * argv[]) {
     ThMoments8CSV.close();
     DistanceMoments.close();
     EquilibriumValue.close();
+    
+    
+    //Loading Parameters for optimization and else.
     
     
     vector<double> WagesInEqWages;
@@ -2659,18 +2725,14 @@ int main(int argc, const char * argv[]) {
     Wages[0]=WageEx[0];
     Wages[1]=WageEx[1];
     
-    WageEx[0]=6.9425;
-    WageEx[1]=7.69912;
     
     //cout << StandardizedExcessDemands(WageEx,  Others) << " Standardized1" << endl;
-    cout << " ---"<< endl;
+
     WageEx[0]=6.9425;
     WageEx[1]=7.69912;
     //cout << StandardizedExcessDemands(WageEx,  Others) << " modified" << endl;
     arma::vec WagesEquilibrium=arma::zeros(2);
     
-    WageEx[0]=6.94398;
-    WageEx[1]=7.699953;
     //cout << StandardizedExcessDemands(WageEx,  Others) << " modified2" << endl;
     
     
@@ -2728,22 +2790,6 @@ int main(int argc, const char * argv[]) {
     
     
     
-    
-    aalpha=0.73;
-    ggamma=2.69;
-    ddelta=509.86;
-    bbeta=284.73;
-    ssigma=6.25;
-    kkappa=0.93;
-    psi=127.7;
-    chi=9.16;
-    rrho=58.34;
-    mmu1=3.7;
-    mmu2=1.13;
-    ssigma1=1.33;
-    ssigma2=3.72;
-    rho12=0.53;
-    c=6.67;
     
     
     
@@ -2822,36 +2868,49 @@ int main(int argc, const char * argv[]) {
     }
     
     
-    cout << c<< " ccccc"<< endl;
-    cout << ParamsDecisionExcessDemand[14]<< " ParamsDecisionExcessDemand[14]"<< endl;
-    cout << Others[14] << " others14"<< endl;
-    cout << VecOthers[14]<< " vecothers14"<< endl;
-    
-    cout << "theomomtn"<< endl;
-    
-    cout << " muajajajajajajaja"<< endl;
-    
-    //InitLWorkersDecision.resize(2);
-    //wi
-    //wf
-    //InitLWorkersDecision[0]=li;
-    //InitLWorkersDecision[1]=lf;
-    //InitProfDecision.resize(3);
-    //InitProfDecision[0]=ni;
-    //InitProfDecision[1]=nf;
-    //InitProfDecision[2]=z;
+
     
     
-    //DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
-    cout << " muajajajajajajaja222222"<< endl;
+    
+    
     
     AdditionalVAriables[0]=2;
     AdditionalVAriables[1]=3;
     
-    MinimizingDistance(MinimizeDistanceParameters,AdditionalVAriables);
     
+    
+    //-------------------------------------------------------
+    //Block of initial prediction of moments
+    //Obtaining initial theoretical moments with initial parameters specified
+    
+    cout << " -----------Obtaining the initial predicted moments--------------------------------- "  << endl;
+    DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
+    cout << " ------------- Obtaining the predicted moments done ---------------" << endl;
+    
+    
+    
+    //--------------------------------------------------------
+    
+    
+    
+    
+    // ------------------------------------------
+
+    // Minimization block
+    // Doing the minimization of variables here:
+    // Minimization block
+    
+    
+    cout << " Minimization block "<< endl;
+    cout << " Initializing distance minimization "<< endl;
+    MinimizingDistance(MinimizeDistanceParameters,AdditionalVAriables);
     cout << " Distance minimization done"<< endl;
-  
+    // ------------------------------------------
+    
+    
+    
+    
+    
     //EquilibriumMoments(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
     //EqWagesNumericVector(VecOthers, WagesVectorIn);
     //StandardizedDistanceEstimator(ParStandardDistance,  AddPar);
@@ -2868,8 +2927,8 @@ int main(int argc, const char * argv[]) {
     
     
     //WagesEquilibrium=EqWagesNumericVector(VecOthers, WagesVectorIn);
-    //DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
-    //EquilibriumMoments(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
+    //
+    
     
     
     
@@ -3012,20 +3071,13 @@ int main(int argc, const char * argv[]) {
     
     
     //Testing the distance estimators
-    
-    
-    
-    //
     //DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
     
     cout << " initializing equilibrium moments "<< endl;
     //EquilibriumMoments(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
-    
     cout << " finalizing equilibrium moments "<< endl;
     
-    //Testing standardized distance estimtor loading parameters
-    cout << " Testing standardized distance estimtor loading parameters"<< endl;
-    cout << " HEEEREEEEEE      "<< endl;
+
     
     
     
@@ -3046,39 +3098,6 @@ int main(int argc, const char * argv[]) {
     cout << WagesEquilibrium[1] << " WagesEquilibrium[1]"<< endl;
     
     
-    
-    
-    
-    
-    
-    Wages[0]=wi;
-    Wages[1]=wf;
-    
-    
-    
-    
-    int n = 2;
-    double m2[] = {0.2, 0.02,  0.02,  0.2};
-    double *c2 = cholesky(m2, n);
-    show_matrix(c2, n);
-    
-    cout << " -----"<< endl;
-    cout << c2[0] << " c[0][0]"<< endl;
-    cout << c2[1] << " c[1][0]"<< endl;
-    cout << c2[2] << " c[2][0]"<< endl;
-    cout << c2[3] << " c[3][0]"<< endl;
-    
-    
-    free(c2);
-    
-    
-    cout << "Hello, World!\n";
-    
-    
-    
-   
-    
-    //ArgWorkers
     
     
 

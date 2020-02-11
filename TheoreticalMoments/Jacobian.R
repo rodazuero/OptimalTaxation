@@ -37,10 +37,14 @@ rm(list=ls(all=TRUE))
 
 
 #Obtaining the empirical moments#
-source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LastGitVersion/OptimalTaxation/EmpiricalMoments/Momentos.R')
+source('/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/EmpiricalMoments/Momentos.R')
 
-CD<-'/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LastGitVersion/OptimalTaxation/AWS/InAws/Sobol4/'
 
+
+#In this section we modify the directory to specify where are we going to extract the parameters and theoretical
+#moments that will be compared with the empircal ones. 
+
+CD<-'/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/'
 setwd(CD)
 
 
@@ -53,8 +57,8 @@ setwd(CD)
 
 #Loading the parameters
 Parameters<-read.csv("ParametersCSV.csv", header = F, sep=",")
-names<-c("aalpha","ggamma","ddelta","bbeta","ssigma","kkappa","psi","chi",
-         "rho","mmu1","mmu2","ssigma1","ssigma2","rho12","c","NA")
+names<-c("aalpha","ggamma","ddelta","bbeta","ssigma","kkappa","rrho","psi",
+         "chi","mmu1","mmu2","ssigma1","ssigma2","rho12","c","NA")
 colnames(Parameters)<-names
 #Loading distance from theoretical to empirical moments
 DistanceMom<-read.csv("DistanceMoments.csv", header = F, sep=",")
@@ -62,7 +66,7 @@ DistanceMom<-read.csv("DistanceMoments.csv", header = F, sep=",")
 
 colnames(DistanceMom)<-"Distance"
 
-#Loading equilibrium 
+#Loading equilibrium //Sometimes this file might not be present.
 EqValues<-read.csv("EquilibriumValue.csv", header = F, sep=",")
 EqValues<-EqValues[,1]
 #Remove the first equilibrium value
@@ -206,26 +210,32 @@ EverythingEquilibrium<-EverythingEq
 
 
 
-#Exclude predictions that do not have positive labor supply informal
-#EverythingEq<-subset(EverythingEq,InformalLaborSupplyPropV1>0.2)
 
-#Exclude predictions that do not have positive informal labor demand
-#EverythingEq<-subset(EverythingEq,InformalDemandProportionV4>0.5)
+#Specify if you want to do a subset of the moments:
 
-#Leave those with high entrepreneurs
-dim(subset(EverythingEq,PropEntrepreneurs>0.20))
-EverythingEq<-subset(EverythingEq,PropEntrepreneurs>0.20)
+SUBSET=FALSE
 
-
-#Alpha more than 0.45
-#EverythingEq<-subset(EverythingEq,aalpha>0.46)
-
-#Exclude those with very few informal demand
-EverythingEq<-subset(EverythingEq,InformalLaborSupplyPropV1>0.5)
-
-#Doing the restrictions necessary in the data
-EverythingEq<-subset(EverythingEq,PropEntrepreneurs>0.25)
-
+if(SUBSET==TRUE){
+  #Exclude predictions that do not have positive labor supply informal
+  #EverythingEq<-subset(EverythingEq,InformalLaborSupplyPropV1>0.2)
+  
+  #Exclude predictions that do not have positive informal labor demand
+  #EverythingEq<-subset(EverythingEq,InformalDemandProportionV4>0.5)
+  
+  #Leave those with high entrepreneurs
+  dim(subset(EverythingEq,PropEntrepreneurs>0.20))
+  EverythingEq<-subset(EverythingEq,PropEntrepreneurs>0.20)
+  
+  
+  #Alpha more than 0.45
+  #EverythingEq<-subset(EverythingEq,aalpha>0.46)
+  
+  #Exclude those with very few informal demand
+  EverythingEq<-subset(EverythingEq,InformalLaborSupplyPropV1>0.5)
+  
+  #Doing the restrictions necessary in the data
+  EverythingEq<-subset(EverythingEq,PropEntrepreneurs>0.25)
+}
 
 
 #Sort by the distance
@@ -686,6 +696,9 @@ for(i in 1:90){
 #----------------------------------------------------------#
 #Conditional distributions of each parameter on equilibrium#
 #----------------------------------------------------------#
+RUNTEST=FALSE
+if (RUNTEST==TRUE){
+
 
 
 #1. Aalpha
@@ -1799,7 +1812,7 @@ mod <- lm(InformalDemandProportionV4 ~ aalpha +
 
 write(print(coef(summary(mod))),file="Regression.txt")
 
-
+}
 
 
 
