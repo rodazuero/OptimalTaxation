@@ -250,15 +250,34 @@ names(MOMENTO1A)<-c("Tamano de la empresa","Informalidad1",
 #Se agrupan las firmas por decil de ventas y se calcula el número de trabajadores
 #que laboran en cada uno de los deciles.
 
+
+#We add trabajadores8, 9 and 10 because these are different types of workers. 
 CENSO$TOTALTRAB<-CENSO$NTRABAJADORES8+CENSO$NTRABAJADORES9+CENSO$NTRABAJADORES10
 sub<-subset(CENSO, CAP5MONTO1>0)
+QuantCorr<-quantile(sub$TOTALTRAB, probs = seq(0.1, 1, 0.1), na.rm = FALSE, names = TRUE, type = 7)
+
+
 sub$deciles<-decile(sub$CAP5MONTO1)
+
+
 MOMENTO2<-sub%>%
   group_by(deciles)%>%
   summarise(trabajadores=sum(TOTALTRAB))
 names(MOMENTO2)<-c("Decil de ventas","Numero de trabajadores")
+
+
+#Rather than doing the percentiles organized by sales, I will do it by number of employees. 
+
+MOMENTO2$`Numero de trabajadores`<-QuantCorr
+
+
+
 M2<-as.matrix.data.frame(MOMENTO2,rownames.force = F)
+M2[,2]<-t(QuantCorr)
 print(xtable(M2), include.rownames=F)
+
+
+
 
 #MOMENTO2$`Decil de ventas`<- Decil de ventas 
 #MOMENTO2$`Numero de trabajadores`<- Numero total de trabajadores en empresas del decil x

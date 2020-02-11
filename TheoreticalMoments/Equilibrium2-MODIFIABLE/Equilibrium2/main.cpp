@@ -1621,87 +1621,110 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     //answer[it][6]=TotalLaborSupply[it];
     //answer[it][7]=doubNumberEntrep/(doubNumberWorkers+doubNumberEntrep);
     
-    //Constructing the empirical moments:
-    vector<double> PropEntrepEmpirical(10);
-    for(int it=0; it<10; it++){
-        PropEntrepEmpirical[it]=0.3625;
-    }
     
     
     
-    //Total income
-    vector<double> IncomeEmpirical(9);
-    IncomeEmpirical[0]=82.756/225.682;
-    IncomeEmpirical[1]=135.012/225.682;
-    IncomeEmpirical[2]=164.702/225.682;
-    IncomeEmpirical[3]=197.829/225.682;
-    IncomeEmpirical[4]=225.682/225.682;
-    IncomeEmpirical[5]=268.271/225.682;
-    IncomeEmpirical[6]=318.264/225.682;
-    IncomeEmpirical[7]=394.568/225.682;
-    IncomeEmpirical[8]=595.318/225.682;
+            //----------------------------------------------------------------------------------
+            //In this block of code we will define the empirical moments to be compared
+            
+    
+            //Moment 0. Production
+            vector<double> Production(9);
+            
+            Production[0]=900.900/5246.640;
+            Production[1]=1653.750/5246.640;
+            Production[2]=2520.000/5246.640;
+            Production[3]=3698.415/5246.640;
+            Production[4]=5246.640/5246.640;
+            Production[5]=7257.600/5246.640;
+            Production[6]=10584.000/5246.640;
+            Production[7]=17050.950/5246.640;
+            Production[8]=38690.505/5246.640;
+    
+            //Moment 1. Taxes proportionally.
+            //Taxes
+            vector<double> Taxes(10);
+            
+            Taxes[0]=0.002457482;
+            Taxes[1]=0.006255534;
+            Taxes[2]=0.12598472;
+            Taxes[3]=0.20355296;
+            Taxes[4]=0.32547876;
+            Taxes[5]=0.47825881;
+            Taxes[6]=0.72803947;
+            Taxes[7]=0.116116270;
+            Taxes[8]=0.233266590;
+            Taxes[9]=1;
+    
+    
+    
+            //Moment 2. Workers demanded (Size of firm).
+    
+            //Moment 3.Informal Demand
+    
+    
+            //Moment 4. Total Income.
+            vector<double> IncomeEmpirical(9);
+            IncomeEmpirical[0]=82.756/225.682;
+            IncomeEmpirical[1]=135.012/225.682;
+            IncomeEmpirical[2]=164.702/225.682;
+            IncomeEmpirical[3]=197.829/225.682;
+            IncomeEmpirical[4]=225.682/225.682;
+            IncomeEmpirical[5]=268.271/225.682;
+            IncomeEmpirical[6]=318.264/225.682;
+            IncomeEmpirical[7]=394.568/225.682;
+            IncomeEmpirical[8]=595.318/225.682;
+    
+    
+            //Moment 5. Informal labor supply
+            //Proportion ifnformal supply
+            vector<double> InformalSupplyProportion(9);
+            InformalSupplyProportion[0]=0.9082840;
+            InformalSupplyProportion[1]=0.8318318;
+            InformalSupplyProportion[2]=0.7062315;
+            InformalSupplyProportion[3]=0.6227545;
+            InformalSupplyProportion[4]=0.5970149;
+            InformalSupplyProportion[5]=0.5134328;
+            InformalSupplyProportion[6]=0.4464286;
+            InformalSupplyProportion[7]=0.3731343;
+            InformalSupplyProportion[8]=0.2298507;
+    
+    
+    
+            //Moment 6. Total Labor Supply relative to median
+            vector<double> TotalLaborSupply(10);
+            TotalLaborSupply[0]=0.748;
+            TotalLaborSupply[1]=0.904;
+            TotalLaborSupply[2]=0.991;
+            TotalLaborSupply[3]=1.02;
+            TotalLaborSupply[4]=1.0000000;
+            TotalLaborSupply[5]=1.03;
+            TotalLaborSupply[6]=1.05;
+            TotalLaborSupply[7]=1.04;
+            TotalLaborSupply[8]=1.02;
+            TotalLaborSupply[9]=0.997;
+    
+            //Moment 7. Proportion of entrepreneurs.
+            vector<double> PropEntrepEmpirical(10);
+            for(int it=0; it<10; it++){
+                PropEntrepEmpirical[it]=0.3625;
+            }
+            
+    
+    //Finish defining the empirical moments
+    //----------------------------------------------------
+    
     
     //Transforming theoretical income in proportion in terms of median:
     for(int it=0; it<9; it++){
+        //Total income and production.
+        //The reason why this why decided to standardize was simply because when it comes to monetary unites
+        //the distance is highly penalyzed. 
         Theomoments[it][4]=Theomoments[it][4]/max(Theomoments[4][4],0.001);
+        
+        
         Theomoments[it][0]=Theomoments[it][0]/max(Theomoments[4][0],0.001);
     }
-    
-    //Production
-    vector<double> Production(9);
-    
-    Production[0]=900.900/5246.640;
-    Production[1]=1653.750/5246.640;
-    Production[2]=2520.000/5246.640;
-    Production[3]=3698.415/5246.640;
-    Production[4]=5246.640/5246.640;
-    Production[5]=7257.600/5246.640;
-    Production[6]=10584.000/5246.640;
-    Production[7]=17050.950/5246.640;
-    Production[8]=38690.505/5246.640;
-    
-    
-    //Taxes
-    vector<double> Taxes(10);
-    
-    Taxes[0]=0.002457482;
-    Taxes[1]=0.006255534;
-    Taxes[2]=0.12598472;
-    Taxes[3]=0.20355296;
-    Taxes[4]=0.32547876;
-    Taxes[5]=0.47825881;
-    Taxes[6]=0.72803947;
-    Taxes[7]=0.116116270;
-    Taxes[8]=0.233266590;
-    Taxes[9]=1;
-    
-    //Proportion ifnformal supply
-    vector<double> InformalSupplyProportion(9);
-    InformalSupplyProportion[0]=0.9082840;
-    InformalSupplyProportion[1]=0.8318318;
-    InformalSupplyProportion[2]=0.7062315;
-    InformalSupplyProportion[3]=0.6227545;
-    InformalSupplyProportion[4]=0.5970149;
-    InformalSupplyProportion[5]=0.5134328;
-    InformalSupplyProportion[6]=0.4464286;
-    InformalSupplyProportion[7]=0.3731343;
-    InformalSupplyProportion[8]=0.2298507;
-    
-    //Total labor supply with respect to the median.
-    //TAKING THE VERSION CORRESPONDING TO
-    vector<double> TotalLaborSupply(10);
-    TotalLaborSupply[0]=0.748;
-    TotalLaborSupply[1]=0.904;
-    TotalLaborSupply[2]=0.991;
-    TotalLaborSupply[3]=1.02;
-    TotalLaborSupply[4]=1.0000000;
-    TotalLaborSupply[5]=1.03;
-    TotalLaborSupply[6]=1.05;
-    TotalLaborSupply[7]=1.04;
-    TotalLaborSupply[8]=1.02;
-    TotalLaborSupply[9]=0.997;
-    double test=1;
-    
     //Open file where moments will be stored
     
     
@@ -1740,14 +1763,6 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     distance+=3*pow((TotalLaborSupply[0]-Theomoments[0][6])/(max(0.0001,TotalLaborSupply[0])),2);
     distance+=3*pow((TotalLaborSupply[4]-Theomoments[4][6])/(max(0.0001,TotalLaborSupply[4])),2);
     distance+=3*pow((TotalLaborSupply[8]-Theomoments[8][6])/(max(0.0001,TotalLaborSupply[8])),2);
-
-
-    
-    //ThMomentsCSV.open("ThMomentsCSV.csv", ios::out | ios::app);
-    
-    
-    //ThMomentsCSV << ", " << endl;
-    //ThMomentsCSV << " " << endl;
     
     //Moments relative to the proportion of informality in firm correspond to
     //4th, 7th and 8th decile. These proportions are 99.6, 97, and 91.2%.

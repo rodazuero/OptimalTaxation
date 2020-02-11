@@ -346,7 +346,7 @@ for(i in 1:1){
                          EverythingEqDistance$TotalWorkersDemandedV9[i])
   
   
-  Comparing$TotalDemandWorkers <-  c(DemandTotalWorkers,MOMENTO2$`Numero de trabajadores`[1:9] )
+  Comparing$TotalDemandWorkers <-  c(DemandTotalWorkers/DemandTotalWorkers[5],MOMENTO2$`Numero de trabajadores`[1:9]/MOMENTO2$`Numero de trabajadores`[5] )
   
   
   
