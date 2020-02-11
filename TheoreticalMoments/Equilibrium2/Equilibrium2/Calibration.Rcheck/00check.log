@@ -1,0 +1,86 @@
+* using log directory ‘/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LastGitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/Calibration.Rcheck’
+* using R version 3.6.0 (2019-04-26)
+* using platform: x86_64-apple-darwin15.6.0 (64-bit)
+* using session charset: UTF-8
+* checking for file ‘Calibration/DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘Calibration’ version ‘1.0’
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘Calibration’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: /private/var/folders/zs/4ldb_g3j5p144765dnlckhk5z4kdnd/T/Rtmp9ULP8y/Rbuild9baba4e5417/Calibration/man/Calibration-package.Rd:26: All text must be in a section
+See ‘/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LastGitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/Calibration.Rcheck/00install.out’ for details.
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... NOTE
+Malformed Title field: should not end in a period.
+'LinkingTo' for
+  ‘nleqslv’ ‘lattice’ ‘ggplot2’ ‘reshape’
+are unused as they have no 'include' directory
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... OK
+* checking Rd files ... WARNING
+prepare_Rd: Calibration-package.Rd:26: All text must be in a section
+prepare_Rd: Calibration-package.Rd:32-33: Dropping empty section \examples
+* checking Rd metadata ... OK
+* checking Rd cross-references ... WARNING
+Unknown package ‘<pkg>’ in Rd xrefs
+* checking for missing documentation entries ... WARNING
+Undocumented code objects:
+  ‘DistanceEstimator’ ‘EqWages’ ‘EqWagesNumericVector’
+All user-level objects in a package should have documentation entries.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking line endings in C/C++/Fortran sources/headers ... OK
+* checking line endings in Makefiles ... OK
+* checking compilation flags in Makevars ... OK
+* checking for GNU extensions in Makefiles ... OK
+* checking for portable use of $(BLAS_LIBS) and $(LAPACK_LIBS) ... OK
+* checking compiled code ... WARNING
+File ‘Calibration/libs/Calibration.so’:
+  Found ‘__ZNSt3__14coutE’, possibly from ‘std::cout’ (C++)
+    Object: ‘main.o’
+  Found ‘_exit’, possibly from ‘exit’ (C)
+    Object: ‘main.o’
+  Found ‘_printf’, possibly from ‘printf’ (C)
+    Object: ‘main.o’
+  Found ‘_putchar’, possibly from ‘putchar’ (C)
+    Object: ‘main.o’
+  Found ‘_puts’, possibly from ‘printf’ (C), ‘puts’ (C)
+    Object: ‘main.o’
+
+Compiled code should not call entry points which might terminate R nor
+write to stdout/stderr instead of to the console, nor use Fortran I/O
+nor system RNGs.
+
+See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
+* checking examples ... NONE
+* checking PDF version of manual ... OK
+* DONE
+Status: 5 WARNINGs, 1 NOTE
