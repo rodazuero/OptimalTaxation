@@ -1659,8 +1659,13 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     
             //Moment 2. Workers demanded (Size of firm).
+            vector<double> WorkersDemanded(10);
+            WorkersDemanded[0]=0.5;
+            WorkersDemanded[4]=1;
+            WorkersDemanded[8]=1.5;
     
             //Moment 3.Informal Demand
+            //This is handled directly in the computation of distances below.
     
     
             //Moment 4. Total Income.
@@ -1717,7 +1722,12 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     
     //Transforming theoretical income in proportion in terms of median:
     for(int it=0; it<9; it++){
-        //Total income and production.
+        
+        //Standardizing demand of workers total.
+        Theomoments[it][2]=Theomoments[it][2]/max(Theomoments[4][4],0.001);
+        
+        
+        //Total income and production are done because of the reason below.
         //The reason why this why decided to standardize was simply because when it comes to monetary unites
         //the distance is highly penalyzed. 
         Theomoments[it][4]=Theomoments[it][4]/max(Theomoments[4][4],0.001);
@@ -1746,24 +1756,18 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     }
     
     
-    
+    //0. Production
     distance+=3*pow((Production[0]-Theomoments[0][0])/(max(0.0001,Production[0])),2);
     distance+=3*pow((Production[4]-Theomoments[4][0])/(max(0.0001,Production[4])),2);
     distance+=3*pow((Production[8]-Theomoments[8][0])/(max(0.0001,Production[8])),2);
     
-    distance+=3*pow((IncomeEmpirical[0]-Theomoments[0][4])/(max(0.0001,IncomeEmpirical[0])),2);
-    distance+=3*pow((IncomeEmpirical[4]-Theomoments[4][4])/(max(0.0001,IncomeEmpirical[4])),2);
-    distance+=3*pow((IncomeEmpirical[8]-Theomoments[8][4])/(max(0.0001,IncomeEmpirical[8])),2);
+    //1. Taxes done inside of the loop.
+    //2. Labor demanded
+    distance+=3*pow((WorkersDemanded[0]-Theomoments[0][2])/(max(0.0001,WorkersDemanded[0])),2);
+    distance+=3*pow((WorkersDemanded[4]-Theomoments[4][2])/(max(0.0001,WorkersDemanded[4])),2);
+    distance+=3*pow((WorkersDemanded[8]-Theomoments[8][2])/(max(0.0001,WorkersDemanded[8])),2);
     
-    
-    distance+=3*pow((InformalSupplyProportion[0]-Theomoments[0][5])/(max(0.0001,InformalSupplyProportion[0])),2);
-    distance+=3*pow((InformalSupplyProportion[4]-Theomoments[4][5])/(max(0.0001,InformalSupplyProportion[4])),2);
-    distance+=3*pow((InformalSupplyProportion[8]-Theomoments[8][5])/(max(0.0001,InformalSupplyProportion[8])),2);
-    
-    distance+=3*pow((TotalLaborSupply[0]-Theomoments[0][6])/(max(0.0001,TotalLaborSupply[0])),2);
-    distance+=3*pow((TotalLaborSupply[4]-Theomoments[4][6])/(max(0.0001,TotalLaborSupply[4])),2);
-    distance+=3*pow((TotalLaborSupply[8]-Theomoments[8][6])/(max(0.0001,TotalLaborSupply[8])),2);
-    
+    //3. Informal demand
     //Moments relative to the proportion of informality in firm correspond to
     //4th, 7th and 8th decile. These proportions are 99.6, 97, and 91.2%.
     distance+=pow((Theomoments[3][3]-0.996)/(0.996),2);
@@ -1771,11 +1775,27 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     distance+=pow((Theomoments[7][3]-0.912)/(0.912),2);
     distance+=pow((Theomoments[8][3]-0.001)/(0.001),2);
     
-    cout << " pow((Theomoments[3][3]-0.996)/(0.996),2) "<< pow((Theomoments[3][3]-0.996)/(0.996),2) << endl;
-    cout << " pow((Theomoments[6][3]-0.996)/(0.996),2) "<< pow((Theomoments[6][3]-0.97)/(0.97),2) << endl;
-    cout << " pow((Theomoments[7][3]-0.996)/(0.996),2) "<< pow((Theomoments[7][3]-0.91)/(0.91),2) << endl;
-    cout << " pow((Theomoments[8][3]-0.996)/(0.996),2) "<< pow((Theomoments[8][3]-0.01)/(0.01),2) << endl;
-    cout << Theomoments[3][3] << "Theomoments[3][3]"<<endl;
+    //4. Total income is done inside of the previous loop.
+    distance+=3*pow((IncomeEmpirical[0]-Theomoments[0][4])/(max(0.0001,IncomeEmpirical[0])),2);
+    distance+=3*pow((IncomeEmpirical[4]-Theomoments[4][4])/(max(0.0001,IncomeEmpirical[4])),2);
+    distance+=3*pow((IncomeEmpirical[8]-Theomoments[8][4])/(max(0.0001,IncomeEmpirical[8])),2);
+    
+    //5. Informal Labor supply.
+    distance+=3*pow((InformalSupplyProportion[0]-Theomoments[0][5])/(max(0.0001,InformalSupplyProportion[0])),2);
+    distance+=3*pow((InformalSupplyProportion[4]-Theomoments[4][5])/(max(0.0001,InformalSupplyProportion[4])),2);
+    distance+=3*pow((InformalSupplyProportion[8]-Theomoments[8][5])/(max(0.0001,InformalSupplyProportion[8])),2);
+    
+    
+    //6. Total Labor supply.
+    distance+=3*pow((TotalLaborSupply[0]-Theomoments[0][6])/(max(0.0001,TotalLaborSupply[0])),2);
+    distance+=3*pow((TotalLaborSupply[4]-Theomoments[4][6])/(max(0.0001,TotalLaborSupply[4])),2);
+    distance+=3*pow((TotalLaborSupply[8]-Theomoments[8][6])/(max(0.0001,TotalLaborSupply[8])),2);
+    
+    
+    //7 Entrepreneurs and 8, aalpha, are done inside of the previous loop. 
+    
+    
+
     
     
     //Writing the csv file of the moments

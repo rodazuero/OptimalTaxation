@@ -312,7 +312,7 @@ for(i in 1:1){
                 EverythingEqDistance$ProductionV9[i])
   
   
-  Comparing$Production <-  c(ProductionTheoretical/1000, MOMENTO7A$Produccion[1:9])
+  Comparing$Production <-  c(ProductionTheoretical, MOMENTO7A$Produccion[1:9]/MOMENTO7A$Produccion[5])
   
   
   #2. Taxes Proportionally cumulative
