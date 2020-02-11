@@ -1760,7 +1760,7 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     distance+=3*pow((Production[0]-Theomoments[0][0])/(max(0.0001,Production[0])),2);
     distance+=3*pow((Production[4]-Theomoments[4][0])/(max(0.0001,Production[4])),2);
     distance+=3*pow((Production[8]-Theomoments[8][0])/(max(0.0001,Production[8])),2);
-    a
+    
     //1. Taxes done inside of the loop.
     //2. Labor demanded
     distance+=3*pow((WorkersDemanded[0]-Theomoments[0][2])/(max(0.0001,WorkersDemanded[0])),2);
@@ -2167,8 +2167,8 @@ void SobolRun(arma::vec WagesVectorIn,
     double a=2;
     cout << a << " a "<< endl;
     
-    std::ifstream theFile ("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/AWS/InAws/Sobol5/SobolDim15.csv");
-    
+    std::ifstream theFile ("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/AWS/InAws/Sobol3/SobolDim15.csv");
+    cout << " Running sobol "<< endl;
     int SIZEOBS=20000;
     int NVAR=15;
     double MYARRAY[SIZEOBS][NVAR];
@@ -2919,14 +2919,14 @@ int main(int argc, const char * argv[]) {
     //Obtaining initial theoretical moments with initial parameters specified
     
     cout << " -----------Obtaining the initial predicted moments--------------------------------- "  << endl;
-    DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
+    //DistanceEstimator(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
     cout << " ------------- Obtaining the predicted moments done ---------------" << endl;
     
     
     
     //--------------------------------------------------------
-    
-    
+    //Running the sobol
+    SobolRun(Wages,InitLWorkersDecision,InitProfDecision);
     
     
     // ------------------------------------------
