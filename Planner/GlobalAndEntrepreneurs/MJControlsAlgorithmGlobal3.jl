@@ -27,22 +27,18 @@ function new_find_controls( θ, ss, pa)
                          ss.λ*(ss.e*n^pa.α*p*h_e-pa.β/(1.0+pa.σ)*z^(1.0+pa.σ)*p*h_e-ss.uw*(h_w+p*h_e)-pa.χ/(1.0+pa.ψ)*l^(1.0+pa.ψ)*h_w)+
                          ss.ω*(θ*l*h_w-n*p*h_e)+ss.ϕ_e*p; #Hamiltonian:
 
+    #Defining bounds we use in various cases (limits of z):
+    z_lwbar = 0.0; #The smallest possible z.
+    z_1     = z_max;
+    z_2     = ((1.0+pa.σ)/(ss.λ*pa.β)*(A_cons+(1.0-pa.α)/pa.α*ss.ω*n_full_info))^(1.0/(1.0+pa.σ));
+    #Keep the lower number:
+    z_upbar = min(z_1,z_2);
+
     if A_cons <= 0
         #Two cases depending if A is super negative or not that negative:
         if A_cons > -(1.0-pa.α)/pa.α*ss.ω*n_full_info
             println("1 case: A_cons<0. A_cons > OtherValue.")
             #1. Evaluating the interior solution:
-            #Define the limits of z we are using:
-            z_lwbar = 0.0000016; #Random Number --> Not zero, because 0 is the corner solution.
-            z_1     = z_max;
-            z_2     = ((1.0+pa.σ)/(ss.λ*pa.β)*(A_cons+(1.0-pa.α)/pa.α*ss.ω*n_full_info))^(1.0/(1.0+pa.σ))
-            #Keep the lower number:
-            if z_1 > z_2
-                z_upbar = z_2;
-            else
-                z_upbar = z_1;
-            end
-
             #Using bisection method:
             if fun_nz(z_lwbar)*fun_nz(z_upbar)<0
                 potential_z = find_zero(fun_nz, (z_lwbar,z_upbar), Bisection());
@@ -93,14 +89,71 @@ function new_find_controls( θ, ss, pa)
 
     else
         println("3 case: A_cons > 0.")
-        error("3 case: A_cons > 0.")
 
+        z_a = ((1.0+pa.σ)/(ss.λ*pa.β)*A_cons/(1.0-pa.α*(1.0+pa.σ)))^(1.0/(1.0+pa.σ));
+        n_a = pa.α/(1.0-pa.α)*1.0/ss.ω*(A_cons*pa.α*(1.0+pa.σ)/(1.0-pa.α*(1.0+pa.σ)));
+        z_res = fun_z(z_a,n_a);
+
+        if z_res > 0
+            println("z_res > 0")
+
+            #Using bisection method:
+            if fun_nz(z_a)*fun_nz(z_upbar)<0
+                potential_z = find_zero(fun_nz, (z_a,z_upbar), Bisection());
+            else
+                error("Bisection: signs equal --> Cannot solve.")
+            end
+
+            potential_n = n_opt(potential_z);
+            den_l(potential_n,potential_z) <= 0.0 && error("Denominator of L is negative or zero.") #Stop when denominator is negative.
+            potential_l = ll_opt(potential_n,potential_z);
+            potential_p = (pa.χ*potential_l^(1.0+pa.ψ))/den_p(potential_n,potential_z);
+
+            interior_hamiltonian = objective(potential_z,potential_n,potential_l,potential_p);
+
+            #2. Evaluating the small z solution:
+            small_zz = z_lwbar + eps();
+            small_nn = n_opt(small_zz);
+            small_nn <= 0.0 && error("The value of N is negative.")
+            den_l(small_nn,small_zz) <= 0.0 && error("Denominator of L (small z) is negative or zero.") #Stop when denominator is negative.
+            small_ll = ll_opt(small_nn,small_zz);
+            small_pp = (pa.χ*corner_ll^(1.0+pa.ψ))/den_p(corner_nn,corner_zz);
+
+            small_hamiltonian = objective(small_zz,small_nn,small_ll,small_pp);
+
+            #3. Defining the solution we are keeping:
+            if small_hamiltonian > interior_hamiltonian
+                zz = small_zz;
+                nn = small_nn;
+                ll = small_ll;
+                pp = small_pp;
+            else
+                zz = potential_z;
+                nn = potential_n;
+                ll = potential_l;
+                pp = potential_p;
+            end
+
+        else
+            println("z_res <= 0")
+
+            z_lwbar = ((1.0+pa.σ)/(ss.λ*pa.β)*A_cons)^(1.0/(1.0+pa.σ)); #Makes n==0.0
+            zz      = z_lwbar;
+            nn      = 0.0;
+            nn <= 0.0 && error("The value of N is negative.")
+            den_l(nn,zz) <= 0.0 && error("Denominator of L is negative or zero.") #Stop when denominator is negative.
+            ll = ll_opt(nn,zz);
+            pp    = (pa.χ*ll^(1.0+pa.ψ))/den_p(nn,zz);
+
+        end
     end
 
     #Final Output:
     #println("zz = ", zz, "nn = ", nn, "ll = ", ll, "pp = ", pp)
     zz, nn, ll, pp
 end
+
+
 
 function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solvec::Array{Float64})
     (Nspan,~)=size(solvec)
