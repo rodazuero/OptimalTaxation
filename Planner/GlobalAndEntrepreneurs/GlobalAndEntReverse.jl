@@ -1,11 +1,11 @@
 
-cd("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Reverse2")
+cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 cd("C:\\Users\\mariagon\\Dropbox\\Reverse2")
 
 using Roots
 using NLopt
 using Statistics
-#using PyPlot
+using PyPlot
 using DataFrames
 using CSV
 using NLsolve
@@ -20,44 +20,32 @@ include("States_NewRungeKutta.jl")
 include("NewMyRungeKuttaReverse.jl")
 
 #Entrepreneurs Problem
-include("ControlsAlgorithmE.jl")
+include("NewControlsAlgorithmE.jl")
+#include("NewControlsAlgorithmEGrid.jl")
 include("States_NewRungeKuttaE.jl")
 #include("NewMyRungeKuttaE.jl")
 include("NewMyRungeKuttaEReverse.jl")
 
 include("ProblemFunction.jl")
 
-
-
 #Marginal taxes plot
 include("marginal_taxes.jl")
 
-
 #Define values for the model parameters
 pa = init_parameters();
-
-
-
-
-
-
-
-
-
-
 
 #Entrepreneurs Problem
     #Initial boundary conditions (states from the global problem)
 
     #Define proportion of agents in global problem
-    gp     =   0.9
+    gp     =   0.8
 
     ue0    =   1000.0
-    μe0    =   0.0
+    μe0    =   0.0- 1.0e-10
     ye0    =   0.0
     λe0    =   1.0
     le0    =   0.0
-    ωe0    =   2.75
+    ωe0    =   2.0
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
@@ -92,78 +80,89 @@ pa = init_parameters();
     RungeKuttaE=hcat(DataFrame(solutione),E, DataFrame(thetae=θespan))
     CSV.write("RungeKuttaNewE.csv", RungeKuttaE)
 
+    #Marginal taxes:
+    τ_prime_e = Array{Float64}(undef,Nspan,2);
+
+    marginal_taxese(controlse, θespan, solutione, pa)
+
+    taxese = DataFrame(τ_prime_e)
+    names!(taxese,[:tau_c, :tau_n] )
+    taxes2e=hcat(DataFrame(theta=θespan),taxese)
+    CSV.write("marginal_taxes_e.csv",taxes2e)
+
     #Plots:
-    graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub, bound_e,τ_prime,τ_prime_e)
+    #Entrepreneurs problem:
 
-        #States
-        estados=subplot(321)
-        suptitle("Optimal states")
-        estados=plot(θespan[1:500], solutione[1:500,1])
-        ylabel("u_e")
-        estados=subplot(322)
-        estados[1,2]=plot(θespan, solutione[:,2])
-        plot(θespan,repeat([0],500),color="lime")
-        ylabel("μe")
-        estados=subplot(323)
-        estados[2,1]=plot(θespan, solutione[:,3])
-        plot(θespan,repeat([pa.θ_e_ub],500),color="lime")
-        ylabel("Ye")
-        estados=subplot(324)
-        estados[2,2]=plot(θespan, solutione[:,4])
-        #plot(θspan,repeat([bound_e],500),color="lime")
-        ylabel("λe")
-        estados=subplot(325)
-        estados[3,1]=plot(θespan, solutione[:,5])
-        plot(θespan,repeat([0],500),color="lime")
-        ylabel("Le")
-        estados=subplot(326)
-        estados[3,2]=plot(θespan, solutione[:,6])
-        ylabel("ωe")
+    #States
+    fig, estados_e=plt.subplots(3,2)
+    fig.suptitle("Optimal States - Entrepreneurs Problem")
+        #u_e:
+    estados_e[1,1].plot(θespan[1:500], solutione[1:500,1])
+    #estados_e[1,1].set_title("u_e")
+    estados_e[1,1].set(ylabel="u_e")
+        #μ_e:
+    estados_e[1,2].plot(θespan[1:500], solutione[1:500,2])
+    estados_e[1,2].plot(θespan[1:500], repeat([0],500), "tab:green")
+    #estados_e[1,2].set_title("μe")
+    estados_e[1,2].set(ylabel="μe")
+        #Y_e:
+    estados_e[2,1].plot(θespan[1:500], solutione[1:500,3])
+    estados_e[2,1].plot(θespan[1:500], repeat([0.15],500), "tab:green")
+    #estados_e[2,1].set_title("Ye")
+    estados_e[2,1].set(ylabel="Ye")
+        #λ_e:
+    estados_e[2,2].plot(θespan[1:500], solutione[1:500,4])
+    #estados_e[2,2].set_title("λe")
+    estados_e[2,2].set(ylabel="λe")
+        #L_e:
+    estados_e[3,1].plot(θespan[1:500], solutione[1:500,5])
+    estados_e[3,1].plot(θespan[1:500], repeat([0],500), "tab:green")
+    #estados_e[3,1].set_title("Le")
+    estados_e[3,1].set(ylabel="Le")
+        #ω:
+    estados_e[3,2].plot(θespan[1:500], solutione[1:500,6])
+    #estados_e[3,2].set_title("ωe")
+    estados_e[3,2].set(ylabel="ωe")
 
-        #Auxiliar states
-        estados=subplot(121)
-        estados[1,2]=plot(θespan, solutione[:,9])
-        plot(θespan,repeat([0],500),color="lime")
-        ylabel("Le*")
-        estados=subplot(122)
-        estados[1,2]=plot(θespan, solutione[:,10])
-        plot(θespan,repeat([0.15],500),color="lime")
-        ylabel("Ye*")
+    #Auxiliar states
+    fig, estados_auxE=plt.subplots(1,2)
+    fig.suptitle("Auxiliar States - Global Problem")
+        #L*:
+    estados_auxE[1,1].plot(θespan[1:500], solutione[1:500,9])
+    estados_auxE[1,1].plot(θespan[1:500], repeat([0],500), "tab:green")
+    #estados_auxE[1,1].set_title("L*")
+    estados_auxE[1,1].set(ylabel="L*")
+        #Y*:
+    estados_auxE[2].plot(θespan[1:500], solutione[1:500,10])
+    estados_auxE[2].plot(θespan[1:500], repeat([0.15],500), "tab:green")
+    #estados_auxE[2].set_title("Y*")
+    estados_auxE[2].set(ylabel="Y*")
 
-        #Controls
-        ctrl=subplot(121)
-        suptitle("Optimal controls")
-        ctrl=plot(θespan, controlse[:,1])
-        ylabel("z")
-        ctrl=subplot(122)
-        ctrl[1,2]=plot(θespan, controlse[:,2])
-        ylabel("n")
+    #Controls
+    fig, controles_e=plt.subplots(1,2)
+    fig.suptitle("Optimal Controls - Entrepreneurs Problem")
+        #ze:
+    controles_e[1,1].plot(θespan[1:500], controlse[:,1])
+    #controles_e[1,1].set_title("ze")
+    controles_e[1,1].set(ylabel="ze")
+        #ne:
+    controles_e[2].plot(θespan[1:500], controlse[:,2])
+    #controles_e[1].set_title("ne")
+    controles_e[2].set(ylabel="ne")
 
-        #Marginal taxes:
-        τ_prime_e = Array{Float64}(undef,Nspan,2);
-
-        marginal_taxese(controlse, θespan, solutione, pa)
-
-        taxese = DataFrame(τ_prime_e)
-        names!(taxese,[:tau_c, :tau_n] )
-        taxes2e=hcat(DataFrame(theta=θespan),taxese)
-        CSV.write("marginal_taxes_e.csv",taxes2e)
-
-        #Marginal taxes plot:
-        plot_margtax = subplot(121)
-        suptitle("Marginal taxes")
-        plot_margtax = plot(θespan[1:500], τ_prime_e[1:500,1])
-        ylabel("τ_c′")
-        plot_margtax = subplot(122)
-        plot_margtax[1,2] = plot(θespan[1:500], τ_prime_e[1:500,2])
-        ylabel("τ_n′")
-
-
+    #Marginal taxes:
+    fig, margtax_e=plt.subplots(1,2)
+    fig.suptitle("Marginal Taxes")
+        #τ_c_prime:
+    margtax_e[1].plot(θespan[1:500], τ_prime_e[:,1])
+    #margtax_e[1].set_title("τ_c'")
+    margtax_e[1].set(ylabel="τ_c'")
+        #τ_n_prime:
+    margtax_e[2].plot(θespan[1:500], τ_prime_e[:,2])
+    #margtax_e[2].set_title("τ_n'")
+    margtax_e[2].set(ylabel="τ_n'")
 
 #Global Problem (Reverse)
-
-    include("NewMyRungeKuttaReverse.jl")
-
 
     uw_end    = solutione[1,1] #guess
     μ_end     = solutione[1,2]
@@ -180,7 +179,7 @@ pa = init_parameters();
     ystar_end = 0.0
     lstar_end = 0.0
 
-    Nspan = 500 
+    Nspan = 500
     y_end= [uw_end, μ_end, e_end, ϕ_e_end, y_agg_end, λ_end, l_agg_end, ω_end, l_new_end, y_new_end, 0, 0 ];
     xlb= pa.θ_w_lb;
     xub = pa.θ_w_ub;
@@ -203,70 +202,10 @@ pa = init_parameters();
     bound_e   = -(pa.indicator*solutione[1,1]^pa.ϕ*he_ub+solutione[1,4]*(e_end*controlse[1,2]^pa.α -(pa.β/(1.0+pa.σ))*controlse[1,1]^(1.0+pa.σ)
                 - solutione[1,1])*he_ub - solutione[1,6]*controlse[1,2]*he_ub + solutione[1,2]*controlse[1,2]^pa.α*(1.0-pa.β*controlse[1,1]^pa.σ))
 
-
     C= DataFrame(controls)
     names!(C,[:z, :n, :l, :p] )
     RungeKutta=hcat(DataFrame(solution),C, DataFrame(theta=θspan))
     CSV.write("RungeKuttaNew.csv", RungeKutta)
-
-    #Graphs Global problem
-
-        #States
-        estados=subplot(421)
-        suptitle("Optimal states")
-        estados=plot(θspan[1:500], solution[1:500,1])
-        ylabel("u_w")
-        estados=subplot(422)
-        estados[1,2]=plot(θspan, solution[:,2])
-        plot(θspan,repeat([0],500),color="lime")
-        ylabel("μ")
-        estados=subplot(423)
-        estados[2,1]=plot(θspan, solution[:,3])
-        plot(θspan,repeat([pa.θ_e_ub],500),color="lime")
-        ylabel("e")
-        estados=subplot(424)
-        estados[2,2]=plot(θspan, solution[:,4])
-        #plot(θspan,repeat([bound_e],500),color="lime")
-        plot(θspan,repeat([bound_e],500),color="lime")
-        ylabel("φe")
-        estados=subplot(425)
-        estados[3,1]=plot(θspan, solution[:,5])
-        ylabel("Y")
-        estados=subplot(426)
-        estados[3,2]=plot(θspan, solution[:,6])
-        ylabel("λ")
-        estados=subplot(427)
-        estados[4,1]=plot(θspan, solution[:,7])
-        plot(θspan,repeat([0],500),color="lime")
-        ylabel("L")
-        estados=subplot(428)
-        estados[4,2]=plot(θspan, solution[:,8])
-        ylabel("ω")
-
-        #Auxiliar states
-        estados=subplot(121)
-        estados[1,2]=plot(θspan, solution[:,11])
-        plot(θspan,repeat([0],500),color="lime")
-        ylabel("L*")
-        estados=subplot(122)
-        estados[1,2]=plot(θspan, solution[:,12])
-        plot(θspan,repeat([0.15],500),color="lime")
-        ylabel("Y*")
-
-        #Controls
-        ctrl=subplot(221)
-        suptitle("Optimal controls")
-        ctrl=plot(θspan, controls[:,1])
-        ylabel("z")
-        ctrl=subplot(222)
-        ctrl[1,2]=plot(θspan, controls[:,2])
-        ylabel("n")
-        ctrl=subplot(223)
-        ctrl[2,1]=plot(θspan, controls[:,3])
-        ylabel("l")
-        ctrl=subplot(224)
-        ctrl[2,2]=plot(θspan, controls[:,4])
-        ylabel("p")
 
         #Marginal taxes:
         τ_prime = Array{Float64}(undef,Nspan,3);
@@ -277,14 +216,5 @@ pa = init_parameters();
         taxes2=hcat(DataFrame(theta=θspan),taxes)
         CSV.write("marginal_taxes.csv",taxes2)
 
-        #Marginal taxes plot:
-        plot_margtax = subplot(131)
-        suptitle("Marginal taxes")
-        plot_margtax = plot(θspan[1:500], τ_prime[1:500,1])
-        ylabel("τ_c′")
-        plot_margtax = subplot(132)
-        plot_margtax[1,2] = plot(θspan[1:500], τ_prime[1:500,2])
-        ylabel("τ_n′")
-        plot_margtax = subplot(133)
-        plot_margtax[1,3] = plot(θspan[1:500], τ_prime[1:500,3])
-        ylabel("τ_l′")
+        #Plots:
+        graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub, bound_e,τ_prime,τ_prime_e)
