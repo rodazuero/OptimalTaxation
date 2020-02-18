@@ -1,4 +1,4 @@
-# OptimalTaxation
+# OptimalTaxation 
 
 
 Repository replicating results in Azuero, Hernandez & Wills. Optimal Taxation and Informality. 
@@ -35,6 +35,6 @@ TheoreticalMoments/Equilibrium2/Equilibrium2: Family of files to calibrate the m
 AWS: Family of files to calibrate the model in Amazon Web services. It is important to note that changes updated in the previous folder (TheoreticalMoments/Equilibrium2/Equilibrium2) should mimick those in AWS. 
     
 
-    mainSansC_prod: Contains the equilibrium computation and calibration without the variable C that is inside of the production function used to increase the number of entrepreneurs. 
+  a  mainSansC_prod: Contains the equilibrium computation and calibration without the variable C that is inside of the production function used to increase the number of entrepreneurs. 
 
 TheoreticalMoments/Equilibrium2/Equilibrium2/GenerateSobolNumbers: Generate sobol numbers to compute distance between empirical and theoretical moments. 
