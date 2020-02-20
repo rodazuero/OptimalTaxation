@@ -91,7 +91,7 @@ function init_parameters()
     α= 0.73;
     δ= 0.12873;
     γ= 0.7341;
-    β= 0.2135;
+    β= 0.05;
     σ= 0.1827;
     #σ= 0.01;
     ϵ= 0.0;
@@ -115,8 +115,8 @@ function init_parameters()
     σ2_w = 6.0; σ_w=σ2_w^0.5;
     σ2_e = 6.0; σ_e=σ2_e^0.5;
     σ_we = 0.0;
-    constant = 5.0;
-    constant_e = 3.0;
+    constant = 0.0;
+    constant_e = 0.0;
 
 #Uniform distribution
     θ_e_a= μ_e-((12.0^0.5)/2)*(σ2_e^0.5);

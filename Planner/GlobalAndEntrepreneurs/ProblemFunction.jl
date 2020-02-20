@@ -46,9 +46,13 @@ function complete_problem!(solution::Array{Float64},solutione::Array{Float64},co
 end
 
 
-function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Array{Float64},controlse::Array{Float64}, θspan, θespan, thetaw_ub, bound_e,τ_prime::Array{Float64},τ_prime_e::Array{Float64})
+function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Array{Float64},controlse::Array{Float64}, θspan, θespan, thetaw_ub, bound_e,τ_prime::Array{Float64},τ_prime_e::Array{Float64},dir::AbstractString)
 
         rc("font", family="serif")
+        original_dir=pwd()
+
+        #Directory to save graphs
+        cd(dir)
 
         #Global problem:
 
@@ -93,7 +97,8 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             estados[4,2].set(ylabel="ω")
 
             #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\States.png")
-            savefig("C:\\Users\\mariagon\\Dropbox\\Results\\States.png")
+            #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\States.png")
+            savefig("States.png")
 
             #Auxiliar states
             fig, estados_aux=plt.subplots(1,2)
@@ -110,7 +115,8 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             estados_aux[2].set(ylabel="Y*")
 
             #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\StatesAux.png")
-            savefig("C:\\Users\\mariagon\\Dropbox\\Results\\StatesAux.png")
+            #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\StatesAux.png")
+            savefig("StatesAux.png")
 
             #Controls
             fig, controles=plt.subplots(2,2)
@@ -133,7 +139,8 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             controles[2,2].set(ylabel="p")
 
             #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\Controls.png")
-            savefig("C:\\Users\\mariagon\\Dropbox\\Results\\Controls.png")
+            #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\Controls.png")
+            savefig("Controls.png")
 
             #Marginal taxes:
             fig, margtax=plt.subplots(1,3)
@@ -152,7 +159,8 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             margtax[3].set(ylabel="τ_l'")
 
             #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\Taxes.png")
-            savefig("C:\\Users\\mariagon\\Dropbox\\Results\\Taxes.png")
+            #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\Taxes.png")
+            savefig("Taxes.png")
 
         #Entrepreneurs problem:
 
@@ -165,7 +173,7 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         estados_e[1,1].set(ylabel="u_e")
             #μ_e:
         estados_e[1,2].plot(θespan[1:500], solutione[1:500,2])
-        estados_e[1,2].plot(θespan[1:500], repeat([0],500), "tab:green")                
+        estados_e[1,2].plot(θespan[1:500], repeat([0],500), "tab:green")
         #estados_e[1,2].set_title("μe")
         estados_e[1,2].set(ylabel="μe")
             #Y_e:
@@ -188,7 +196,8 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         estados_e[3,2].set(ylabel="ωe")
 
         #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\StatesEntrepreneurs.png")
-        savefig("C:\\Users\\mariagon\\Dropbox\\Results\\StatesEntrepreneurs.png")
+        #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\StatesEntrepreneurs.png")
+        savefig("StatesEntrepreneurs.png")
 
         #Auxiliar states
         fig, estados_auxE=plt.subplots(1,2)
@@ -205,7 +214,8 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         estados_auxE[2].set(ylabel="Y*")
 
         #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\StatesAuxEntrepreneurs.png")
-        savefig("C:\\Users\\mariagon\\Dropbox\\Results\\StatesAuxEntrepreneurs.png")
+        #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\StatesAuxEntrepreneurs.png")
+        savefig("StatesAuxEntrepreneurs.png")
 
         #Controls
         fig, controles_e=plt.subplots(1,2)
@@ -220,7 +230,8 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         controles_e[2].set(ylabel="ne")
 
         #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\ControlsEntrepreneurs.png")
-        savefig("C:\\Users\\mariagon\\Dropbox\\Results\\ControlsEntrepreneurs.png")
+        #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\ControlsEntrepreneurs.png")
+        savefig("ControlsEntrepreneurs.png")
 
         #Marginal taxes:
         fig, margtax_e=plt.subplots(1,2)
@@ -235,6 +246,9 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         margtax_e[2].set(ylabel="τ_n'")
 
         #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\TaxesEntrepreneurs.png")
-        savefig("C:\\Users\\mariagon\\Dropbox\\Results\\TaxesEntrepreneurs.png")
+        #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\TaxesEntrepreneurs.png")
+        savefig("TaxesEntrepreneurs.png")
 
+        #Return to original directory
+        cd(original_dir)
 end

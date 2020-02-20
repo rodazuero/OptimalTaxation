@@ -11,7 +11,8 @@ function new_find_controls( θ, ss, pa)
     n_full_info = ((ss.λ*pa.α*ss.e)/ss.ω)^(1.0/(1.0-pa.α));
     z_max  = (1.0/pa.β)^(1.0/pa.σ); #Max possible evasion.
     A_cons = (pa.indicator*ss.uw^pa.ϕ-ss.λ*ss.uw)+ss.ϕ_e/h_e;
-    println("A_cons = ", A_cons)
+    cond   = -(1.0-pa.α)/pa.α*ss.ω*n_full_info
+    println("A_cons = ", A_cons, "  n_full = ", n_full_info, "  condition", cond )
 
     #Defining the functions we are using:
     n_opt(z)   = 1.0/ss.ω*pa.α/(1.0-pa.α)*(ss.λ*pa.β/(1.0+pa.σ)*z^(1.0+pa.σ)-A_cons);
@@ -27,12 +28,14 @@ function new_find_controls( θ, ss, pa)
                          ss.λ*(ss.e*n^pa.α*p*h_e-pa.β/(1.0+pa.σ)*z^(1.0+pa.σ)*p*h_e-ss.uw*(h_w+p*h_e)-pa.χ/(1.0+pa.ψ)*l^(1.0+pa.ψ)*h_w)+
                          ss.ω*(θ*l*h_w-n*p*h_e)+ss.ϕ_e*p; #Hamiltonian:
 
-    #Defining bounds we use in various cases (limits of z):
-    z_lwbar = 0.0; #The smallest possible z.
-    z_1     = z_max;
-    z_2     = ((1.0+pa.σ)/(ss.λ*pa.β)*(A_cons+(1.0-pa.α)/pa.α*ss.ω*n_full_info))^(1.0/(1.0+pa.σ));
-    #Keep the lower number:
-    z_upbar = min(z_1,z_2);
+    #Defining bounds (limits of z) for cases 1 and 3:
+    if A_cons+(1.0-pa.α)/pa.α*ss.ω*n_full_info > 0
+        z_lwbar = 0.0; #The smallest possible z.
+        z_1     = z_max;
+        z_2     = ((1.0+pa.σ)/(ss.λ*pa.β)*(A_cons+(1.0-pa.α)/pa.α*ss.ω*n_full_info))^(1.0/(1.0+pa.σ));
+        #Keep the lower number:
+        z_upbar = min(z_1,z_2);
+    end
 
     if A_cons <= 0
         #Two cases depending if A is super negative or not that negative:
@@ -168,7 +171,7 @@ function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solve
       ω     = solvec[j,8];
       ss    = State(e, uw, ϕ_e, μ, λ, ω);
 
-      (zz, nn, ll, pp) = MJnew_find_controls( θ, ss, pa)
+      (zz, nn, ll, pp) = new_find_controls( θ, ss, pa)
       ctrlvec[j,1] = zz;
       ctrlvec[j,2] = nn;
       ctrlvec[j,3] = ll;

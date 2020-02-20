@@ -45,7 +45,7 @@ pa = init_parameters();
     ye0    =   0.0
     λe0    =   1.0
     le0    =   0.0
-    ωe0    =   2.0
+    ωe0    =   0.9
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
@@ -217,4 +217,5 @@ pa = init_parameters();
         CSV.write("marginal_taxes.csv",taxes2)
 
         #Plots:
-        graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub, bound_e,τ_prime,τ_prime_e)
+        graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
+         bound_e,τ_prime,τ_prime_e,"C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs")
