@@ -46,7 +46,7 @@ function complete_problem!(solution::Array{Float64},solutione::Array{Float64},co
 end
 
 
-function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Array{Float64},controlse::Array{Float64}, θspan, θespan, thetaw_ub, bound_e,τ_prime::Array{Float64},τ_prime_e::Array{Float64},dir::AbstractString)
+function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Array{Float64},controlse::Array{Float64}, θspan, θespan, thetaw_ub, bound_e,τ_prime::Array{Float64},τ_prime_e::Array{Float64},dir::AbstractString,utilities_prime::Array{Float64},A_mat::Array{Float64})
 
         rc("font", family="serif")
         original_dir=pwd()
@@ -248,6 +248,32 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\TaxesEntrepreneurs.png")
         #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\TaxesEntrepreneurs.png")
         savefig("TaxesEntrepreneurs.png")
+
+        #Graphs for the utilities:
+        fig, utilities=plt.subplots(1,2)
+        fig.suptitle("Change in Utilities")
+            #uw_prime:
+        utilities[1].plot(θspan[1:500], utilities_prime[:,1])
+        utilities[1].set(ylabel="uw'")
+            #ue_prime:
+        utilities[2].plot(θespan[1:500], utilities_prime[:,2])
+        utilities[2].set(ylabel="ue'")
+
+        savefig("ChangeUtilities.png")
+
+        #Graphs for A:
+        fig, A_graphs=plt.subplots(1,2)
+        fig.suptitle("A")
+            #Value for A:
+        #A_graphs = plot(θspan[1:500], A_mat[:,1], A_mat[:,2])
+        #suptitle("A")
+        A_graphs[1] = plot(θspan[1:500], A_mat[:,1])
+        A_graphs[1].set(ylabel="A")
+            #Bound for A:
+        A_graphs[2].plot(θspan[1:500], A_mat[:,2])
+        A_graphs[2].set(ylabel="A Bound")
+
+        savefig("AGraphs.png")
 
         #Return to original directory
         cd(original_dir)

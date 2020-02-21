@@ -1,6 +1,6 @@
 
 cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
-cd("C:\\Users\\mariagon\\Dropbox\\Reverse2")
+cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 
 using Roots
 using NLopt
@@ -26,6 +26,7 @@ include("States_NewRungeKuttaE.jl")
 #include("NewMyRungeKuttaE.jl")
 include("NewMyRungeKuttaEReverse.jl")
 
+#The file for the function that computes everything:
 include("ProblemFunction.jl")
 
 #Marginal taxes plot
@@ -38,14 +39,17 @@ pa = init_parameters();
     #Initial boundary conditions (states from the global problem)
 
     #Define proportion of agents in global problem
-    gp     =   0.8
+    gp     =   0.9
 
     ue0    =   1000.0
-    μe0    =   0.0- 1.0e-10
+    ue0    =   900.0
+    μe0    =   0.0 - 1.0e-10
     ye0    =   0.0
     λe0    =   1.0
     le0    =   0.0
     ωe0    =   0.9
+    ωe0    =   1.272054
+    ωe0    =   1.272
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
@@ -163,7 +167,6 @@ pa = init_parameters();
     margtax_e[2].set(ylabel="τ_n'")
 
 #Global Problem (Reverse)
-
     uw_end    = solutione[1,1] #guess
     μ_end     = solutione[1,2]
     e_end     = elb;
@@ -191,7 +194,6 @@ pa = init_parameters();
     using DelimitedFiles
     writedlm("SolutionNew.csv",solution,';')
 
-
     θspan = Array{Float64,1}
     θspan = collect(xlb:xstep:xub)
 
@@ -216,6 +218,29 @@ pa = init_parameters();
         taxes2=hcat(DataFrame(theta=θspan),taxes)
         CSV.write("marginal_taxes.csv",taxes2)
 
+        #Utilities:
+        utilities_prime = Array{Float64}(undef,Nspan,2);
+
+        for i=1:Nspan
+            utilities_prime[i,1] = pa.χ*controls[i,3]^(1.0+pa.ψ)/θspan[i]; #u_w
+            utilities_prime[i,2] = controlse[i,2]^pa.α*(1.0-pa.β*controlse[i,1]^pa.σ); #u_e
+        end
+
+        #A:
+        A_matrix = Array{Float64}(undef,Nspan,2);
+
+        for i=1:Nspan
+            A_matrix[i,1] = (pa.indicator*solution[i,1]^pa.ϕ-solution[i,6]*solution[i,1]) + solution[i,4]/pa.he(θspan[i],solution[i,3]); #A
+            n_full_info   = ((solution[i,6]*pa.α*solution[i,3])/solution[i,8])^(1.0/(1.0-pa.α));
+            A_matrix[i,2] = -(1.0-pa.α)/pa.α*solution[i,8]*n_full_info; #A if z is 0 and n_full_info
+        end
+
+        plot(solution[:,3], controls[:,2].^pa.α.*(1.0.-τ_prime[:,1]))
+        plot(solution[:,3], A_matrix[:,1])
+
         #Plots:
+        #graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
+        #        bound_e,τ_prime,τ_prime_e,"C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs")
         graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
-         bound_e,τ_prime,τ_prime_e,"C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs")
+                bound_e,τ_prime,τ_prime_e,"C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
+                utilities_prime,A_matrix)
