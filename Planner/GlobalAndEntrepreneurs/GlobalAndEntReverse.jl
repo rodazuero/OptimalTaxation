@@ -39,16 +39,16 @@ pa = init_parameters();
     #Initial boundary conditions (states from the global problem)
 
     #Define proportion of agents in global problem
-    gp     =   0.5
+    gp     =   0.983
 
-    ue0    =   1000.0
-    ue0    =   900.0
+    ue0    =   100.0
+    ue0    =   630.0
     μe0    =   0.0 - 1.0e-10
     ye0    =   0.0
     λe0    =   1.0
     le0    =   0.0
     ωe0    =   0.9
-    ωe0    =   0.938
+    ωe0    =   1.34232
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
@@ -164,9 +164,9 @@ pa = init_parameters();
         end
 
         #Plots:
-        graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
-               bound_e,τ_prime,τ_prime_e,"C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
-               utilities_prime,A_matrix)
+        #graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
+        #       bound_e,τ_prime,τ_prime_e,"C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
+        #       utilities_prime,A_matrix)
         graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
                 bound_e,τ_prime,τ_prime_e,"C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
                 utilities_prime,A_matrix)
