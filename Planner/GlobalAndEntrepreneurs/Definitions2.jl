@@ -139,6 +139,7 @@ function init_parameters()
     #quantile_theta_w_ub(k) = cdf(dist_marginal_w,k) - 0.8
     #θ_w_ub = find_zero(quantile_theta_w_ub, (-100.0,100.0))
     θ_w_ub = quantile(dist_marginal_w,1.0-1.0e-2) - constant;
+    #θ_w_ub = θ_w_b;
 
     #theta_e_lb
     #quantile_theta_e_lb(k) = cdf(dist_marginal_e,k) - 0.2
@@ -149,7 +150,7 @@ function init_parameters()
     #quantile_theta_e_ub(k) = cdf(dist_marginal_e,k) - 0.8
     #θ_e_ub = find_zero(quantile_theta_e_ub, (-100.0,100.0))
     θ_e_ub = quantile(dist_marginal_e,1.0-1.0e-2)-constant_e;
-    #θ_e_ub = θ_e_b-constant;
+    #θ_e_ub = θ_e_b;
 
     hw(θ,e)= ((e-θ_e_a)/(θ_e_b-θ_e_a))*(1/(θ_w_b-θ_w_a)); # h_w(θ)= F_e|w(e|θ) fw(θ)
     he(θ,e)= ((θ-θ_w_a)/(θ_w_b-θ_w_a))*(1/(θ_e_b-θ_e_a)); # h_e(e)= F_w|e(θ|e) fe(e)

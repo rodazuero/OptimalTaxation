@@ -252,9 +252,10 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         #Graphs for the utilities:
         fig, utilities=plt.subplots(1,2)
         fig.suptitle("Change in Utilities")
-            #uw_prime:
-        utilities[1].plot(θspan[1:500], utilities_prime[:,1])
-        utilities[1].set(ylabel="uw'")
+            #ue_prime:
+        utilities[1].plot(solution[:,3], A_mat[:,3])
+        utilities[1].set(ylabel="ue' in global")
+        utilities[1].set(xlabel="e(θ_w)")
             #ue_prime:
         utilities[2].plot(θespan[1:500], utilities_prime[:,2])
         utilities[2].set(ylabel="ue'")
@@ -263,11 +264,11 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
 
         #Graphs for A:
         fig, A_graphs=plt.subplots(1,2)
-        fig.suptitle("A")
+        fig.suptitle("A Graphs")
             #Value for A:
         #A_graphs = plot(θspan[1:500], A_mat[:,1], A_mat[:,2])
         #suptitle("A")
-        A_graphs[1] = plot(θspan[1:500], A_mat[:,1])
+        A_graphs[1].plot(θspan[1:500], A_mat[:,1])
         A_graphs[1].set(ylabel="A")
             #Bound for A:
         A_graphs[2].plot(θspan[1:500], A_mat[:,2])
