@@ -1,3 +1,27 @@
+
+#Basic directions#. 
+Afterwards we provide more details on each step. 
+Everything is included in the makefile. To configure the instance:
+
+make configureserver
+make installR
+make InstallRcppArmadillo
+
+After putting all the zip files and unzip in the EC2 instance. Execute:
+
+make parallelrun
+
+Recall to configure the necessary details (number of threads, etc.).  
+
+
+
+
+
+##First block##
+
+Setting up the necessary files to run the mpi. Not likely to be necessary.
+
+
 1. Go to http://mpitutorial.com/tutorials/installing-mpich2/
 2. Read the bullshit and download the mphch2:http://www.mpich.org/
 3. On the directory where the zip file is stored, run: 
