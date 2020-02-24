@@ -11,6 +11,9 @@ After putting all the zip files and unzip in the EC2 instance. Execute:
 
 make parallelrun
 
+This program will compile and execute mainTesla.cpp. 
+mainTesla.cpp is equal to the main.cpp defined to run locally but it is
+important to take into account that the dictionaries change!
 Recall to configure the necessary details (number of threads, etc.).  
 
 
