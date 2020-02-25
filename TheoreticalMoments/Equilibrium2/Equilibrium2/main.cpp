@@ -1023,7 +1023,7 @@ arma::vec EqWagesNumericVector(arma::vec Others, arma::vec WagesInit){
         printf("found minimum at f(%g) = %0.10g\n",Winitial[0], ExcessDemandValueFinal);
     }
     
-    EquilibriumValue.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2SobolsGenerated/EquilibriumValue.csv", ios::out | ios::app);
+    EquilibriumValue.open("/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/EquilibriumValue.csv", ios::out | ios::app);
     
     EquilibriumValue<<ExcessDemandValueFinal << " , " ;
     EquilibriumValue << endl;
