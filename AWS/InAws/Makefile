@@ -69,13 +69,15 @@ export OMP_NUM_THREADS=4
 
 #-------------------------------------
 #3. Include directories:
-INCDIR1=/usr/lib64/R/library/RcppArmadillo/include/
+INCDIR1=/usr/lib64/R/library/RcppArmadillo/incilude/
 INCDIR2=$(HOME)install/include/
-INCDIR3=/home/ec2-user/R/x86_64-koji-linux-gnu-library/3.4/Rcpp/include
-INCDIR4=/usr/lib64/R/include
+INCDIR3=/home/ec2-user/R/x86_64-koji-linux-gnu-library/3.4/Rcpp/include/
+INCDIR4=/usr/lib64/R/include/
+INCDIR5=/home/ec2-user/R/x86_64-koji-linux-gnu-library/3.4/RcppArmadillo/
+INCDIR6=/home/ec2-user/R/x86_64-koji-linux-gnu-library/3.4/RcppArmadillo/include
 
 #Generating the INC for all the paths ->this is for tesla
-INC=$(INCDIR1) $(INCDIR2) $(INCDIR3) $(INCDIR4)
+INC=$(INCDIR1) $(INCDIR2) $(INCDIR3) $(INCDIR4) $(INCDIR5) $(INCDIR6)
 #INC=$(INCDIR3)
 INC_PARAMS=$(foreach d, $(INC), -I$d)
 #-------------------------------------
@@ -99,7 +101,8 @@ configureserver:
 	sudo yum install gsl 
 	sudo yum install gsl-devel
 	sudo yum install gcc-c++
-
+	sudo yum install openblas
+	sudo yum install lapack
 
 installR:
 	sudo amazon-linux-extras install R3.4
