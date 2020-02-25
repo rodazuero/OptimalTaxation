@@ -5,7 +5,7 @@
 #version=1 
 
 #2. Amazon server name
-SERV=ec2-34-222-212-182
+SERV=ec2-54-149-149-122
 
 
 #3. Local directory where file is stored
@@ -15,11 +15,15 @@ DIR=
 KEYDIR=/Users/rodrigoazuero/Documents/Parallelcomputing/amazoncomputing/
 
 #5. Key name
-KEYNAME=rodazuero-key-pair-nvirginia.pem
+KEYNAME=RodrigoWashingtonDC.pem
 
 #6. File to transfer from server to pc
 FROMSERVERTOPC=/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/gitVersion/OptimalTaxation/AWS/InAws/mainTesla.cpp
+
+
 #scp -i /Users/rodrigoazuero/Documents/Parallelcomputing/amazoncomputing/rodazuero-key-pair-nvirginia.pem /Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolDim14 ec2-user@ec2-52-87-167-229.compute-1.amazonaws.com:~
+
+
 toserver:
 	scp -i $(KEYDIR)$(KEYNAME) $(FROMSERVERTOPC) ec2-user@$(SERV).compute-1.amazonaws.com:~
 	
@@ -48,7 +52,7 @@ OUTPUTSMOOTH=smooth
 OUTPUTPARALLEL=paralleloutput
 #4. Files to run in main:
 SOURCE=mainTesla.cpp
-SOURCEHOPSPACK=main_hopspack.cpp
+
 SOURCENLOPT=main_nlopt.cpp
 SOURCESMOOTH=mainSmoothingDistribution.cpp
 SOURCEPARALLEL=mainTesla.cpp
