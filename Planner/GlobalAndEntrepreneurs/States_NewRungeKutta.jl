@@ -68,7 +68,8 @@ function find_states!(du,u,pa,θ,ini)
     #dVe_de= λ*n^pa.α;=#
     #Uniform distribution
     ∂he_de = 0.0;
-    ∂hw_de = 1.0/((pa.θ_w_b-pa.θ_w_a)*(pa.θ_e_b-pa.θ_e_a));
+    #∂hw_de = 1.0/((pa.θ_w_b-pa.θ_w_a)*(pa.θ_e_b-pa.θ_e_a));
+    ∂hw_de = pa.gg(θ,e); #In the uniform case.
 
     du[1] = pa.χ*l^(1.0+pa.ψ)/θ;
     if uw > 0.0

@@ -12,7 +12,7 @@ function new_find_controls( θ, ss, pa)
     z_max  = (1.0/pa.β)^(1.0/pa.σ); #Max possible evasion.
     A_cons = (pa.indicator*ss.uw^pa.ϕ-ss.λ*ss.uw)+ss.ϕ_e/h_e;
     cond   = -(1.0-pa.α)/pa.α*ss.ω*n_full_info
-    println("A_cons = ", A_cons, "  n_full = ", n_full_info, "  condition", cond )
+    #println("A_cons = ", A_cons, "  n_full = ", n_full_info, "  condition", cond )
 
     #Defining the functions we are using:
     n_opt(z)   = 1.0/ss.ω*pa.α/(1.0-pa.α)*(ss.λ*pa.β/(1.0+pa.σ)*z^(1.0+pa.σ)-A_cons);
@@ -31,7 +31,7 @@ function new_find_controls( θ, ss, pa)
     nn_z0 = -A_cons*1.0/ss.ω*pa.α/(1.0-pa.α);
     #Defining bounds (limits of z) for cases 1 and 3:
     if nn_z0 >= n_full_info
-        
+
         println("1 case: A_cons implies n>n_full_info, z==0.")
         zz = 0.0;
         nn = nn_z0;
@@ -154,7 +154,7 @@ function new_find_controls( θ, ss, pa)
 
     #Final Output:
     #println("zz = ", zz, "nn = ", nn, "ll = ", ll, "pp = ", pp)
-    zz, nn, ll, pp
+    zz, nn, ll, pp;
 end
 
 

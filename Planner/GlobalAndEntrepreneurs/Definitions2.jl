@@ -116,8 +116,8 @@ function init_parameters()
     σ2_w = 6.0; σ_w=σ2_w^0.5;
     σ2_e = 6.0; σ_e=σ2_e^0.5;
     σ_we = 0.0;
-    constant = 0.0;
-    constant_e = 0.0;
+    constant_w_lw = 1.0e-2;
+    constant_e_lw = 1.0e-2;
 
 #Uniform distribution
     θ_e_a= μ_e-((12.0^0.5)/2)*(σ2_e^0.5);
@@ -127,63 +127,45 @@ function init_parameters()
     θ_w_a= μ_w-((12.0^0.5)/2)*(σ2_w^0.5);
     θ_w_b= μ_w+((12.0^0.5)/2)*(σ2_w^0.5);
 
-    dist_marginal_w=Uniform(θ_w_a,θ_w_b);
-    dist_marginal_e=Uniform(θ_e_a,θ_e_b);
+    dist_marginal_w = Uniform(θ_w_a,θ_w_b);
+    dist_marginal_e = Uniform(θ_e_a,θ_e_b);
 
     #theta_w_lb
     #quantile_theta_w_lb(k) = cdf(dist_marginal_w,k) - 0.2
     #θ_w_lb = find_zero(quantile_theta_w_lb, (-100.0,100.0))
-    θ_w_lb = quantile(dist_marginal_w,1.0e-2)-constant;
+    θ_w_lb = quantile(dist_marginal_w,constant_w_lw);
 
     #theta_w_ub
     #quantile_theta_w_ub(k) = cdf(dist_marginal_w,k) - 0.8
     #θ_w_ub = find_zero(quantile_theta_w_ub, (-100.0,100.0))
-    θ_w_ub = quantile(dist_marginal_w,1.0-1.0e-2) - constant;
-    #θ_w_ub = θ_w_b;
+    #θ_w_ub = quantile(dist_marginal_w,1.0-1.0e-3);
+    θ_w_ub = θ_w_b;
 
     #theta_e_lb
     #quantile_theta_e_lb(k) = cdf(dist_marginal_e,k) - 0.2
     #θ_e_lb = find_zero(quantile_theta_e_lb, (-100.0,100.0))
-    θ_e_lb = quantile(dist_marginal_e,1.0e-2)-constant_e;
+    θ_e_lb = quantile(dist_marginal_e,constant_e_lw);
 
     #theta_e_ub
     #quantile_theta_e_ub(k) = cdf(dist_marginal_e,k) - 0.8
     #θ_e_ub = find_zero(quantile_theta_e_ub, (-100.0,100.0))
-    θ_e_ub = quantile(dist_marginal_e,1.0-1.0e-2)-constant_e;
-    #θ_e_ub = θ_e_b;
+    #θ_e_ub = quantile(dist_marginal_e,1.0-1.0e-3);
+    θ_e_ub = θ_e_b;
 
-    hw(θ,e)= ((e-θ_e_a)/(θ_e_b-θ_e_a))*(1/(θ_w_b-θ_w_a)); # h_w(θ)= F_e|w(e|θ) fw(θ)
-    he(θ,e)= ((θ-θ_w_a)/(θ_w_b-θ_w_a))*(1/(θ_e_b-θ_e_a)); # h_e(e)= F_w|e(θ|e) fe(e)
-    hh(θ,e,p)= hw(θ,e) + p*he(θ,e);
+    #hw(θ,e)   = ((e-θ_e_a)/(θ_e_b-θ_e_a))*(1/(θ_w_b-θ_w_a)); # h_w(θ)= F_e|w(e|θ) fw(θ)
+    #he(θ,e)   = ((θ-θ_w_a)/(θ_w_b-θ_w_a))*(1/(θ_e_b-θ_e_a)); # h_e(e)= F_w|e(θ|e) fe(e)
+    #hh(θ,e,p) = hw(θ,e) + p*he(θ,e);
 
-    gg(θ,e) = 0.0
+    #gg(θ,e) = 1.0/((pa.θ_w_b-pa.θ_w_a)*(pa.θ_e_b-pa.θ_e_a)); #For uniform case.
+
+    cons_mod_dis = 1.0/(1.0-constant_w_lw*constant_e_lw);
+    hw(θ,e)   = (((e-θ_e_a)/(θ_e_b-θ_e_a))*(1/(θ_w_b-θ_w_a)))*cons_mod_dis; # h_w(θ)= F_e|w(e|θ) fw(θ)
+    he(θ,e)   = (((θ-θ_w_a)/(θ_w_b-θ_w_a))*(1/(θ_e_b-θ_e_a)))*cons_mod_dis; # h_e(e)= F_w|e(θ|e) fe(e)
+    hh(θ,e,p) = hw(θ,e) + p*he(θ,e);
+
+    gg(θ,e) = (1.0/((pa.θ_w_b-pa.θ_w_a)*(pa.θ_e_b-pa.θ_e_a)))*cons_mod_dis; #For uniform case.
 
     weights, nodes = gausslegendre(25);
 
     Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ϵ, ς, ϕ, G, indicator, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, weights, nodes, θ_e_a, θ_e_b, θ_w_a, θ_w_b, θ_w_lb, θ_w_ub, θ_e_lb, θ_e_ub);
 end
-
-
-
-#=function distr_hw(θ::Real, e::Real, pa::Param)
-   (N,)=size(pa.nodes);
-    b = e;
-    integral=0.0;
-    for i=1:N
-        x = (pa.nodes[i] +1.0)*b/2.0;
-        integral += pa.gg(θ,x)*pa.weights[i];
-    end
-    integral = integral*b/2.0;
-end=#
-
-
-#=function distr_he(θ::Real, e::Real, pa::Param)
-    (N,)=size(pa.nodes);
-    b = θ;
-    integral=0.0;
-    for i=1:N
-        x = (pa.nodes[i] +1.0)*b/2.0;
-        integral += pa.gg(x,e)*pa.weights[i];
-    end
-    integral = integral*b/2.0;
-end=#

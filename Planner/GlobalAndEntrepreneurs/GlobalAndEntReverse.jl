@@ -39,16 +39,17 @@ pa = init_parameters();
     #Initial boundary conditions (states from the global problem)
 
     #Define proportion of agents in global problem
-    gp     =   0.983
+    gp     =   0.989
 
-    ue0    =   100.0
+    #ue0    =   100.0
     ue0    =   630.0
+    ue0    =   585.0
     μe0    =   0.0 - 1.0e-10
     ye0    =   0.0
     λe0    =   1.0
     le0    =   0.0
-    ωe0    =   0.9
-    ωe0    =   1.34232
+    ωe0    =   1.3
+    ωe0    =   1.3
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];

@@ -56,7 +56,7 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; v
         #println("z1")
 
         A_cons = (pa.indicator*y[1]^pa.ϕ-y[6]*y[1])+y[4]/pa.he(ini[11],y[3]);
-        println("States_A_cons = ", A_cons)
+        #println("States_A_cons = ", A_cons)
 
         find_states!(z1, y, pa, θ, ini);
         any(isnan,z1) && error("z1 is NaN ")
