@@ -1246,8 +1246,6 @@ vector<vector<double> > TheoMoments(arma::vec Others, arma::vec WagesEquilibrium
             TthetaWorkerIndex[NumberWorkers]=Ttheta[0];
             WorkerIndex[NumberWorkers]=it;
             WageTotal+=Ttheta[0]*(ParamsDecision[0]*DecVector[0][2]+ParamsDecision[1]*DecVector[1][2]);
-            
-            
             NumberWorkers=NumberWorkers+1;
         }
         
