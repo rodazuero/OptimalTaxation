@@ -1,6 +1,21 @@
-function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Array{Float64},τ_prime::Array{Float64},pa)
+function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Array{Float64},tax_prime::Array{Float64},pa,θevec::Array{Float64},solvece::Array{Float64})
 
-    (Nspan,~)=size(solvec)
+    (Nspan,~) = size(solvec)
+    (Nespan,) = size(θevec)
+
+    #Defining the propostions matrix:
+    proposition1 = Array{Float64}(undef,Nspan,3)
+    proposition2 = Array{Float64}(undef,Nspan,2)
+    proposition3 = Array{Float64}(undef,Nspan,4)
+
+    #Defining the elasticities and the taxes in the θ_w_lb:
+    ε_l_1Tlpr = 1.0/pa.ψ;
+    ε_l_θw    = 1.0/pa.ψ;
+    ε_z_Tcpr  = 1.0/pa.σ;
+
+    T_c = tax_prime[1]
+    T_n = tax_prime[2]
+    T_l = tax_prime[3]
 
     for j=1:Nspan
       #Definition of states and controls:
@@ -21,48 +36,56 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
       pp    = ctrlvec[j,4];
 
       #Recover ditributions and elasticities:
-      h_e = pa.he(θ, e);
-      h_w = pa.hw(θ, e);
+      h_e     = pa.he(θ, e);
+      h_e_fix = pa.he(pa.θ_w_ub, e);
+      h_w     = pa.hw(θ, e);
+      hh      = pa.hh(θ, e, pp);
+      gg      = pa.gg(θ, e);
 
-      T_lpr = τ_prime[i,3]
-      el_z_tc = 1.0/pa.σ;
-      el_l_tl = 1.0/pa.ψ;
-      el_l_θw = 1.0/pa.ψ;
+      T_cpr = tax_prime[j,1];
+      T_npr = tax_prime[j,2];
+      T_lpr = tax_prime[j,3];
+
+      Vw = (pa.indicator*uw - λ*uw) + ω*ll*θ - λ*pa.χ/(1.0+pa.ψ)*ll^(1.0+pa.ψ);
+      Ve = (pa.indicator*uw - λ*uw) + λ*e*nn^pa.α - λ*pa.β/(1.0+pa.σ)*zz^(1.0+pa.σ) - ω*nn;
 
       #Solving the elements of the propositions:
       #1:
-      T_lpr/(1.0-T_lpr)*el_l_tl/(1.0+el_l_θw)*θ*h_w
-      #2:
-      e/(1.0-T_cpr)*T_npr/(1.0-T_npr)
+        proposition1[j,1] = (1.0-pa.indicator*pa.ϕ*uw^(pa.ϕ-1.0)/λ)*hh;
+        proposition1[j,2] = T_lpr/(1.0-T_lpr)*ε_l_1Tlpr/(1.0+ε_l_1Tlpr)*θ*h_w;
+        proposition1[j,3] = ε_z_Tcpr*zz/nn^pa.α*h_e;
 
-      #3:
-      el_z_tc*zz/nn^pa.α*h_e
+        #2:
+        proposition2[j,1] = ε_z_Tcpr*zz/nn^pa.α;
+        proposition2[j,2] = e/(1.0-T_cpr)*T_npr/(1.0+T_npr);
+
+        #3:
+        proposition3[j,1] = ε_z_Tcpr*zz/nn^pa.α*h_e;
+        proposition3[j,2] = 1.0/λ*(Vw-Ve)*gg*1.0/(nn^pa.α*(1.0-pa.β*zz^pa.σ));
+        proposition3[j,3] = (1.0-pa.indicator*pa.ϕ*uw^(pa.ϕ-1.0)/λ)*h_e_fix;
 
     end
-end
 
-
-function marginal_taxese(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Array{Float64},pa)
-
-    (Nspan,~)=size(solvec)
-
-    for j=1:Nspan
+    for j=1:Nespan
       #Definition of states and controls:
-      θ = θvec[j];
+      θe = θevec[j];
 
-      ue    = solvec[j,1];
-      μe    = solvec[j,2];
-      ye    = solvec[j,3];
-      λe    = solvec[j,4];
-      le    = solvec[j,5];
-      ωe    = solvec[j,6];
+      ue    = solvece[j,1];
+      μe    = solvece[j,2];
+      ye    = solvece[j,3];
+      λe    = solvece[j,4];
+      le    = solvece[j,5];
+      ωe    = solvece[j,6];
 
-      zz    = ctrlvec[j,1];
-      nn    = ctrlvec[j,2];
+      #Recover ditributions and elasticities:
+      h_e_fix = pa.he(pa.θ_w_ub, θe);
 
-      #Find the marginal taxes:
-      τ_prime_e[j,1] = pa.β*zz^pa.σ; #τ_c_prime
-      τ_prime_e[j,2] = (λe*pa.α*θ*nn^(pa.α-1)-ωe)/ωe; #τ_n_prime
+        #3:
+        proposition3[j,4] = (1.0-pa.indicator*pa.ϕ*ue^(pa.ϕ-1.0)/λe)*h_e_fix;
 
     end
+
+    #Returns of the function:
+    proposition1, proposition2, proposition3;
+
 end
