@@ -5,15 +5,22 @@ Everything is included in the makefile. To configure the instance:
 
 make configureserver
 make installR
-make InstallRcppArmadillo
+make InstallRcppArmadillo //If command does not run, install directly from R >install.packages('RcppArmadillo') and load library.
+
 
 After putting all the zip files and unzip in the EC2 instance. Execute:
 
 make parallelrun
 
+
+
 This program will compile and execute mainTesla.cpp. 
 mainTesla.cpp is equal to the main.cpp defined to run locally but it is
-important to take into account that the dictionaries change!
+important to take into account that the dictionaries change and some function definitions also are modified. 
+Careful! Only modify the corresponding functions from main.cpp to mainTesla.cpp. 
+(Example void SobolRun is loaded differently to guarantee succesful parallelization). 
+A copy and paste ALL approach might fail since functions are sometimes defined differently. Modify simultaneously main.cpp and mainTesla.cpp
+
 Recall to configure the necessary details (number of threads, etc.).  
 
 
