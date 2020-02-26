@@ -48,7 +48,8 @@ function find_states!(du,u,pa,θ,ini)
     ss = State(ini[3], ini[1], ini[4], ini[2], ini[6], ini[8]);
 
     #Find optimal controls
-    (z, n, l, p) = new_find_controls( ini[11], ss, pa);
+    #(z, n, l, p) = new_find_controls( ini[11], ss, pa);
+    (z, n, l, p) = new_find_controlsChangeE( ini[11], ss, pa);
     println("z = ", z, "n = ", n, "l = ", l, "p = ", p)
     any(isnan,(z, n, l, p)) && error("Function find_states gets NaN controls")
 
@@ -68,8 +69,8 @@ function find_states!(du,u,pa,θ,ini)
     #dVe_de= λ*n^pa.α;=#
     #Uniform distribution
     ∂he_de = 0.0;
-    #∂hw_de = 1.0/((pa.θ_w_b-pa.θ_w_a)*(pa.θ_e_b-pa.θ_e_a));
-    ∂hw_de = pa.gg(θ,e); #In the uniform case.
+    ∂hw_de = 1.0/((pa.θ_w_b-pa.θ_w_a)*(pa.θ_e_b-pa.θ_e_a));
+    #∂hw_de = pa.gg(θ,e); #In the uniform case.
 
     du[1] = pa.χ*l^(1.0+pa.ψ)/θ;
     if uw > 0.0
@@ -87,6 +88,33 @@ function find_states!(du,u,pa,θ,ini)
     du[10]= e*n^pa.α*p*h_e - pa.β*z^(1+pa.σ)/(1+pa.σ)*p*h_e; #Production - evasion
 
     println("ϕ_e' =", du[4], "u_w' =", du[1])
+
+    nothing
+end
+
+function find_statesChangeE!(du,u,pa,θ,ini)
+    μ     = u[1];
+    e     = u[2];
+
+    #Construct state object
+    #ss = State(e, uw, ϕ_e, μ, λ, ω);
+    ss = State(ini[3], ini[1], ini[4], ini[2], ini[6], ini[8]);
+
+    #Find optimal controls
+    #(z, n, l, p) = new_find_controls( ini[11], ss, pa);
+    (p) = new_find_controlsChangeE( ini[11], ss, pa);
+
+    h_e   =  pa.he( θ, e);
+    h_w   =  pa.hw( θ, e);
+    h_tot = h_w + p*h_e;
+
+    if uw > 0.0
+        du[1] = λ*h_tot;
+    else
+        du[1] = Inf;
+    end
+
+    du[2] = p;
 
     nothing
 end

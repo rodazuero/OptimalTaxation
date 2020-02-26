@@ -129,20 +129,10 @@ function init_parameters()
     dist_marginal_e = Uniform(θ_e_a,θ_e_ub);
 
     #theta_w_lb
-    #quantile_theta_w_lb(k) = cdf(dist_marginal_w,k) - 0.2
-    #θ_w_lb = find_zero(quantile_theta_w_lb, (-100.0,100.0))
     θ_w_lb = quantile(dist_marginal_w,constant_w_lw);
 
     #theta_e_lb
-    #quantile_theta_e_lb(k) = cdf(dist_marginal_e,k) - 0.2
-    #θ_e_lb = find_zero(quantile_theta_e_lb, (-100.0,100.0))
     θ_e_lb = quantile(dist_marginal_e,constant_e_lw);
-
-    #hw(θ,e)   = ((e-θ_e_a)/(θ_e_b-θ_e_a))*(1/(θ_w_b-θ_w_a)); # h_w(θ)= F_e|w(e|θ) fw(θ)
-    #he(θ,e)   = ((θ-θ_w_a)/(θ_w_b-θ_w_a))*(1/(θ_e_b-θ_e_a)); # h_e(e)= F_w|e(θ|e) fe(e)
-    #hh(θ,e,p) = hw(θ,e) + p*he(θ,e);
-
-    #gg(θ,e) = 1.0/((pa.θ_w_b-pa.θ_w_a)*(pa.θ_e_b-pa.θ_e_a)); #For uniform case.
 
     cons_mod_dis = 1.0/(1.0-constant_w_lw*constant_e_lw);
     hw(θ,e)   = (((e-θ_e_a)/(θ_e_ub-θ_e_a))*(1/(θ_w_ub-θ_w_a)))*cons_mod_dis; # h_w(θ)= F_e|w(e|θ) fw(θ)

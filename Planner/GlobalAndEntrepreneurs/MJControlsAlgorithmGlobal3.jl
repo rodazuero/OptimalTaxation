@@ -159,6 +159,19 @@ end
 
 
 
+function new_find_controlsChangeE( θ, ss, pa)
+    #INPUT: states and parameters
+    #OUTPUT: optimal controls
+
+    par  = 3.0;
+    cons = 5.0;
+
+    pp = (1.0+par)*cons*(θ-pa.θ_w_lb)^par
+
+    pp;
+end
+
+
 function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solvec::Array{Float64})
     (Nspan,~)=size(solvec)
 
@@ -172,7 +185,8 @@ function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solve
       ω     = solvec[j,8];
       ss    = State(e, uw, ϕ_e, μ, λ, ω);
 
-      (zz, nn, ll, pp) = new_find_controls( θ, ss, pa)
+      #(zz, nn, ll, pp) = new_find_controls( θ, ss, pa)
+      (zz, nn, ll, pp) = new_find_controlsChangeE( θ, ss, pa)
       ctrlvec[j,1] = zz;
       ctrlvec[j,2] = nn;
       ctrlvec[j,3] = ll;
