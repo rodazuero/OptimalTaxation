@@ -206,13 +206,31 @@ pa = init_parameters();
             A_matrix[i,3] = controls[i,2]^pa.α*(1.0-τ_prime[i,1]); #u_e in global
         end
 
+        #Max evasion:
+        mat_for_z = Array{Float64}(undef,Nspan,4);
+
+        for i=1:Nspan
+            mat_for_z[i,1] = (solution[i,6]*solution[i,3]*controls[i,2]-solution[i,8]*controls[i,2]); #Max posible evasion.
+            mat_for_z[i,2] = controls[i,1]; #Evasion in model.
+            mat_for_z[i,3] = (solutione[i,4]*θespan[i]*controlse[i,2]-solutione[i,6]*controlse[i,2]); #Max posible evasion.
+            mat_for_z[i,4] = controlse[i,1]; #Evasion in model.
+        end
+
         #Plots:
         #graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
         #       bound_e,τ_prime,τ_prime_e,"C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
         #       utilities_prime,A_matrix)
         graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
                 bound_e,τ_prime,τ_prime_e,"C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
-                utilities_prime,A_matrix)
+                utilities_prime,A_matrix,mat_for_z)
+
+
+
+
+
+                estados_e[1,2].plot(θespan[1:500], repeat([0],500), "tab:green")
+                #estados_e[1,2].set_title("μe")
+                estados_e[1,2].set(ylabel="μe")
 
 
 

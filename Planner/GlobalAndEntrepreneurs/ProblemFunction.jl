@@ -46,7 +46,7 @@ function complete_problem!(solution::Array{Float64},solutione::Array{Float64},co
 end
 
 
-function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Array{Float64},controlse::Array{Float64}, θspan, θespan, thetaw_ub, bound_e,τ_prime::Array{Float64},τ_prime_e::Array{Float64},dir::AbstractString,utilities_prime::Array{Float64},A_mat::Array{Float64})
+function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Array{Float64},controlse::Array{Float64}, θspan, θespan, thetaw_ub, bound_e,τ_prime::Array{Float64},τ_prime_e::Array{Float64},dir::AbstractString,utilities_prime::Array{Float64},A_mat::Array{Float64},mat_z::Array{Float64})
 
         rc("font", family="serif")
         original_dir=pwd()
@@ -275,6 +275,24 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         A_graphs[2].set(ylabel="A Bound")
 
         savefig("AGraphs.png")
+
+        #Graphs for Z:
+        fig, Z_graphs=plt.subplots(2,2)
+        fig.suptitle("Evasion Graphs")
+            #Value for max possible evasion:
+            Z_graphs[1,1].plot(θspan[:], mat_z[:,1])
+            Z_graphs[1,1].set(ylabel="λen^α - ωn",xlabel="θw")
+            #Evasion in model:
+            Z_graphs[1,2].plot(θspan[:], mat_z[:,2])
+            Z_graphs[1,2].set(ylabel="z",xlabel="θw")
+            #Value for max possible evasion:
+            Z_graphs[2,1].plot(θespan[:], mat_z[:,3])
+            Z_graphs[2,1].set(ylabel="λθen^α - ωn",xlabel="θe")
+            #Evasion in model:
+            Z_graphs[2,2].plot(θespan[:], mat_z[:,4])
+            Z_graphs[2,2].set(ylabel="z",xlabel="θe")
+
+            savefig("zGraphs.png")
 
         #Return to original directory
         cd(original_dir)
