@@ -51,13 +51,33 @@ mutable struct Param
 end
 
 mutable struct State
-    μ::Float64
     e::Float64 #Threshold function
+    uw::Float64 #Utility
+    ϕ_e::Float64
+    μ::Float64
+    λ::Float64
+    ω::Float64
 end
 
 mutable struct Control
+    n::Float64
     p::Float64
+    z::Float64
+    l::Float64
 end
+
+mutable struct StateE
+    ue::Float64 #Utility
+    μe::Float64
+    λe::Float64
+    ωe::Float64
+end
+
+mutable struct ControlE
+    ze::Float64
+    ne::Float64
+end
+
 
 #Constructor for the parameters
 function init_parameters()
@@ -83,13 +103,21 @@ function init_parameters()
     #indicator = 1; #The Utilitarian case
 
     ## Distributions:
+    #μ_w = 1.7626;
+    #μ_e = 1.2528;
+    #σ2_w = 1.0921; σ_w=σ2_w^0.5;
+    #σ2_e = 1.1675; σ_e=σ2_e^0.5;
+    #σ_we = 0.0;
+
     μ_w = 10.0;
     μ_e = 10.0;
     σ2_w = 6.0; σ_w=σ2_w^0.5;
     σ2_e = 6.0; σ_e=σ2_e^0.5;
     σ_we = 0.0;
-    constant_w_lw = 1.0e-2;
-    constant_e_lw = 1.0e-2;
+    constant_w_lw = 0.0;
+    #1.0e-2;
+    constant_e_lw = 0.0;
+    #1.0e-2;
 
 #Uniform distribution
     θ_e_a  = μ_e-((12.0^0.5)/2)*(σ2_e^0.5);
@@ -109,11 +137,11 @@ function init_parameters()
     θ_e_lb = quantile(dist_marginal_e,constant_e_lw);
 
     cons_mod_dis = 1.0/(1.0-constant_w_lw*constant_e_lw);
-    hw(θ,e)   = (((e-θ_e_a)/(θ_e_ub-θ_e_a))*(1/(θ_w_ub-θ_w_a)))*cons_mod_dis; # h_w(θ)= F_e|w(e|θ) fw(θ)
-    he(θ,e)   = (((θ-θ_w_a)/(θ_w_ub-θ_w_a))*(1/(θ_e_ub-θ_e_a)))*cons_mod_dis; # h_e(e)= F_w|e(θ|e) fe(e)
+    hw(θ,e)   = (e-θ_e_a)/(θ_e_ub-θ_e_a)/(θ_w_ub-θ_w_a)*cons_mod_dis; # h_w(θ)= F_e|w(e|θ) fw(θ)
+    he(θ,e)   = (θ-θ_w_a)/(θ_w_ub-θ_w_a)/(θ_e_ub-θ_e_a)*cons_mod_dis; # h_e(e)= F_w|e(θ|e) fe(e)
     hh(θ,e,p) = hw(θ,e) + p*he(θ,e);
 
-    gg(θ,e) = (1.0/((pa.θ_w_ub-pa.θ_w_a)*(pa.θ_e_ub-pa.θ_e_a)))*cons_mod_dis; #For uniform case.
+    gg(θ,e) = 1.0/(θ_w_ub-θ_w_a)/(θ_e_ub-θ_e_a)*cons_mod_dis; #For uniform case.
 
     weights, nodes = gausslegendre(25);
 

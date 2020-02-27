@@ -1,5 +1,5 @@
 
-function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; verbose = false)
+function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step, pa, par, cons; verbose = false)
     #
     solution[end,:] = y_end
 
@@ -29,19 +29,19 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; v
         ini[2] = solution[Nspan+1-i,2]  # e
         ini[3] = θ  #Actual θ_w;
 
-        find_states!(z1, y, pa, θ, ini);
+        find_states!(z1, y, pa, θ, ini, par, cons);
         any(isnan,z1) && error("z1 is NaN ")
 
         #println("z2")
-        find_states!(z2, y+0.5*step*z1, pa, x+0.5*step, ini );
+        find_states!(z2, y+0.5*step*z1, pa, x+0.5*step, ini, par, cons);
         any(isnan,z2) && error("z2 is NaN ")
 
         #println("z3")
-        find_states!(z3, y+0.5*step*z2, pa, x+0.5*step, ini );
+        find_states!(z3, y+0.5*step*z2, pa, x+0.5*step, ini, par, cons);
         any(isnan,z3) && error("z3 is NaN ")
 
         #println("z4")
-        find_states!(z4, y+step*z3, pa, x+step, ini);
+        find_states!(z4, y+step*z3, pa, x+step, ini, par, cons);
         any(isnan,z4) && error("z4 is NaN ")
 
         #Update vector of states
