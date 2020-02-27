@@ -214,6 +214,10 @@ pa = init_parameters();
                 bound_e,τ_prime,τ_prime_e,"C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
                 utilities_prime,A_matrix)
 
+
+
+
+
                 proposition1 = Array{Float64}(undef,Nspan,3)
                 proposition2 = Array{Float64}(undef,Nspan,2)
                 proposition3 = Array{Float64}(undef,Nspan,4)
