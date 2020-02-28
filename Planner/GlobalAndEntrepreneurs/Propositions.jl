@@ -94,7 +94,7 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
     proposition3[:,2] = sol_int;
 
     to_integrate = proposition3[:,3];
-    sol_int = integrals(to_integrate,θespan);
+    sol_int = integrals(to_integrate,θspan);
     proposition3[:,3] = sol_int;
 
     to_integrate = proposition3[:,4];
