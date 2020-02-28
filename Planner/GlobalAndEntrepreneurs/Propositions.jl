@@ -6,7 +6,7 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
     #Defining the propostions matrix:
     proposition1 = Array{Float64}(undef,Nspan,3)
     proposition2 = Array{Float64}(undef,Nspan,2)
-    proposition3 = Array{Float64}(undef,Nspan,4)
+    proposition3 = Array{Float64}(undef,Nspan,5)
 
     #Defining the elasticities and the taxes in the θ_w_lb:
     ε_l_1Tlpr = 1.0/pa.ψ;
@@ -61,9 +61,8 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
 
         #3:
         proposition3[j,1] = ε_z_Tcpr*zz/nn^pa.α*h_e;
-        proposition3[j,2] = 1.0/λ*(Vw-Ve)*gg*1.0/(nn^pa.α*(1.0-pa.β*zz^pa.σ));
-        proposition3[j,3] = (1.0-pa.indicator*pa.ϕ*uw^(pa.ϕ-1.0)/λ)*h_e_fix;
-
+        proposition3[j,2] = 1.0/λ*(Ve-Vw)*gg*1.0/(nn^pa.α*(1.0-pa.β*zz^pa.σ));
+        proposition3[j,3] = (1.0-pa.indicator*pa.ϕ*uw^(pa.ϕ-1.0)/λ)*h_e*pp;
     end
 
     for j=1:Nespan
@@ -84,6 +83,25 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
         proposition3[j,4] = (1.0-pa.indicator*pa.ϕ*ue^(pa.ϕ-1.0)/λe)*h_e_fix;
 
     end
+
+    #We have to get the values of the integrals:
+    to_integrate = proposition1[:,1];
+    sol_int = integrals(to_integrate,θspan);
+    proposition1[:,1] = sol_int;
+
+    to_integrate = proposition3[:,2];
+    sol_int = integrals(to_integrate,θspan);
+    proposition3[:,2] = sol_int;
+
+    to_integrate = proposition3[:,3];
+    sol_int = integrals(to_integrate,θespan);
+    proposition3[:,3] = sol_int;
+
+    to_integrate = proposition3[:,4];
+    sol_int = integrals(to_integrate,θespan);
+    proposition3[:,4] = sol_int;
+
+    proposition3[:,5] = proposition3[:,3]+proposition3[:,4];
 
     #Returns of the function:
     proposition1, proposition2, proposition3;

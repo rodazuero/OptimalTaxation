@@ -34,6 +34,7 @@ include("marginal_taxes.jl")
 
 #Propositions:
 include("Propositions.jl")
+include("Integrals.jl")
 
 #Define values for the model parameters
 pa = init_parameters();
@@ -90,20 +91,20 @@ pa = init_parameters();
     τ_prime_e = Array{Float64}(undef,Nspan,2);
     marginal_taxese(controlse, θespan, solutione, pa);
 
-    TaxesE = Array{Float64}(undef,Nspan,2);
-    taxes_pathe(controlse, θespan, solutione, pa)
 
-    fig, tax_e=plt.subplots(1,2)
-    fig.suptitle("Taxes Path")
+
+    #TaxesE = Array{Float64}(undef,Nspan,2);
+    #taxes_pathe(controlse, θespan, solutione, pa)
+
+    #fig, tax_e=plt.subplots(1,2)
+    #fig.suptitle("Taxes Path")
         #τ_c:
-    tax_e[1].plot(θespan[1:500], TaxesE[:,1])
-    tax_e[1].set(ylabel="τ_c")
+    #tax_e[1].plot(θespan[1:500], TaxesE[:,1])
+    #tax_e[1].set(ylabel="τ_c")
         #τ_n:
-    tax_e[2].plot(θespan[1:500], TaxesE[:,2])
-    tax_e[2].set(ylabel="τ_n")
+    #tax_e[2].plot(θespan[1:500], TaxesE[:,2])
+    #tax_e[2].set(ylabel="τ_n")
 
-
-    (θespan[2]-θespan[1])/2.0*(pa.β*controlse[1,1]^pa.σ + pa.β*controlse[2,1]^pa.σ)
     #taxese = DataFrame(τ_prime_e)
     #names!(taxese,[:tau_c, :tau_n] )
     #taxes2e=hcat(DataFrame(theta=θespan),taxese)
@@ -161,28 +162,29 @@ pa = init_parameters();
         τ_prime = Array{Float64}(undef,Nspan,3);
         marginal_taxes(controls, θspan, solution, pa)
 
-        taxes_path(controls, θspan, solution, pa);
-
-        ctrlvec = controls
-        θvec = θspan
-        solvec = solution
 
 
-        fig, tax=plt.subplots(1,3)
-        fig.suptitle("Taxes")
+        #taxes_path(controls, θspan, solution, pa);
+
+        #ctrlvec = controls
+        #θvec = θspan
+        #solvec = solution
+
+        #fig, tax=plt.subplots(1,3)
+        #fig.suptitle("Taxes")
             #τ_c:
-        tax[1,1].plot(θspan[1:500], Taxes[:,1])
-        tax[1,1].set(ylabel="τ_c'")
+        #tax[1,1].plot(θspan[1:500], Taxes[:,1])
+        #tax[1,1].set(ylabel="τ_c'")
             #τ_n:
-        tax[2].plot(θspan[1:500], Taxes[:,2])
-        tax[2].set(ylabel="τ_n'")
+        #tax[2].plot(θspan[1:500], Taxes[:,2])
+        #tax[2].set(ylabel="τ_n'")
             #τ_l:
-        tax[3].plot(θspan[1:500], Taxes[:,3])
-        tax[3].set(ylabel="τ_l'")
+        #tax[3].plot(θspan[1:500], Taxes[:,3])
+        #tax[3].set(ylabel="τ_l'")
 
-θ*ω-λ*pa.χ*ll^pa.ψ
-θspan[1]*solution[1,8]-pa.χ*controls[1,3]^pa.ψ
-θspan[1]*solution[1,8]/solution[1,6]*controls[1,3]-pa.χ/(1.0+pa.ψ)*controls[1,3]^(1.0+pa.ψ)-solution[1,1]
+
+
+
         #taxes = DataFrame(τ_prime)
         #names!(taxes,[:tau_c, :tau_n, :tau_l] )
         #taxes2=hcat(DataFrame(theta=θspan),taxes)
@@ -210,11 +212,18 @@ pa = init_parameters();
         mat_for_z = Array{Float64}(undef,Nspan,4);
 
         for i=1:Nspan
-            mat_for_z[i,1] = (solution[i,6]*solution[i,3]*controls[i,2]-solution[i,8]*controls[i,2]); #Max posible evasion.
+            mat_for_z[i,1] = (solution[i,6]*solution[i,3]*controls[i,2]^pa.α-solution[i,8]*controls[i,2]); #Max posible evasion.
             mat_for_z[i,2] = controls[i,1]; #Evasion in model.
-            mat_for_z[i,3] = (solutione[i,4]*θespan[i]*controlse[i,2]-solutione[i,6]*controlse[i,2]); #Max posible evasion.
+            mat_for_z[i,3] = (solutione[i,4]*θespan[i]*controlse[i,2]^pa.α-solutione[i,6]*controlse[i,2]); #Max posible evasion.
             mat_for_z[i,4] = controlse[i,1]; #Evasion in model.
         end
+
+        #Getting the propositions:
+        proposition1 = Array{Float64}(undef,Nspan,3);
+        proposition2 = Array{Float64}(undef,Nspan,2);
+        proposition3 = Array{Float64}(undef,Nspan,5);
+
+        (proposition1, proposition2, proposition3) = propositions(controls,θspan,solution,τ_prime,pa,θespan,solutione);
 
         #Plots:
         #graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
@@ -222,46 +231,4 @@ pa = init_parameters();
         #       utilities_prime,A_matrix)
         graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
                 bound_e,τ_prime,τ_prime_e,"C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
-                utilities_prime,A_matrix,mat_for_z)
-
-
-
-
-
-                estados_e[1,2].plot(θespan[1:500], repeat([0],500), "tab:green")
-                #estados_e[1,2].set_title("μe")
-                estados_e[1,2].set(ylabel="μe")
-
-
-
-
-
-                proposition1 = Array{Float64}(undef,Nspan,3)
-                proposition2 = Array{Float64}(undef,Nspan,2)
-                proposition3 = Array{Float64}(undef,Nspan,4)
-        (proposition1, proposition2, proposition3) = propositions(controls,θspan,solution,τ_prime,pa,θespan,solutione)
-
-int = proposition1[:,1]
-(sum(int)-0.5*int[1]-0.5*int[end])*(θspan[end]-θspan[1])/(Nspan-1.0)
-
-*(1.0-pa.constant_w_lw*pa.constant_e_lw);
-
-int1 = proposition3[:,3]
-int2 = proposition3[:,4]
-
-sum(int1)
-sum(int2)
-(sum(int2)-0.5*int2[1]-0.5*int2[end])*(θspan[end]-θspan[1])/(Nspan-1.0)*(1.0-pa.constant_w_lw*pa.constant_e_lw);
-
-
-mus = Array{Float64}(undef,Nspan,2)
-
-for i =1:Nspan
-    θ = θspan[i]
-    e = solution[i,3]
-
-    mus[i,1] = solution[i,2]
-    mus[i,2] = (1.0-((e-pa.θ_e_a)*(θ-pa.θ_w_a))/((pa.θ_e_ub-pa.θ_e_a)*(pa.θ_w_ub-pa.θ_w_a)))/0.9999 + solution[i,2]
-end
-
-plot(mus[:,2])
+                utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3)
