@@ -56,6 +56,14 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
 
         #Global problem:
 
+            #Full information
+            n_full = Array{Float64}(undef,Nspan,1);
+            l_full = Array{Float64}(undef,Nspan,1);
+            for i=1:Nspan
+                n_full[i]=(pa.α*solution[i,3]/solution[i,8])^(1.0/(1.0-pa.α))
+                l_full[i]=((θspan[i]*solution[i,8])/(solution[i,6]*pa.χ))^(1.0/pa.ψ)
+            end
+
             #States
             fig, estados=plt.subplots(4,2)
             fig.suptitle("Optimal States - Global Problem")
@@ -126,13 +134,17 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             #controles[1,1].set_title("z")
             controles[1,1].set(ylabel="z")
                 #n:
-            controles[1,2].plot(θspan[1:500], controls[1:500,2])
-            #controles[1,2].set_title("n")
-            controles[1,2].set(ylabel="n")
+           controles[1,2].plot(θspan[1:500], controls[1:500,2])
+           controles[1,2].plot(θspan[1:500], n_full[1:500], linestyle="--")
+           #controles[1,2].set_title("n")
+           controles[1,2].set(ylabel="n")
+           controles[1,2].legend(["n","n full info"],loc="upper left")
                 #l:
             controles[2,1].plot(θspan[1:500], controls[1:500,3])
+            controles[2,1].plot(θspan[1:500], l_full[1:500], linestyle="--")
             #controles[2,1].set_title("l")
             controles[2,1].set(ylabel="l")
+            controles[2,1].legend(["l","l full info"],loc="upper left")
                 #p:
             controles[2,2].plot(θspan[1:500], controls[1:500,4])
             #controles[2,2].set_title("p")
@@ -163,6 +175,12 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             savefig("MarginalTaxes.png")
 
         #Entrepreneurs problem:
+
+        #Full information
+           n_full_e = Array{Float64}(undef,Nspan,1);
+           for i=1:Nspan
+               n_full_e[i]=(pa.α*θespan[i]/solutione[i,6])^(1.0/(1.0-pa.α))
+           end
 
         #States
         fig, estados_e=plt.subplots(3,2)
@@ -226,8 +244,10 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         controles_e[1,1].set(ylabel="ze")
             #ne:
         controles_e[2].plot(θespan[1:500], controlse[:,2])
+        controles_e[2].plot(θespan[1:500], n_full_e[1:500], linestyle="--")
         #controles_e[1].set_title("ne")
         controles_e[2].set(ylabel="ne")
+        controles_e[2].legend(["n","n full info"],loc="upper left")
 
         #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\ControlsEntrepreneurs.png")
         #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\ControlsEntrepreneurs.png")
@@ -356,6 +376,73 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             prop3[3].legend(["εz z/n^α he","1/λ [Ve-Vw] g 1/ue'","λ he p"],loc="upper right")
 
             savefig("proposition3.png")
+
+
+            #Graphs for all the span of entrepreneurs (both problems)
+            θe_all=vcat(solution[:,3],θespan)
+
+            #States
+            fig, estados_e=plt.subplots(3,2)
+            fig.suptitle("Optimal States")
+                #u_e:
+            estados_e[1,1].plot(θe_all, vcat(solution[1:500,1],solutione[1:500,1]))
+            #estados_e[1,1].set_title("u_e")
+            estados_e[1,1].set(ylabel="u_e")
+                #μ_e:
+            estados_e[1,2].plot(θe_all, vcat(solution[1:500,2],solutione[1:500,2]))
+            estados_e[1,2].plot(θe_all, repeat([0],1000), "tab:green")
+            #estados_e[1,2].set_title("μe")
+            estados_e[1,2].set(ylabel="μe")
+                #Y_e:
+            estados_e[2,1].plot(θe_all, vcat(solution[1:500,5],solutione[1:500,3]))
+            estados_e[2,1].plot(θe_all, repeat([0.15],1000), "tab:green")
+            #estados_e[2,1].set_title("Ye")
+            estados_e[2,1].set(ylabel="Ye")
+                #λ_e:
+            estados_e[2,2].plot(θe_all, vcat(solution[1:500,6],solutione[1:500,4]))
+            #estados_e[2,2].set_title("λe")
+            estados_e[2,2].set(ylabel="λe")
+                #L_e:
+            estados_e[3,1].plot(θe_all, vcat(solution[1:500,7],solutione[1:500,5]))
+            estados_e[3,1].plot(θe_all, repeat([0],1000), "tab:green")
+            #estados_e[3,1].set_title("Le")
+            estados_e[3,1].set(ylabel="Le")
+                #ω:
+            estados_e[3,2].plot(θe_all, vcat(solution[1:500,8],solutione[1:500,6]))
+            #estados_e[3,2].set_title("ωe")
+            estados_e[3,2].set(ylabel="ωe")
+
+            savefig("StatesAll.png")
+
+            #Controls
+            fig, controles_e=plt.subplots(1,2)
+            fig.suptitle("Optimal Controls")
+                #ze:
+            controles_e[1,1].plot(θe_all, vcat(controls[1:500,1],controlse[1:500,1]))
+            #controles_e[1,1].set_title("ze")
+            controles_e[1,1].set(ylabel="ze")
+                #ne:
+            controles_e[2].plot(θe_all, vcat(controls[1:500,2],controlse[1:500,2]))
+            controles_e[2].plot(θe_all, vcat(n_full[1:500],n_full_e[1:500]), linestyle="--")
+            #controles_e[1].set_title("ne")
+            controles_e[2].set(ylabel="ne")
+            controles_e[2].legend(["n","n full info"],loc="upper left")
+
+            savefig("ControlsAll.png")
+
+            #Marginal taxes:
+            fig, margtax_e=plt.subplots(1,2)
+            fig.suptitle("Marginal Taxes")
+                #τ_c_prime:
+            margtax_e[1].plot(θe_all, vcat(τ_prime[:,1],τ_prime_e[:,1]))
+            #margtax_e[1].set_title("τ_c'")
+            margtax_e[1].set(ylabel="τ_c'")
+                #τ_n_prime:
+            margtax_e[2].plot(θe_all, vcat(τ_prime[:,2],τ_prime_e[:,2]))
+            #margtax_e[2].set_title("τ_n'")
+            margtax_e[2].set(ylabel="τ_n'")
+
+            savefig("MarginalTaxesAll.png")
 
         #Taxes liabilities:
         fig, tax=plt.subplots(2,3)
