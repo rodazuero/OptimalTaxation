@@ -4,9 +4,9 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
     (Nespan,) = size(θevec)
 
     #Defining the propostions matrix:
-    proposition1 = Array{Float64}(undef,Nspan,3)
-    proposition2 = Array{Float64}(undef,Nspan,2)
-    proposition3 = Array{Float64}(undef,Nspan,5)
+    proposition1 = fill(NaN,Nspan,4)
+    proposition2 = fill(NaN,Nspan,2)
+    proposition3 = fill(NaN,Nspan,6)
 
     #Defining the elasticities and the taxes in the θ_w_lb:
     ε_l_1Tlpr = 1.0/pa.ψ;
@@ -70,11 +70,7 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
       θe = θevec[j];
 
       ue    = solvece[j,1];
-      μe    = solvece[j,2];
-      ye    = solvece[j,3];
       λe    = solvece[j,4];
-      le    = solvece[j,5];
-      ωe    = solvece[j,6];
 
       #Recover ditributions and elasticities:
       h_e_fix = pa.he(pa.θ_w_ub, θe);
@@ -85,23 +81,26 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
     end
 
     #We have to get the values of the integrals:
-    to_integrate = proposition1[:,1];
-    sol_int = integrals(to_integrate,θspan);
+    method            = 1;
+    to_integrate      = proposition1[:,1];
+    sol_int           = integrals(to_integrate,θspan,method);
     proposition1[:,1] = sol_int;
 
-    to_integrate = proposition3[:,2];
-    sol_int = integrals(to_integrate,θspan);
+    to_integrate      = proposition3[:,2];
+    sol_int           = integrals(to_integrate,θspan,method);
     proposition3[:,2] = sol_int;
 
-    to_integrate = proposition3[:,3];
-    sol_int = integrals(to_integrate,θspan);
+    to_integrate      = proposition3[:,3];
+    sol_int           = integrals(to_integrate,θspan,method);
     proposition3[:,3] = sol_int;
 
-    to_integrate = proposition3[:,4];
-    sol_int = integrals(to_integrate,θespan);
+    to_integrate      = proposition3[:,4];
+    sol_int           = integrals(to_integrate,θespan,method);
     proposition3[:,4] = sol_int;
 
-    proposition3[:,5] = proposition3[:,3]+proposition3[:,4];
+    proposition1[:,4] = proposition1[:,2]+proposition1[:,3];
+    proposition3[:,5] = proposition3[:,1]+proposition3[:,2];
+    proposition3[:,6] = proposition3[:,3]+proposition3[:,4];
 
     #Returns of the function:
     proposition1, proposition2, proposition3;

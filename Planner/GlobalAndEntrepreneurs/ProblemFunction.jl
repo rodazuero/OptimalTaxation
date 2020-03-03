@@ -46,7 +46,7 @@ function complete_problem!(solution::Array{Float64},solutione::Array{Float64},co
 end
 
 
-function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Array{Float64},controlse::Array{Float64}, θspan::Array{Float64}, θespan::Array{Float64}, thetaw_ub, bound_e, τ_prime::Array{Float64},τ_prime_e::Array{Float64},dir::AbstractString,utilities_prime::Array{Float64},A_mat::Array{Float64},mat_z::Array{Float64},proposition1::Array{Float64},proposition2::Array{Float64},proposition3::Array{Float64})
+function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Array{Float64},controlse::Array{Float64}, θspan::Array{Float64}, θespan::Array{Float64}, thetaw_ub, bound_e, τ_prime::Array{Float64},τ_prime_e::Array{Float64},dir::AbstractString,utilities_prime::Array{Float64},A_mat::Array{Float64},mat_z::Array{Float64},proposition1::Array{Float64},proposition2::Array{Float64},proposition3::Array{Float64},taxes::Array{Float64},taxes_ent::Array{Float64})
 
         rc("font", family="serif")
         original_dir=pwd()
@@ -160,7 +160,7 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
 
             #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\Taxes.png")
             #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\Taxes.png")
-            savefig("Taxes.png")
+            savefig("MarginalTaxes.png")
 
         #Entrepreneurs problem:
 
@@ -247,7 +247,7 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
 
         #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\TaxesEntrepreneurs.png")
         #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\TaxesEntrepreneurs.png")
-        savefig("TaxesEntrepreneurs.png")
+        savefig("MarginalTaxesEntrepreneurs.png")
 
         #Graphs for the utilities:
         fig, utilities=plt.subplots(1,2)
@@ -341,24 +341,62 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             savefig("proposition2.png")
 
         #Proposition3:
-        fig, prop3=plt.subplots(1,4)
+        fig, prop3=plt.subplots(1,3)
         fig.suptitle("Proposition 3")
-            #Left Side (1):
-            prop3[1].plot(θspan[:], proposition3[:,1])
-            prop3[1].set(ylabel="εz z/n^α he",xlabel="θw")
-            #Left Side (2):
-            prop3[2].plot(θspan[:], proposition3[:,2])
-            prop3[2].set(ylabel="1/λ [Ve-Vw] g 1/ue'", xlabel="θw")
+            #Left Side:
+            prop3[1].plot(θspan[:], proposition3[:,5])
+            prop3[1].set(ylabel="εz z/n^α he + 1/λ [Ve-Vw] g 1/ue'",xlabel="θw")
             #Right Side:
-            prop3[3].plot(θespan[:], proposition3[:,5])
-            prop3[3].set(ylabel="λ he", xlabel="θw")
+            prop3[2].plot(θspan[:], proposition3[:,6])
+            prop3[2].set(ylabel="λ he p", xlabel="θw")
             #All:
-            prop3[4].plot(θspan[:], proposition3[:,1])
-            prop3[4].plot(θspan[:], proposition3[:,2])
-            prop3[4].plot(θspan[:], proposition3[:,5])
-            prop3[4].legend(["εz z/n^α he","1/λ [Ve-Vw] g 1/ue'","he"],loc="upper right")
+            prop3[3].plot(θspan[:], proposition3[:,1])
+            prop3[3].plot(θspan[:], proposition3[:,2])
+            prop3[3].plot(θspan[:], proposition3[:,6])
+            prop3[3].legend(["εz z/n^α he","1/λ [Ve-Vw] g 1/ue'","λ he p"],loc="upper right")
 
             savefig("proposition3.png")
+
+        #Taxes liabilities:
+        fig, tax=plt.subplots(2,3)
+        fig.suptitle("Taxes Global Problem")
+            #τ_c:
+        tax[1,1].plot(θspan[1:500], taxes[:,1])
+        tax[1,1].set(ylabel="T_c", xlabel="θw")
+            #τ_n:
+        tax[1,2].plot(θspan[1:500], taxes[:,2])
+        tax[1,2].set(ylabel="T_n", xlabel="θw")
+            #τ_l:
+        tax[1,3].plot(θspan[1:500], taxes[:,3])
+        tax[1,3].set(ylabel="T_l", xlabel="θw")
+            #τ_c:
+        tax[2,1].plot(taxes[:,4], taxes[:,1])
+        tax[2,1].set(ylabel="T_c", xlabel="e*n^α- ωe n-Tn")
+            #τ_n:
+        tax[2,2].plot(taxes[:,5], taxes[:,2])
+        tax[2,2].set(ylabel="T_n", xlabel="ω n")
+            #τ_l:
+        tax[2,3].plot(taxes[:,6], taxes[:,3])
+        tax[2,3].set(ylabel="T_l", xlabel="θw l ω")
+
+        savefig("Taxes_Global.png")
+
+        fig, tax_ent=plt.subplots(2,2)
+        fig.suptitle("Taxes Entrepreneurs Problem")
+            #τ_c:
+        tax_ent[1,1].plot(θespan[1:500], taxes_ent[:,1])
+        tax_ent[1,1].set(ylabel="T_c", xlabel="θe")
+            #τ_n:
+        tax_ent[1,2].plot(θespan[1:500], taxes_ent[:,2])
+        tax_ent[1,2].set(ylabel="T_n", xlabel="θe")
+            #τ_c:
+        tax_ent[2,1].plot(taxes_ent[:,3], taxes_ent[:,1])
+        tax_ent[2,1].set(ylabel="T_c", xlabel="θe*n^α- ωe n-Tn")
+            #τ_n:
+        tax_ent[2,2].plot(taxes_ent[:,4], taxes_ent[:,2])
+        tax_ent[2,2].set(ylabel="T_n", xlabel="ωe n")
+
+        savefig("Taxes_Entrepreneurs.png")
 
         #Return to original directory
         cd(original_dir)

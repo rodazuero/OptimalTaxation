@@ -16,14 +16,11 @@ using NLsolve
 include("Definitions2.jl")
 include("MJControlsAlgorithmGlobal3.jl")
 include("States_NewRungeKutta.jl")
-#include("NewMyRungeKutta.jl")
 include("NewMyRungeKuttaReverse.jl")
 
 #Entrepreneurs Problem
 include("NewControlsAlgorithmE.jl")
-#include("NewControlsAlgorithmEGrid.jl")
 include("States_NewRungeKuttaE.jl")
-#include("NewMyRungeKuttaE.jl")
 include("NewMyRungeKuttaEReverse.jl")
 
 #The file for the function that computes everything:
@@ -91,29 +88,10 @@ pa = init_parameters();
     τ_prime_e = Array{Float64}(undef,Nspan,2);
     marginal_taxese(controlse, θespan, solutione, pa);
 
-
-
-    #TaxesE = Array{Float64}(undef,Nspan,2);
-    #taxes_pathe(controlse, θespan, solutione, pa)
-
-    #fig, tax_e=plt.subplots(1,2)
-    #fig.suptitle("Taxes Path")
-        #τ_c:
-    #tax_e[1].plot(θespan[1:500], TaxesE[:,1])
-    #tax_e[1].set(ylabel="τ_c")
-        #τ_n:
-    #tax_e[2].plot(θespan[1:500], TaxesE[:,2])
-    #tax_e[2].set(ylabel="τ_n")
-
     #taxese = DataFrame(τ_prime_e)
     #names!(taxese,[:tau_c, :tau_n] )
     #taxes2e=hcat(DataFrame(theta=θespan),taxese)
     #CSV.write("marginal_taxes_e.csv",taxes2e)
-
-    taxese = DataFrame(TaxesE)
-    names!(TaxesE,[:tau_c, :tau_n] )
-    taxes2e=hcat(DataFrame(theta=θespan),taxese)
-    CSV.write("taxes_e.csv",taxes2e)
 
 #Global Problem (Reverse)
     uw_end    = solutione[1,1] #guess
@@ -140,8 +118,8 @@ pa = init_parameters();
     solution = Array{Float64}(undef,Nspan,12);
     my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)
 
-    using DelimitedFiles
-    writedlm("SolutionNew.csv",solution,';')
+    #using DelimitedFiles
+    #writedlm("SolutionNew.csv",solution,';')
 
     θspan = Array{Float64,1}
     θspan = collect(xlb:xstep:xub)
@@ -153,37 +131,46 @@ pa = init_parameters();
     bound_e   = -(pa.indicator*solutione[1,1]^pa.ϕ*he_ub+solutione[1,4]*(e_end*controlse[1,2]^pa.α -(pa.β/(1.0+pa.σ))*controlse[1,1]^(1.0+pa.σ)
                 - solutione[1,1])*he_ub - solutione[1,6]*controlse[1,2]*he_ub + solutione[1,2]*controlse[1,2]^pa.α*(1.0-pa.β*controlse[1,1]^pa.σ))
 
-    C= DataFrame(controls)
-    names!(C,[:z, :n, :l, :p] )
-    RungeKutta=hcat(DataFrame(solution),C, DataFrame(theta=θspan))
-    CSV.write("RungeKuttaNew.csv", RungeKutta)
+    #C= DataFrame(controls)
+    #names!(C,[:z, :n, :l, :p] )
+    #RungeKutta=hcat(DataFrame(solution),C, DataFrame(theta=θspan))
+    #CSV.write("RungeKuttaNew.csv", RungeKutta)
 
         #Marginal taxes and taxes path:
         τ_prime = Array{Float64}(undef,Nspan,3);
         marginal_taxes(controls, θspan, solution, pa)
 
+        (taxes, taxes_ent) = taxes_path(controls, θspan, solution, pa, θespan, solutione, controlse, τ_prime, τ_prime_e);
 
+        taxes_rev     = fill(NaN,Nspan,6);
+        taxes_rev_ent = fill(NaN,Nspan,4);
 
-        #taxes_path(controls, θspan, solution, pa);
+        taxes_rev[:,1:3] = taxes;
+        for j=1:Nspan
+            θ = θspan[j];
+            e     = solution[j,3];
+            ω     = solution[j,8];
 
-        #ctrlvec = controls
-        #θvec = θspan
-        #solvec = solution
+            zz    = controls[j,1];
+            nn    = controls[j,2];
+            ll    = controls[j,3];
+            pp    = controls[j,4];
 
-        #fig, tax=plt.subplots(1,3)
-        #fig.suptitle("Taxes")
-            #τ_c:
-        #tax[1,1].plot(θspan[1:500], Taxes[:,1])
-        #tax[1,1].set(ylabel="τ_c'")
-            #τ_n:
-        #tax[2].plot(θspan[1:500], Taxes[:,2])
-        #tax[2].set(ylabel="τ_n'")
-            #τ_l:
-        #tax[3].plot(θspan[1:500], Taxes[:,3])
-        #tax[3].set(ylabel="τ_l'")
+            taxes_rev[j,4] = e*nn^pa.α-ω*nn-taxes[j,2]; #Tc
+            taxes_rev[j,5] = ω*nn; #Tn
+            taxes_rev[j,6] = θ*ll*ω; #Tl
+        end
 
+        taxes_rev_ent[:,1:2] = taxes_ent;
+        for j=1:Nspan
+            θe = θespan[j];
+            ωe    = solutione[j,6];
 
+            nn    = controlse[j,2];
 
+            taxes_rev_ent[j,3] = θe*nn^pa.α-ωe*nn-taxes_ent[j,2]; #Tc
+            taxes_rev_ent[j,4] = ωe*nn; #Tn
+        end
 
         #taxes = DataFrame(τ_prime)
         #names!(taxes,[:tau_c, :tau_n, :tau_l] )
@@ -219,9 +206,9 @@ pa = init_parameters();
         end
 
         #Getting the propositions:
-        proposition1 = Array{Float64}(undef,Nspan,3);
-        proposition2 = Array{Float64}(undef,Nspan,2);
-        proposition3 = Array{Float64}(undef,Nspan,5);
+        proposition1 = fill(NaN,Nspan,4);
+        proposition2 = fill(NaN,Nspan,2);
+        proposition3 = fill(NaN,Nspan,6);
 
         (proposition1, proposition2, proposition3) = propositions(controls,θspan,solution,τ_prime,pa,θespan,solutione);
 
@@ -231,4 +218,4 @@ pa = init_parameters();
         #       utilities_prime,A_matrix)
         graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
                 bound_e,τ_prime,τ_prime_e,"C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
-                utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3)
+                utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_rev, taxes_rev_ent)
