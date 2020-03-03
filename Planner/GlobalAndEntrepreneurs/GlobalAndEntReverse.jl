@@ -226,9 +226,9 @@ pa = init_parameters();
         (proposition1, proposition2, proposition3) = propositions(controls,θspan,solution,τ_prime,pa,θespan,solutione);
 
         #Plots:
-        #graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
-        #       bound_e,τ_prime,τ_prime_e,"C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
-        #       utilities_prime,A_matrix)
         graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
                 bound_e,τ_prime,τ_prime_e,"C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
                 utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3)
+        graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
+               bound_e,τ_prime,τ_prime_e,"C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
+               utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3)
