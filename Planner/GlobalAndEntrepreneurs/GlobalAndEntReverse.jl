@@ -140,37 +140,14 @@ pa = init_parameters();
         τ_prime = Array{Float64}(undef,Nspan,3);
         marginal_taxes(controls, θspan, solution, pa)
 
-        (taxes, taxes_ent) = taxes_path(controls, θspan, solution, pa, θespan, solutione, controlse, τ_prime, τ_prime_e);
+        (taxes, taxes_ent, taxes_rev, taxes_rev_ent) = taxes_path(controls, θspan, solution, pa, θespan, solutione, controlse, τ_prime, τ_prime_e);
 
-        taxes_rev     = fill(NaN,Nspan,6);
-        taxes_rev_ent = fill(NaN,Nspan,4);
-
-        taxes_rev[:,1:3] = taxes;
-        for j=1:Nspan
-            θ = θspan[j];
-            e     = solution[j,3];
-            ω     = solution[j,8];
-
-            zz    = controls[j,1];
-            nn    = controls[j,2];
-            ll    = controls[j,3];
-            pp    = controls[j,4];
-
-            taxes_rev[j,4] = e*nn^pa.α-ω*nn-taxes[j,2]; #Tc
-            taxes_rev[j,5] = ω*nn; #Tn
-            taxes_rev[j,6] = θ*ll*ω; #Tl
-        end
-
-        taxes_rev_ent[:,1:2] = taxes_ent;
-        for j=1:Nspan
-            θe = θespan[j];
-            ωe    = solutione[j,6];
-
-            nn    = controlse[j,2];
-
-            taxes_rev_ent[j,3] = θe*nn^pa.α-ωe*nn-taxes_ent[j,2]; #Tc
-            taxes_rev_ent[j,4] = ωe*nn; #Tn
-        end
+        taxes_full     = fill(NaN,Nspan,6);
+        taxes_ent_full = fill(NaN,Nspan,4);
+        taxes_full[:,1:3] = taxes;
+        taxes_full[:,4:6] = taxes_rev;
+        taxes_ent_full[:,1:2] = taxes_ent;
+        taxes_ent_full[:,3:4] = taxes_rev_ent;
 
         #taxes = DataFrame(τ_prime)
         #names!(taxes,[:tau_c, :tau_n, :tau_l] )
@@ -212,10 +189,99 @@ pa = init_parameters();
 
         (proposition1, proposition2, proposition3) = propositions(controls,θspan,solution,τ_prime,pa,θespan,solutione);
 
+ctrlvec = controls
+θvec = θspan
+solvec = solution
+controls,θspan,solution,τ_prime,pa,θespan,solutione
+
         #Plots:
         graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
                 bound_e,τ_prime,τ_prime_e,"C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
-                utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_rev, taxes_rev_ent)
+                utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_full, taxes_ent_full)
         graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
                 bound_e,τ_prime,τ_prime_e,"C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
                 utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_rev, taxes_rev_ent)
+
+
+
+                diff = fill(NaN,Nspan,2)
+                for j = 1:Nspan
+                    diff[j,1] = proposition3[j,1]+ proposition3[j,2]-proposition3[j,3]
+                    #diff[j,2] = proposition1[j,1]- proposition1[j,2]-proposition1[j,3]
+                    diff[j,2] = -solution[j,2]- proposition1[j,2]-proposition1[j,3]
+                end
+
+                        #Proposition3:
+                        fig, prop3=plt.subplots(1,2)
+                        fig.suptitle("Proposition 3")
+                            prop3[1].plot(θspan[:], proposition3[:,1])
+                            prop3[1].plot(θspan[:], proposition3[:,2])
+                            prop3[1].plot(θspan[:], proposition3[:,3])
+                            prop3[1].legend(["εz z/n^α he","1/λ [Ve-Vw] g 1/ue'","λ he p"],loc="upper right")
+                                prop3[2].plot(θspan[:], diff[:,1])
+
+                                #Proposition1:
+                                fig, prop1=plt.subplots(1,2)
+                                fig.suptitle("Proposition 1")
+                                    #prop1[1].plot(θspan[:], proposition1[:,1])
+                                    prop1[1].plot(θspan[:], -solution[:,2])
+                                    prop1[1].plot(θspan[:], proposition1[:,2])
+                                    prop1[1].plot(θspan[:], proposition1[:,3])
+                                    prop1[1].legend(["-μ","Tl'/(1-Tl') εl/(1+εl) θw hw","εz z/n^α he"],loc="upper right")
+                                    prop1[2].plot(θspan[:], diff[:,2])
+
+
+
+        to_plot = fill(NaN,Nspan,3);
+        for j=1:Nspan
+            #Definition of states and controls:
+            θ = θspan[j];
+
+                  uw    = solution[j,1];
+                  μ     = solution[j,2];
+                  e     = solution[j,3];
+                  ϕ_e   = solution[j,4];
+                  y_agg = solution[j,5];
+                  λ     = solution[j,6];
+                  l_agg = solution[j,7];
+                  ω     = solution[j,8];
+
+                  zz    = controls[j,1];
+                  nn    = controls[j,2];
+                  ll    = controls[j,3];
+                  pp    = controls[j,4];
+
+                  Tn = taxes_full[j,2];
+
+                  #Find the marginal taxes:
+                  to_plot[j,1] = e*nn^pa.α-ω*nn
+                  to_plot[j,2] = e*nn^pa.α-ω*nn - Tn
+                  to_plot[j,3] = e*nn^pa.α-ω*nn - Tn - zz
+
+                end
+
+
+                        fig, tax_ent=plt.subplots(2,3)
+                        fig.suptitle("")
+                            #τ_c:
+                        tax_ent[1,1].plot(θspan[1:500], to_plot[:,1])
+                        tax_ent[1,1].set(ylabel="e*nn^pa.α-ω*e*nn", xlabel="θw")
+                            #τ_n:
+                        tax_ent[1,2].plot(θspan[1:500], to_plot[:,2])
+                        tax_ent[1,2].set(ylabel="e*nn^pa.α-ω*e*nn - Tn", xlabel="θw")
+                            #τ_c:
+                        tax_ent[1,3].plot(θspan[1:500], to_plot[:,3])
+                        tax_ent[1,3].set(ylabel="e*nn^pa.α-ω*e*nn - Tn - z", xlabel="θw")
+                        #τ_c:
+                    tax_ent[2,1].plot(solution[:,3], to_plot[:,1])
+                    tax_ent[2,1].set(ylabel="e*nn^pa.α-ω*e*nn", xlabel="e")
+                        #τ_n:
+                    tax_ent[2,2].plot(solution[:,3], to_plot[:,2])
+                    tax_ent[2,2].set(ylabel="e*nn^pa.α-ω*e*nn - Tn", xlabel="e")
+                        #τ_c:
+                    tax_ent[2,3].plot(solution[:,3], to_plot[:,3])
+                    tax_ent[2,3].set(ylabel="e*nn^pa.α-ω*e*nn - Tn - z", xlabel="e")
+
+
+
+                        savefig("Taxes_Entrepreneurs.png")

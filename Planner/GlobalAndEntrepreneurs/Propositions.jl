@@ -6,16 +6,12 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
     #Defining the propostions matrix:
     proposition1 = fill(NaN,Nspan,4)
     proposition2 = fill(NaN,Nspan,2)
-    proposition3 = fill(NaN,Nspan,6)
+    proposition3 = fill(NaN,Nspan,4)
 
     #Defining the elasticities and the taxes in the θ_w_lb:
     ε_l_1Tlpr = 1.0/pa.ψ;
     ε_l_θw    = 1.0/pa.ψ;
     ε_z_Tcpr  = 1.0/pa.σ;
-
-    T_c = tax_prime[1]
-    T_n = tax_prime[2]
-    T_l = tax_prime[3]
 
     for j=1:Nspan
       #Definition of states and controls:
@@ -65,42 +61,20 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
         proposition3[j,3] = (1.0-pa.indicator*pa.ϕ*uw^(pa.ϕ-1.0)/λ)*h_e*pp;
     end
 
-    for j=1:Nespan
-      #Definition of states and controls:
-      θe = θevec[j];
-
-      ue    = solvece[j,1];
-      λe    = solvece[j,4];
-
-      #Recover ditributions and elasticities:
-      h_e_fix = pa.he(pa.θ_w_ub, θe);
-
-        #3:
-        proposition3[j,4] = (1.0-pa.indicator*pa.ϕ*ue^(pa.ϕ-1.0)/λe)*h_e_fix;
-
-    end
-
     #We have to get the values of the integrals:
-    method            = 1;
-    to_integrate      = proposition1[:,1];
-    sol_int           = integrals(to_integrate,θspan,method);
+    sol_int           = fill(NaN,Nspan)
+    my_integral_ub!(sol_int,proposition1[:,1],θspan,-solution[end,2]);
     proposition1[:,1] = sol_int;
 
-    to_integrate      = proposition3[:,2];
-    sol_int           = integrals(to_integrate,θspan,method);
-    proposition3[:,2] = sol_int;
+    result           = fill(NaN,Nspan)
+    my_integral_ub!(result,proposition3[:,2],θspan,0.0);
+    proposition3[:,2] = result;
 
-    to_integrate      = proposition3[:,3];
-    sol_int           = integrals(to_integrate,θspan,method);
+    my_integral_ub!(sol_int,proposition3[:,3],θspan,-solution[end,2]);
     proposition3[:,3] = sol_int;
 
-    to_integrate      = proposition3[:,4];
-    sol_int           = integrals(to_integrate,θespan,method);
-    proposition3[:,4] = sol_int;
-
     proposition1[:,4] = proposition1[:,2]+proposition1[:,3];
-    proposition3[:,5] = proposition3[:,1]+proposition3[:,2];
-    proposition3[:,6] = proposition3[:,3]+proposition3[:,4];
+    proposition3[:,4] = proposition3[:,1]+proposition3[:,2];
 
     #Returns of the function:
     proposition1, proposition2, proposition3;

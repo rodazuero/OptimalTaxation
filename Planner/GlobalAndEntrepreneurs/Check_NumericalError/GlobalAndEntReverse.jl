@@ -9,8 +9,8 @@ using PyPlot
 using DataFrames
 using CSV
 using NLsolve
+using DifferentialEquations
 #using Plots
-#using DifferentialEquations
 
 #Global Problem
 include("Definitions2.jl")
@@ -75,6 +75,8 @@ pa = init_parameters();
         real[i,1] = cons*(θspan[i]-pa.θ_w_lb)^(1.0+par)+(pa.θ_e_lb+upper_cons)
     end
 
+    find_states_RKPack!
+
     fig, figura=plt.subplots(1,4)
     fig.suptitle("Figura")
         #μ:
@@ -89,3 +91,17 @@ pa = init_parameters();
         #p:
     figura[4].plot(θspan[1:500], controls[1:500,1])
     figura[4].set(ylabel="p")
+
+
+    par   = 0.0;
+    upper_cons = 0.0;
+    cons  = ((elb-(pa.θ_e_lb+upper_cons))/((pa.θ_w_ub-pa.θ_w_lb)^(1.0+par)));
+    p = [par,cons,pa.θ_w_lb,1.0]
+
+    my_runge_kutta_reverse_RKPack!(du,u,p,θ)
+
+    u0    = [μ_end, e_end]
+    tspan = (pa.θ_w_lb,pa.θ_w_ub)
+
+    prob = ODEProblem(my_runge_kutta_reverse_RKPack!,u0,tspan,p)
+    sol = solve(prob)

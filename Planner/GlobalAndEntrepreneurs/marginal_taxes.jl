@@ -60,30 +60,86 @@ function taxes_path(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Array{
     #Defining the taxes in the θ_w_lb: the order: Tc, Tn and Tl (first for θw, then Entrepreneurs θe).
     #Taxes    = Array{Float64}(undef,Nspan,5)
     Taxes_gb      = fill(NaN,Nspan,3)
-    Taxes_gb[1,1] = solvec[1,3]*ctrlvec[1,2]^pa.α-solvec[1,8]/solvec[1,6]*ctrlvec[1,2]-pa.β/(1.0+pa.σ)*ctrlvec[1,1]^(1.0+pa.σ); #T_c
+    Taxes_gb[1,1] = solvec[1,3]*ctrlvec[1,2]^pa.α-solvec[1,8]/solvec[1,6]*ctrlvec[1,2]-pa.β/(1.0+pa.σ)*ctrlvec[1,1]^(1.0+pa.σ)-solvec[1,1]; #T_c
     Taxes_gb[1,2] = 0.0; #T_n
     Taxes_gb[1,3] = θvec[1]*solvec[1,8]/solvec[1,6]*ctrlvec[1,3]-pa.χ/(1.0+pa.ψ)*ctrlvec[1,3]^(1.0+pa.ψ)-solvec[1,1]; #T_l
 
     #We have to get the values of the integrals:
-    method = 0.0;
-    for i=1:3
-      to_integrate  = margtax[:,i];
-      sol_int       = integrals(to_integrate,θspan,method);
-      Taxes_gb[:,i] = Taxes_gb[1,i] .+sol_int[:];
+    #Define the values of the limits of the integral (tax base):
+    tax_base = fill(NaN,Nspan,3)
+    for j = 1:Nspan
+      θ  = θspan[j];
+      e  = solvec[j,3];
+      ω  = solvec[j,8];
+      nn = ctrlvec[j,2];
+      ll = ctrlvec[j,3];
+      tax_base[j,2] = ω*nn; #Tn
+      tax_base[j,3] = θ*ll*ω; #Tl
     end
+
+    for i=2:3
+      sol_int      = fill(NaN,Nspan)
+      base         = tax_base[:,i]; #Tax base for the integral factor
+      to_integrate = margtax[:,i];
+      my_integral_lb!(sol_int,to_integrate,base,Taxes_gb[1,i]);
+      Taxes_gb[:,i] = sol_int[:];
+    end
+
+    #Calculating for Tc:
+    for j = 1:Nspan
+      θ  = θspan[j];
+      e  = solvec[j,3];
+      ω  = solvec[j,8];
+      zz = ctrlvec[j,1];
+      nn = ctrlvec[j,2];
+      ll = ctrlvec[j,3];
+      Tn = Taxes_gb[j,2];
+      tax_base[j,1] = e*nn^pa.α-ω*nn-Tn-zz; #Tc
+    end
+
+    i=1
+      sol_int      = fill(NaN,Nspan)
+      base         = tax_base[:,i]; #Tax base for the integral factor
+      to_integrate = margtax[:,i];
+      my_integral_lb!(sol_int,to_integrate,base,Taxes_gb[1,i]);
+      Taxes_gb[:,i] = sol_int[:];
 
     #Now we solve the taxes for θe:
     Taxes_ent      = fill(NaN,Nspan,2)
     Taxes_ent[1,1] = Taxes_gb[end,1]; #T_c
     Taxes_ent[1,2] = Taxes_gb[end,2]; #T_n
 
-    #We have to get the values of the integrals:
-    for i=1:2
-      to_integrate   = margtaxe[:,i];
-      sol_int        = integrals(to_integrate,θspan,method);
-      Taxes_ent[:,i] = Taxes_ent[1,i] .+sol_int[:];
+    tax_base_ent = fill(NaN,Nspan,2)
+    for j = 1:Nspan
+      ωe = solvece[j,6];
+      nn = ctrlvece[j,2];
+      tax_base_ent[j,2] = ωe*nn; #Tn
     end
 
+    i=2
+      sol_int      = fill(NaN,Nspan)
+      base         = tax_base_ent[:,i]; #Tax base for the integral factor
+      to_integrate = margtaxe[:,i];
+      my_integral_lb!(sol_int,to_integrate,base,Taxes_ent[1,i]);
+      Taxes_ent[:,i] = sol_int[:];
+
+    #Calculating for Tc:
+    for j = 1:Nspan
+      θe = θespan[j];
+      ωe = solvece[j,6];
+      zz = ctrlvece[j,1];
+      nn = ctrlvece[j,2];
+      Tn = Taxes_ent[j,2]
+      tax_base_ent[j,1] = θe*nn^pa.α-ωe*nn-Tn-zz; #Tc
+    end
+
+    i=1
+      sol_int      = fill(NaN,Nspan)
+      base         = tax_base_ent[:,i]; #Tax base for the integral factor
+      to_integrate = margtaxe[:,i];
+      my_integral_lb!(sol_int,to_integrate,base,Taxes_ent[1,i]);
+      Taxes_ent[:,i] = sol_int[:];
+
     #Final Output:
-    Taxes_gb, Taxes_ent;
+    Taxes_gb, Taxes_ent, tax_base, tax_base_ent;
 end

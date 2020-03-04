@@ -1,25 +1,29 @@
-function integrals(intvec::Array{Float64},θvec::Array{Float64},method)
-#Method indicates what limit in the integral we have fixed:
-    #1: we have the upper limit fixed,
-    #0: we have the lower limit fixed.
+function my_integral_lb!(sol_int::Array{Float64,1},intvec::Array{Float64,1},θvec::Array{Float64,1},y0::Float64)
 
     (Nspan,) = size(θvec);
-    sol_int  = fill(NaN,Nspan,1);
-    factor   = (θvec[end]-θvec[1])/(Nspan-1.0); #Factor to multiply the integral.
 
     #We are going to integrate using the trapezoid rule:
-    if method == 1
-        #When we have the upper bound fixed in the integral:
-        for i=1:Nspan
-            sol_int[i,1] = (sum(intvec[i:end])-0.5*intvec[i]-0.5*intvec[end])*factor;
-        end
-    else
-        #When we have the lowed bound fixed in the integral:
-        for i=1:Nspan
-            sol_int[i,1] = (sum(intvec[1:i])-0.5*intvec[i]-0.5*intvec[1])*factor;
+    for i=1:Nspan
+        if i == 1
+          sol_int[i] = y0;
+        else
+          sol_int[i] = sol_int[i-1]+(intvec[i]+intvec[i-1])/2.0*(θvec[i]-θvec[i-1]);
         end
     end
+    nothing
+end
 
-    #Returns of the function --> Vector containing the integral for each productivity:
-    sol_int;
+function my_integral_ub!(sol_int::Array{Float64,1},intvec::Array{Float64,1},θvec::Array{Float64,1},yend::Float64)
+
+    (Nspan,) = size(θvec);
+
+    #We are going to integrate using the trapezoid rule:
+    for i=Nspan:-1:1
+        if i == Nspan
+          sol_int[i] = yend;
+        else
+          sol_int[i] = sol_int[i+1]-(intvec[i]+intvec[i+1])/2.0*(θvec[i]-θvec[i+1]);
+        end
+    end
+    nothing
 end

@@ -325,58 +325,79 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
 
         #Graphs for Propositions:
         #Proposition1:
-        fig, prop1=plt.subplots(1,4)
-        fig.suptitle("Proposition 1")
+        #fig, prop1=plt.subplots(1,4)
+        #fig.suptitle("Proposition 1")
             #Left Side:
-            prop1[1].plot(θspan[:], -solution[:,2])
-            prop1[1].set(ylabel="-μ",xlabel="θw")
+            #prop1[1].plot(θspan[:], -solution[:,2])
+            #prop1[1].set(ylabel="-μ",xlabel="θw")
             #Right Side (1):
-            prop1[2].plot(θspan[:], proposition1[:,2])
-            prop1[2].set(ylabel="Tl'/(1-Tl') εl/(1+εl) θw hw", xlabel="θw")
+            #prop1[2].plot(θspan[:], proposition1[:,2])
+            #prop1[2].set(ylabel="Tl'/(1-Tl') εl/(1+εl) θw hw", xlabel="θw")
             #Right Side (2):
-            prop1[3].plot(θspan[:], proposition1[:,3])
-            prop1[3].set(ylabel="εz z/n^α he", xlabel="θw")
+            #prop1[3].plot(θspan[:], proposition1[:,3])
+            #prop1[3].set(ylabel="εz z/n^α he", xlabel="θw")
             #All:
-            prop1[4].plot(θspan[:], -solution[:,2])
-            prop1[4].plot(θspan[:], proposition1[:,2])
-            prop1[4].plot(θspan[:], proposition1[:,3])
-            prop1[4].legend(["-μ","Tl'/(1-Tl') εl/(1+εl) θw hw","εz z/n^α he"],loc="upper right")
+            #prop1[4].plot(θspan[:], -solution[:,2])
+            #prop1[4].plot(θspan[:], proposition1[:,2])
+            #prop1[4].plot(θspan[:], proposition1[:,3])
+            #prop1[4].legend(["-μ","Tl'/(1-Tl') εl/(1+εl) θw hw","εz z/n^α he"],loc="upper right")
+
+            fig, prop1=plt.subplots(1)
+            fig.suptitle("Proposition 1")
+                prop1.plot(θspan[:], -solution[:,2])
+                prop1.plot(θspan[:], proposition1[:,2])
+                prop1.plot(θspan[:], proposition1[:,3])
+                prop1.legend(["-μ","Tl'/(1-Tl') εl/(1+εl) θw hw","εz z/n^α he"],loc="upper right")
+                prop1.set(xlabel="θw")
 
             savefig("proposition1.png")
 
         #Proposition2:
-        fig, prop2=plt.subplots(1,3)
-        fig.suptitle("Proposition 2")
+        #fig, prop2=plt.subplots(1,3)
+        #fig.suptitle("Proposition 2")
             #Left Side:
-            prop2[1].plot(θspan[:], proposition2[:,1])
-            prop2[1].set(ylabel="εz z/n^α",xlabel="θw")
+            #prop2[1].plot(θspan[:], proposition2[:,1])
+            #prop2[1].set(ylabel="εz z/n^α",xlabel="θw")
             #Right Side:
-            prop2[2].plot(θspan[:], proposition2[:,2])
-            prop2[2].set(ylabel="e/(1-Tc') Tn'/(1+Tn)", xlabel="θw")
+            #prop2[2].plot(θspan[:], proposition2[:,2])
+            #prop2[2].set(ylabel="e/(1-Tc') Tn'/(1+Tn)", xlabel="θw")
             #All:
-            prop2[3].plot(θspan[:], proposition2[:,1])
-            prop2[3].plot(θspan[:], proposition2[:,2])
-            plt.legend(["εz z/n^α","e/(1-Tc') Tn'/(1+Tn)"],loc="upper right")
+            #prop2[3].plot(θspan[:], proposition2[:,1])
+            #prop2[3].plot(θspan[:], proposition2[:,2])
+            #plt.legend(["εz z/n^α","e/(1-Tc') Tn'/(1+Tn)"],loc="upper right")
+
+            fig, prop2=plt.subplots(1)
+            fig.suptitle("Proposition 2")
+                prop2.plot(θspan[:], proposition2[:,1])
+                #prop2[3].plot(θspan[:], proposition2[:,2])
+                prop2.set(ylabel="εz z/n^α or e/(1-Tc') Tn'/(1+Tn)",xlabel="θw")
 
             savefig("proposition2.png")
 
         #Proposition3:
-        fig, prop3=plt.subplots(1,3)
-        fig.suptitle("Proposition 3")
+        #fig, prop3=plt.subplots(1,3)
+        #fig.suptitle("Proposition 3")
             #Left Side:
-            prop3[1].plot(θspan[:], proposition3[:,5])
-            prop3[1].set(ylabel="εz z/n^α he + 1/λ [Ve-Vw] g 1/ue'",xlabel="θw")
+            #prop3[1].plot(θspan[:], proposition3[:,5])
+            #prop3[1].set(ylabel="εz z/n^α he + 1/λ [Ve-Vw] g 1/ue'",xlabel="θw")
             #Right Side:
-            prop3[2].plot(θspan[:], proposition3[:,6])
-            prop3[2].set(ylabel="λ he p", xlabel="θw")
+            #prop3[2].plot(θspan[:], proposition3[:,6])
+            #prop3[2].set(ylabel="λ he p", xlabel="θw")
             #All:
-            prop3[3].plot(θspan[:], proposition3[:,1])
-            prop3[3].plot(θspan[:], proposition3[:,2])
-            prop3[3].plot(θspan[:], proposition3[:,6])
-            prop3[3].legend(["εz z/n^α he","1/λ [Ve-Vw] g 1/ue'","λ he p"],loc="upper right")
+            #prop3[3].plot(θspan[:], proposition3[:,1])
+            #prop3[3].plot(θspan[:], proposition3[:,2])
+            #prop3[3].plot(θspan[:], proposition3[:,6])
+            #prop3[3].legend(["εz z/n^α he","1/λ [Ve-Vw] g 1/ue'","λ he p"],loc="upper right")
+
+            fig, prop3=plt.subplots(1)
+            fig.suptitle("Proposition 3")
+                prop3.plot(θspan[:], proposition3[:,1])
+                prop3.plot(θspan[:], proposition3[:,2])
+                prop3.plot(θspan[:], proposition3[:,3])
+                prop3.legend(["εz z/n^α he","1/λ [Ve-Vw] g 1/ue'","λ he p"],loc="upper right")
+                prop3.set(xlabel="θw")
 
             savefig("proposition3.png")
-
 
             #Graphs for all the span of entrepreneurs (both problems)
             θe_all=vcat(solution[:,3],θespan)
@@ -448,17 +469,17 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         fig, tax=plt.subplots(2,3)
         fig.suptitle("Taxes Global Problem")
             #τ_c:
-        tax[1,1].plot(θspan[1:500], taxes[:,1])
-        tax[1,1].set(ylabel="T_c", xlabel="θw")
+        tax[1,1].plot(solution[:,3], taxes[:,1])
+        tax[1,1].set(ylabel="T_c", xlabel="e")
             #τ_n:
-        tax[1,2].plot(θspan[1:500], taxes[:,2])
-        tax[1,2].set(ylabel="T_n", xlabel="θw")
+        tax[1,2].plot(solution[:,3], taxes[:,2])
+        tax[1,2].set(ylabel="T_n", xlabel="e")
             #τ_l:
         tax[1,3].plot(θspan[1:500], taxes[:,3])
         tax[1,3].set(ylabel="T_l", xlabel="θw")
             #τ_c:
         tax[2,1].plot(taxes[:,4], taxes[:,1])
-        tax[2,1].set(ylabel="T_c", xlabel="e*n^α- ωe n-Tn")
+        tax[2,1].set(ylabel="T_c", xlabel="e*n^α- ω n-Tn -z")
             #τ_n:
         tax[2,2].plot(taxes[:,5], taxes[:,2])
         tax[2,2].set(ylabel="T_n", xlabel="ω n")
@@ -478,7 +499,7 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         tax_ent[1,2].set(ylabel="T_n", xlabel="θe")
             #τ_c:
         tax_ent[2,1].plot(taxes_ent[:,3], taxes_ent[:,1])
-        tax_ent[2,1].set(ylabel="T_c", xlabel="θe*n^α- ωe n-Tn")
+        tax_ent[2,1].set(ylabel="T_c", xlabel="θe*n^α- ωe n-Tn-z")
             #τ_n:
         tax_ent[2,2].plot(taxes_ent[:,4], taxes_ent[:,2])
         tax_ent[2,2].set(ylabel="T_n", xlabel="ωe n")
