@@ -160,7 +160,7 @@ end
 function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solvec::Array{Float64})
     (Nspan,~)=size(solvec)
 
-    for j=1:Nspan
+    for j=Nspan:-1:1
       θ     = θvec[j];
       uw    = solvec[j,1];
       μ     = solvec[j,2];

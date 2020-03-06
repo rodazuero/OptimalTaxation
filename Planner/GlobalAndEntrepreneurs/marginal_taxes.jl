@@ -2,7 +2,7 @@ function marginal_taxes(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Ar
 
     (Nspan,~)=size(solvec)
 
-    for j=1:Nspan
+    for j=Nspan:-1:1
       #Definition of states and controls:
       θ = θvec[j];
 
@@ -32,7 +32,7 @@ function marginal_taxese(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::A
 
     (Nspan,~)=size(solvec)
 
-    for j=1:Nspan
+    for j=Nspan:-1:1
       #Definition of states and controls:
       θ = θvec[j];
 

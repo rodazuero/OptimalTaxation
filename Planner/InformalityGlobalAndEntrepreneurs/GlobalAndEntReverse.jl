@@ -1,22 +1,21 @@
-
-cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
-cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
+cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\InformalityGlobalAndEntrepreneurs")
+cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\InformalityGlobalAndEntrepreneurs")
 
 using Roots
 using NLopt
 using Statistics
-using PyPlot
+#using PyPlot
 using DataFrames
 using CSV
 using NLsolve
-#using Plots
+using Plots
 #using DifferentialEquations
 
 #Global Problem
-include("Definitions2.jl")
-include("MJControlsAlgorithmGlobal3.jl")
-include("States_NewRungeKutta.jl")
-include("2NewMyRungeKuttaReverse.jl")
+include("Definitions.jl")
+#include("MJControlsAlgorithmGlobal3.jl")
+#include("States_NewRungeKutta.jl")
+#include("NewMyRungeKuttaReverse.jl")
 
 #Entrepreneurs Problem
 include("NewControlsAlgorithmE.jl")
@@ -27,11 +26,11 @@ include("NewMyRungeKuttaEReverse.jl")
 include("ProblemFunction.jl")
 
 #Marginal taxes:
-include("marginal_taxes.jl")
+#include("marginal_taxes.jl")
 
 #Propositions:
-include("Propositions.jl")
-include("Integrals.jl")
+#include("Propositions.jl")
+#include("Integrals.jl")
 
 #Define values for the model parameters
 pa = init_parameters();
@@ -42,24 +41,36 @@ pa = init_parameters();
     #Define proportion of agents in global problem
     gp     =   0.993
 
-    #ue0    =   100.0
     ue0    =   640.0
-    #ue0    =   600.0
     μe0    =   0.0 - 1.0e-10
     ye0    =   0.0
     λe0    =   1.0
     le0    =   0.0
-    ωe0    =   1.3429705
+    ωfe0   =   1.343
+    lie0   =   0.0
+    ωie0   =   1.343
+    wie0   =   1.343
+    ϕie0   =   0.0
 
     Nspan = 500
-    y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
+    y_end = [ue0, μe0, ye0, λe0, le0, ωfe0, lie0, ωie0, wie0, ϕie0, 0.0, 0.0, 0.0];
     elb = pa.θ_e_ub - ((1-gp)*(pa.θ_e_ub-pa.θ_e_a)*(1.0-pa.constant_w_lw*pa.constant_e_lw));
     eub = pa.θ_e_ub;
     estep = (eub - elb)/(Nspan - 1);
     espan = eub:-estep:elb;
-    solutione = Array{Float64}(undef,Nspan,10);
+    solutione = Array{Float64}(undef,Nspan,13);
     fill!(solutione,NaN);
     my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
+
+solution=solutione
+xspan=espan
+step=estep
+θw=pa.θ_w_ub
+
+du=z1
+u=y
+θ=θw
+
 
     #solutione[end,:]
     #using DelimitedFiles
@@ -295,20 +306,20 @@ pa = init_parameters();
 
                     graphs = fill(NaN,Nspan,2)
                     for j = 1:Nspan
-                        graphs[j,1] = controls[j,2]^pa.α
+                        graphs[j,1] = contols[:,2]^pa.α
+
+
                     end
+                    graphs[2:500,2] = diff(controls[:,1])
 
-                    graphs[2:500,2] = diff(controls[:,1])./diff(solution[:,3])
-
-                                            fig, tax_ent=plt.subplots(1,2)
+                                            fig, tax_ent=plt.subplots(2,3)
                                             fig.suptitle("")
                                                 #τ_c:
-                                            tax_ent[1].plot(solution[:,3], graphs[:,1],solution[:,3], graphs[:,2])
+                                            tax_ent[1,1].plot(θspan[1:500], to_plot[:,1])
+                                            tax_ent[1,1].set(ylabel="e*nn^pa.α-ω*e*nn", xlabel="θw")
                                                 #τ_n:
-                                            tax_ent[2].plot(θspan[1:500], graphs[:,2])
-
-
-
+                                            tax_ent[1,2].plot(θspan[1:500], to_plot[:,2])
+                                            tax_ent[1,2].set(ylabel="e*nn^pa.α-ω*e*nn - Tn", xlabel="θw")
                                                 #τ_c:
                                             tax_ent[1,3].plot(θspan[1:500], to_plot[:,3])
                                             tax_ent[1,3].set(ylabel="e*nn^pa.α-ω*e*nn - Tn - z", xlabel="θw")
