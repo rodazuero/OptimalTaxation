@@ -4,7 +4,8 @@ function my_runge_kuttae_reverse!(solution::Array{Float64,2},y_end::Array{Float6
 # We get the following auxiliary states: le_new, lie_new and ye_new.
 
     # θw is the upper bound of workers distribution. It´s taken from the global problem.
-    (Nspan,num_states) = size(solution);
+    (Nspan,columns) = size(solution);
+    num_states = columns - 3;
     solution[end,1:num_states] = y_end;
 
     #Defining the vectors for Ruge-Kutta:
@@ -25,7 +26,7 @@ function my_runge_kuttae_reverse!(solution::Array{Float64,2},y_end::Array{Float6
     #Loop over values of θ_e:
     for i=Nspan:-1:1
 
-        #println("i = ", i)
+        println("i = ", i)
         #Current value for θ_e
         x  = xspan[i];
         θe = xspan[i];
@@ -51,17 +52,21 @@ function my_runge_kuttae_reverse!(solution::Array{Float64,2},y_end::Array{Float6
         find_statese!(z4, y+step*z3, pa, θw, x+step, ini);
         any(isnan,z4) && error("z4 is NaN ")
 
-        if i==1
-            solution[Nspan,9]=solution[Nspan,5]./solution[Nspan,8]
-            solution[Nspan,10]=solution[Nspan,3]./solution[Nspan,7]
+        #Update vector of states
+        dy = (z1+2.0*z2+2.0*z3+z4)/6.0;
+        if i > 1
+            solution[i-1,1:num_states] = solution[i,1:num_states] - step*dy;
+
+            solution[i-1,14] = solution[i-1,5]./solution[i-1,11];
+            solution[i-1,15] = solution[i-1,7]./solution[i-1,12];
+            solution[i-1,16] = solution[i-1,3]./solution[i-1,13];
+
         end
 
-        #Update vector of states:
-        dy = (z1+2.0*z2+2.0*z3+z4)/6.0;
-        if i < Nspan
-            solution[i+1,1:8] = solution[i,1:8] - step*dy;
-            solution[i+1,9]=solution[i+1,5]./solution[i+1,7]
-            solution[i+1,10]=solution[i+1,3]./solution[i+1,8]
+        if i==Nspan
+            solution[Nspan,14]=solution[Nspan,5]./solution[Nspan,11];
+            solution[Nspan,15]=solution[Nspan,7]./solution[Nspan,12];
+            solution[Nspan,16]=solution[Nspan,3]./solution[Nspan,13];
         end
     end
 end

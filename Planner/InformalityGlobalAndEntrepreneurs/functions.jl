@@ -23,7 +23,7 @@ pa = init_parameters();
 
     ue    =   640.0
     μe    =   0.0 - 1.0e-10
-    μe    =   -0.9
+    #μe    =   -0.9
     ye_agg    =   0.0
     λe    =   1.0
     le_agg    =   0.0

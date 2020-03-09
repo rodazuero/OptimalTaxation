@@ -4,11 +4,11 @@ cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\InformalityGlobalA
 using Roots
 using NLopt
 using Statistics
-#using PyPlot
+using PyPlot
 using DataFrames
 using CSV
 using NLsolve
-using Plots
+#using Plots
 #using DifferentialEquations
 
 #Global Problem
@@ -58,19 +58,9 @@ pa = init_parameters();
     eub = pa.θ_e_ub;
     estep = (eub - elb)/(Nspan - 1);
     espan = eub:-estep:elb;
-    solutione = Array{Float64}(undef,Nspan,13);
+    solutione = Array{Float64}(undef,Nspan,16);
     fill!(solutione,NaN);
     my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
-
-solution=solutione
-xspan=espan
-step=estep
-θw=pa.θ_w_ub
-
-du=z1
-u=y
-θ=θw
-
 
     #solutione[end,:]
     #using DelimitedFiles
@@ -86,10 +76,29 @@ u=y
     θespan = Array{Float64,1}
     θespan = collect(elb:estep:eub)
 
-    controlse = Array{Float64}(undef,Nspan,2);
+    controlse = Array{Float64}(undef,Nspan,3);
     fill!(controlse,NaN);
     recover_controlse!(controlse, pa.θ_w_ub ,θespan, solutione);
     controlse
+
+
+        #Controls
+        fig, controles_e=plt.subplots(1,3)
+        fig.suptitle("Optimal Controls - Entrepreneurs Problem")
+            #ze:
+        controles_e[1].plot(θespan[1:500], controlse[:,1])
+        #controles_e[1,1].set_title("ze")
+        controles_e[1].set(ylabel="ze")
+            #ne:
+        controles_e[2].plot(θespan[1:500], controlse[:,2])
+        #controles_e[2].plot(θespan[1:500], n_full_e[1:500], linestyle="--")
+        #controles_e[1].set_title("ne")
+        controles_e[2].set(ylabel="ne")
+        controles_e[2].legend(["n","n full info"],loc="upper left")
+            #ne:
+        controles_e[3].plot(θespan[1:500], controlse[:,3])
+        controles_e[1].set_title("nie")
+        
 
     #E= DataFrame(controlse)
     #names!(E,[:z, :n] )

@@ -16,12 +16,13 @@ using NLsolve
 include("Definitions2.jl")
 include("MJControlsAlgorithmGlobal3.jl")
 include("States_NewRungeKutta.jl")
-include("2NewMyRungeKuttaReverse.jl")
+include("NewMyRungeKuttaReverse.jl")
 
 #Entrepreneurs Problem
 include("NewControlsAlgorithmE.jl")
 include("States_NewRungeKuttaE.jl")
-include("NewMyRungeKuttaEReverse.jl")
+#include("NewMyRungeKuttaEReverse.jl")
+include("TryEntrepreneurs.jl")
 
 #The file for the function that computes everything:
 include("ProblemFunction.jl")
@@ -60,6 +61,13 @@ pa = init_parameters();
     solutione = Array{Float64}(undef,Nspan,10);
     fill!(solutione,NaN);
     my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
+
+
+    solution=solutione
+    xspan=espan
+    step=estep
+    θw=pa.θ_w_ub
+
 
     #solutione[end,:]
     #using DelimitedFiles

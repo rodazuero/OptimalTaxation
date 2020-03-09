@@ -23,7 +23,7 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
 
     #Hamiltonian:
     objective(ze,ne,nie) = pa.indicator*sse.ue^pa.ϕ*h_e + sse.λe*( θe*ne^pa.α - pa.β*ze^(1.0+pa.σ)/(1.0+pa.σ) - pa.δ/(1.0+pa.γ)*nie^(1.0+pa.γ) - sse.ue)*h_e -
-                           sse.ωfe*(ne-nei)*h_e + sse.μe*ne^pa.α*(1.0-pa.β*ze^pa.σ) - sse.ωie*nie*h_e;
+                           sse.ωfe*(ne-nie)*h_e + sse.μe*ne^pa.α*(1.0-pa.β*ze^pa.σ) - sse.ωie*nie*h_e;
 
     #1. The interior solution is:
     #Using bisection method:
@@ -33,44 +33,58 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
         error("Bisection: signs equal --> Cannot solve.")
     end
 
-    potential_n = n_opt(potential_z);
+    potential_n  = n_opt(potential_z);
+    potential_ni = fun_ni(potential_n);
 
-    interior_hamiltonian = objective(potential_z,potential_n);
+    interior_hamiltonian = objective(potential_z,potential_n,potential_ni);
 
     #2. The corner solution is:
-    corner_zz = 0.0;
-    corner_nn = 0.0;
+    corner_zz  = 0.0;
+    corner_nn  = 0.0;
+    corner_nni = 0.0;
 
-    corner_hamiltonian = objective(corner_zz,corner_nn);
+    corner_hamiltonian = objective(corner_zz,corner_nn,corner_nni);
 
     if corner_hamiltonian > interior_hamiltonian
-        zze = corner_zz;
-        nne = corner_nn;
+        zze  = corner_zz;
+        nne  = corner_nn;
+        nnie = corner_nni;
     else
-        zze = potential_z;
-        nne = potential_n;
+        zze  = potential_z;
+        nne  = potential_n;
+        nnie = potential_ni;
     end
 
     #Final Output:
-    #println("zze = ", zze, "nne = ", nne)
-    zze, nne
+    println("zze = ", zze, "nne = ", nne, "nnie = ", nnie)
+    zze, nne, nnie
 
 end
 
-function recover_controlse!(ctrlvec::Array{Float64}, θw::Float64 ,θvec::Array{Float64}, solvec::Array{Float64})
+function recover_controlse!(ctrlvec::Array{Float64,2}, θw::Float64 ,θvec::Array{Float64}, solvec::Array{Float64,2})
     (Nspan,~)=size(solvec)
 
-    for j=1:Nspan
-      θe = θvec[j];
-      ue    = solvec[j,1];
-      μe     = solvec[j,2];
-      λe     = solvec[j,4];
-      ωe     = solvec[j,6];
-      sse = StateE(ue, μe, λe, ωe);
+    for j=Nspan:-1:1
+        θe      = θvec[j];
+        ue      = solvec[j,1];
+        μe      = solvec[j,2];
+        ye_agg  = solvec[j,3];
+        λe      = solvec[j,4];
+        le_agg  = solvec[j,5];
+        ωfe     = solvec[j,6];
+        lie_agg = solvec[j,7];
+        ωie     = solvec[j,8];
+        wie     = solvec[j,9];
+        ϕie     = solvec[j,10];
 
-      (zze, nne) = new_find_controlse( θw, θe, sse, pa)
-      ctrlvec[j,1] = zze;
-      ctrlvec[j,2] = nne;
+        sse = StateE(ue, μe, ye_agg, λe, le_agg, ωfe, lie_agg, ωie, wie, ϕie);
+
+        (zze, nne, nnie) = new_find_controlse( θw, θe, sse, pa)
+
+        ctrlvec[j,1] = zze;
+        ctrlvec[j,2] = nne;
+        ctrlvec[j,3] = nnie;
     end
+
     nothing
 end
