@@ -26,7 +26,7 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
                            sse.ωfe*(ne-nie)*h_e + sse.μe*ne^pa.α*(1.0-pa.β*ze^pa.σ) - sse.ωie*nie*h_e;
 
     #Defining values for the grid:
-    Nz = 1000; #Number of Zs
+    Nz = 100000; #Number of Zs
     zstep = (z_upbar - z_lwbar)/(Nz-1);
     zgrid = range(z_lwbar, stop = z_upbar, length = Nz);
 
@@ -75,8 +75,8 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
         nn  = corner_nn;
         nni = corner_nni;
     else
-        zz  = nne;
-        nn  = zze;
+        zz  = zze;
+        nn  = nne;
         nni = nnie;
     end
 
@@ -86,20 +86,30 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
 
 end
 
-function recover_controlse!(ctrlvec::Array{Float64}, θw::Float64 ,θvec::Array{Float64}, solvec::Array{Float64})
+function recover_controlse!(ctrlvec::Array{Float64,2}, θw::Float64 ,θvec::Array{Float64}, solvec::Array{Float64,2})
     (Nspan,~)=size(solvec)
 
-    for j=1:Nspan
-      θe = θvec[j];
-      ue    = solvec[j,1];
-      μe     = solvec[j,2];
-      λe     = solvec[j,4];
-      ωe     = solvec[j,6];
-      sse = StateE(ue, μe, λe, ωe);
+    for j=Nspan:-1:1
+        θe      = θvec[j];
+        ue      = solvec[j,1];
+        μe      = solvec[j,2];
+        ye_agg  = solvec[j,3];
+        λe      = solvec[j,4];
+        le_agg  = solvec[j,5];
+        ωfe     = solvec[j,6];
+        lie_agg = solvec[j,7];
+        ωie     = solvec[j,8];
+        wie     = solvec[j,9];
+        ϕie     = solvec[j,10];
 
-      (zze, nne) = new_find_controlse( θw, θe, sse, pa)
-      ctrlvec[j,1] = zze;
-      ctrlvec[j,2] = nne;
+        sse = StateE(ue, μe, ye_agg, λe, le_agg, ωfe, lie_agg, ωie, wie, ϕie);
+
+        (zze, nne, nnie) = new_find_controlse( θw, θe, sse, pa)
+
+        ctrlvec[j,1] = zze;
+        ctrlvec[j,2] = nne;
+        ctrlvec[j,3] = nnie;
     end
+
     nothing
 end

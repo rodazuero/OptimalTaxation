@@ -98,11 +98,11 @@ pa = init_parameters();
             #ne:
         controles_e[3].plot(θespan[1:500], controlse[:,3])
         controles_e[1].set_title("nie")
-        
 
-    #E= DataFrame(controlse)
-    #names!(E,[:z, :n] )
-    #CSV.write("ControlsEntrepreneurs.csv", E)
+
+    E= DataFrame(controlse)
+    names!(E,[:z, :n, :ni] )
+    CSV.write("ControlsEntrepreneurs.csv", E)
     #RungeKuttaE=hcat(DataFrame(solutione),E, DataFrame(thetae=θespan))
     #CSV.write("RungeKuttaNewE.csv", RungeKuttaE)
 
