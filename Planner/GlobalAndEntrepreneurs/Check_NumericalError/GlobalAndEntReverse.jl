@@ -47,9 +47,8 @@ pa = init_parameters();
 #Global Problem (Reverse)
     μ_end = solutione[1,2];
     e_end = elb;
-    μ_end = 0.0;
-    e_end = pa.θ_e_ub;
-    par   = 0.0;
+    #Definitions for the functions of e and p:
+    par   = -0.75;
     upper_cons = 0.0
     cons  = ((elb-(pa.θ_e_lb+upper_cons))/((pa.θ_w_ub-pa.θ_w_lb)^(1.0+par)));
 
@@ -69,39 +68,81 @@ pa = init_parameters();
     recover_controls!(controls, θspan, solution, par, cons);
     controls
 
-    real = Array{Float64}(undef,Nspan,1);
+    #Calculating the values of the observed μ and e (analitic solution):
+    real = Array{Float64}(undef,Nspan,2);
+    fill!(real, NaN);
 
     for i=1:Nspan
-        real[i,1] = cons*(θspan[i]-pa.θ_w_lb)^(1.0+par)+(pa.θ_e_lb+upper_cons)
+        real[i,2] = cons*(θspan[i]-pa.θ_w_lb)^(1.0+par)+(pa.θ_e_lb+upper_cons)
+        real[i,1] = -1.0 + ((θspan[i]-pa.θ_w_lb)*(real[i,2]-pa.θ_e_lb))/((pa.θ_w_ub-pa.θ_w_lb)*(pa.θ_e_ub-pa.θ_e_lb))
     end
 
-    find_states_RKPack!
-
-    fig, figura=plt.subplots(1,4)
-    fig.suptitle("Figura")
+    fig, figura=plt.subplots(1,3)
+    fig.suptitle("Our RK solutions")
         #μ:
-    figura[1].plot(θspan[1:500], solution[1:500,1])
+    figura[1].plot(θspan[1:500], solution[1:500,2])
+    figura[1].plot(θspan[1:500], real[:,2])
+    figura[1].legend(["μ RK", "μ real"],loc="upper right")
     figura[1].set(ylabel="μ")
         #e:
     figura[2].plot(θspan[1:500], solution[1:500,2])
+    figura[2].plot(θspan[1:500], real[:,2])
+    figura[2].legend(["e RK", "e real"],loc="upper right")
     figura[2].set(ylabel="e")
-        #e real:
-    figura[3].plot(θspan[1:500], real[:,1])
-    figura[3].set(ylabel="e real")
         #p:
-    figura[4].plot(θspan[1:500], controls[1:500,1])
-    figura[4].set(ylabel="p")
+    figura[3].plot(θspan[1:500], controls[1:500,1])
+    figura[3].set(ylabel="p")
 
+    #Calculating the function through the Runge-Kutta package:
+    parameters = [par,cons,pa.θ_w_lb,λe0]; #Parameters to solve the differencial equations
 
-    par   = 0.0;
-    upper_cons = 0.0;
-    cons  = ((elb-(pa.θ_e_lb+upper_cons))/((pa.θ_w_ub-pa.θ_w_lb)^(1.0+par)));
-    p = [par,cons,pa.θ_w_lb,1.0]
+    initial_val = [μ_end, e_end]; #Initial values to solve the differencial equations
+    θ_limits    = (pa.θ_w_ub,pa.θ_w_lb) #The θspan, to solve the equations
 
-    my_runge_kutta_reverse_RKPack!(du,u,p,θ)
+    prob = ODEProblem(my_runge_kutta_reverse_RKPack!,initial_val,θ_limits,parameters)
+    alg = RK4()
+    solution_RKPack = solve(prob,alg_hints=[:stiff])
+    alg = Rosenbrock23()
+    solution_RKPack = solve(prob,alg)
+    #Saving the results in a matrix:
+    sol_RKPackage = Array{Float64}(undef,Nspan,2);
+    fill!(sol_RKPackage, NaN);
+    for i = 1:Nspan
+        (mu_sol,e_sol) = solution_RKPack(θspan[i]);
+        sol_RKPackage[i,1] = mu_sol;
+        sol_RKPackage[i,2] = e_sol;
+    end
+    diff_estimated = Array{Float64}(undef,Nspan,4);
+    fill!(diff_estimated, NaN);
+    diff_estimated[:,1] = real[:,1]-sol_RKPackage[:,1];
+    diff_estimated[:,2] = real[:,1]-solution[:,1];
+    diff_estimated[:,3] = real[:,2]-sol_RKPackage[:,2];
+    diff_estimated[:,4] = real[:,2]-solution[:,2];
 
-    u0    = [μ_end, e_end]
-    tspan = (pa.θ_w_lb,pa.θ_w_ub)
+        #Viendo lo que generó el paquete:
+        fig, figura=plt.subplots(1,2)
+        fig.suptitle("Package RK solutions")
+            #μ:
+        figura[1].plot(θspan[1:500], sol_RKPackage[1:500,2])
+        figura[1].plot(θspan[1:500], real[:,2])
+        figura[1].legend(["μ RK", "μ real"],loc="upper right")
+        figura[1].set(ylabel="μ")
+            #e:
+        figura[2].plot(θspan[1:500], sol_RKPackage[1:500,2])
+        figura[2].plot(θspan[1:500], real[:,2])
+        figura[2].legend(["e RK", "e real"],loc="upper right")
+        figura[2].set(ylabel="e")
 
-    prob = ODEProblem(my_runge_kutta_reverse_RKPack!,u0,tspan,p)
-    sol = solve(prob)
+    #Viendo las diferencias con entre nuestra solución y el paquete:
+    fig, figura_RK=plt.subplots(1,2)
+    fig.suptitle("Runge Kutta Approximation Method")
+            #μ:
+        figura_RK[1].plot(θspan[:], diff_estimated[:,1])
+        figura_RK[1].plot(θspan[:], diff_estimated[:,2])
+        figura_RK[1].legend(["μ from package", "μ from our RK"],loc="upper right")
+        figura_RK[1].set(ylabel="μ", xlabel="θw")
+
+        figura_RK[2].plot(θspan[:], diff_estimated[:,3])
+        figura_RK[2].plot(θspan[:], diff_estimated[:,4])
+        figura_RK[2].legend(["e from package", "e from our RK"],loc="upper right")
+        figura_RK[2].set(ylabel="e", xlabel="θw")

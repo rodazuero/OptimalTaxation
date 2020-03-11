@@ -51,6 +51,7 @@ pa = init_parameters();
     λe0    =   1.0
     le0    =   0.0
     ωe0    =   1.3429705
+    ωe0    =   1.35
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
@@ -61,13 +62,6 @@ pa = init_parameters();
     solutione = Array{Float64}(undef,Nspan,10);
     fill!(solutione,NaN);
     my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
-
-
-    solution=solutione
-    xspan=espan
-    step=estep
-    θw=pa.θ_w_ub
-
 
     #solutione[end,:]
     #using DelimitedFiles

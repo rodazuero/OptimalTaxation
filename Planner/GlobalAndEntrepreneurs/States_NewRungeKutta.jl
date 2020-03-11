@@ -49,7 +49,7 @@ function find_states!(du,u,pa,θ,ini)
 
     #Find optimal controls
     #(z, n, l, p) = new_find_controls( ini[11], ss, pa);
-    (z, n, l, p) = new_find_controls( ini[11], ss, pa);
+    (z, n, l, p, κnz) = new_find_controls( ini[11], ss, pa);
     println("z = ", z, "n = ", n, "l = ", l, "p = ", p)
     any(isnan,(z, n, l, p)) && error("Function find_states gets NaN controls")
 
@@ -58,7 +58,6 @@ function find_states!(du,u,pa,θ,ini)
     h_tot= h_w + p*h_e;
 
     Vw = pa.indicator*uw^pa.ϕ + θ*l*ω - λ*uw - λ*pa.χ*l^(1.0+pa.ψ)/(1.0+pa.ψ);
-    #Ve = uw^pa.ϕ + λ*e*n^pa.α - λ*pa.β*(z^(1+pa.σ))/(1+pa.σ) - ω*n - λ*uw;
     Ve = pa.indicator*uw^pa.ϕ + λ*e*n^pa.α - λ*pa.β*z^(1.0+pa.σ)/(1.0+pa.σ) - ω*n - λ*uw;
     #Non independent distributions
     #dhw_de = pa.gg( θ , e);
@@ -79,7 +78,7 @@ function find_states!(du,u,pa,θ,ini)
         du[2] = Inf;
     end
     du[3] = p;
-    du[4] = -( Vw*∂hw_de + Ve*p*∂he_de + λ*n^pa.α*p*h_e);
+    du[4] = -( Vw*∂hw_de + Ve*p*∂he_de + λ*n^pa.α*(p*h_e + κnz));
     du[5] = ( e*n^pa.α - pa.β*z^(1.0+pa.σ)/(1.0+pa.σ) )*p*h_e - uw*h_tot - pa.χ*l^(1.0+pa.ψ)/(1.0+pa.ψ)*h_w;
     du[6] = 0.0;
     du[7] = θ*l*h_w - (n-pa.ϵ)*p*h_e;
