@@ -35,7 +35,8 @@ function new_find_controls( θ, ss, pa)
 
         println("1 case: A_cons implies n>n_full_info, z==0.")
         zz = 0.0;
-        nn = nn_z0;
+        nn_pi0 = ((ss.λ*ss.e)/ss.ω)^(1.0/(1.0-pa.α));
+        nn = min(nn_z0,nn_pi0);
         den_l(nn,zz) <= 0.0 && error("Denominator of L is negative or zero.") #Stop when denominator is negative.
         ll = ll_opt(nn,zz);
         pp = (pa.χ*ll^(1.0+pa.ψ))/den_p(nn,zz);
@@ -100,8 +101,11 @@ function new_find_controls( θ, ss, pa)
                 fun_zagrzero(n)     = ss.e*n^pa.α - ss.ω/ss.λ*n;
                 lkappa_nzagrzero(n) = pa.σ*pa.β*fun_zagrzero(n)^(pa.σ-1.0)/(1.0-pa.β*fun_zagrzero(n)^pa.σ)*(A_cons +
                                       ss.λ*ss.e*n^pa.α - ss.ω*n - ss.λ*fun_zagrzero(n)/pa.σ*(1.0-pa.β/(1.0+pa.σ)*fun_zagrzero(n)^pa.σ));
-                funct_nagrzero(n)   = pa.α/n*(-(1.0-pa.α)/pa.α*ss.ω*n + ss.λ/(1.0+pa.σ)*pa.β*fun_zagrzero(n)^(1.0+pa.σ) - A_cons) +
-                                      lkappa_nzagrzero(n)*(pa.α*ss.e*n^(pa.α-1.0) - ss.ω/ss.λ);
+                funct_nagrzero(n)   = pa.α*(-(1.0-pa.α)/pa.α*ss.ω*n + ss.λ/(1.0+pa.σ)*pa.β*fun_zagrzero(n)^(1.0+pa.σ) - A_cons) +
+                                      lkappa_nzagrzero(n)*(pa.α*ss.e*n^pa.α - ss.ω/ss.λ*n);
+
+                println("fun(n_lwbar) = ", funct_nagrzero(n_lwbar), "fun(n_upbar) = ", funct_nagrzero(n_upbar),
+                        "n_lwbar = ", n_lwbar, "n_upbar = ", n_upbar)
 
                 #Solving for n using bisection:
                 if funct_nagrzero(n_lwbar)*funct_nagrzero(n_upbar)<0
