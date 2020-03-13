@@ -1,5 +1,5 @@
 function new_find_controls( θ, ss, pa, par, cons)
-
+      
       pp = (1.0+par)*cons*(θ-pa.θ_w_lb)^par
 
       pp;

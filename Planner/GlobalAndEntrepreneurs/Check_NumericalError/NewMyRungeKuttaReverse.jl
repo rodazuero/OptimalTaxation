@@ -54,18 +54,16 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step, pa, 
 
 end
 
-function my_runge_kutta_reverse_RKPack!(du,u,p,t)
+function my_runge_kutta_reverse_RKPack!(du,u,p,θ)
+    pp = (1.0+p[1])*p[2]*(θ-p[3])^p[1];
 
-    pp = (1.0+p[1])*p[2]*(θ-p[3])^p[1]
-
+    #Defining the variables we are solving:
     μ     = u[1];
     e     = u[2];
 
-    h_e   = pa.he( θ, e);
-    h_w   = pa.hw( θ, e);
     h_tot = pa.hh( θ, e, pp);
 
+    #Solving the difference of the variables:
     du[1] = p[4]*h_tot;
     du[2] = pp;
-
 end

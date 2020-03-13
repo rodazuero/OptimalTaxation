@@ -57,7 +57,7 @@ end
 function recover_controlse!(ctrlvec::Array{Float64}, θw::Float64 ,θvec::Array{Float64}, solvec::Array{Float64})
     (Nspan,~)=size(solvec)
 
-    for j=1:Nspan
+    for j=Nspan:-1:1
       θe = θvec[j];
       ue    = solvec[j,1];
       μe     = solvec[j,2];

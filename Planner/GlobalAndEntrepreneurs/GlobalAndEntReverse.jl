@@ -51,6 +51,7 @@ pa = init_parameters();
     λe0    =   1.0
     le0    =   0.0
     ωe0    =   1.3429705
+    ωe0    =   1.3
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
@@ -61,13 +62,6 @@ pa = init_parameters();
     solutione = Array{Float64}(undef,Nspan,10);
     fill!(solutione,NaN);
     my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
-
-
-    solution=solutione
-    xspan=espan
-    step=estep
-    θw=pa.θ_w_ub
-
 
     #solutione[end,:]
     #using DelimitedFiles
@@ -278,27 +272,40 @@ pa = init_parameters();
                 end
 
 
+
                         fig, tax_ent=plt.subplots(2,3)
                         fig.suptitle("")
                             #τ_c:
                         tax_ent[1,1].plot(θspan[1:500], to_plot[:,1])
-                        tax_ent[1,1].set(ylabel="e*nn^pa.α-ω*e*nn", xlabel="θw")
+                        tax_ent[1,1].set(ylabel="e*nn^pa.α-ω*nn", xlabel="θw")
                             #τ_n:
                         tax_ent[1,2].plot(θspan[1:500], to_plot[:,2])
-                        tax_ent[1,2].set(ylabel="e*nn^pa.α-ω*e*nn - Tn", xlabel="θw")
+                        tax_ent[1,2].set(ylabel="e*nn^pa.α-ω*nn - Tn", xlabel="θw")
                             #τ_c:
                         tax_ent[1,3].plot(θspan[1:500], to_plot[:,3])
-                        tax_ent[1,3].set(ylabel="e*nn^pa.α-ω*e*nn - Tn - z", xlabel="θw")
+                        tax_ent[1,3].set(ylabel="e*nn^pa.α-ω*nn - Tn - z", xlabel="θw")
                         #τ_c:
                     tax_ent[2,1].plot(solution[:,3], to_plot[:,1])
-                    tax_ent[2,1].set(ylabel="e*nn^pa.α-ω*e*nn", xlabel="e")
+                    tax_ent[2,1].set(ylabel="e*nn^pa.α-ω*nn", xlabel="e")
                         #τ_n:
                     tax_ent[2,2].plot(solution[:,3], to_plot[:,2])
-                    tax_ent[2,2].set(ylabel="e*nn^pa.α-ω*e*nn - Tn", xlabel="e")
+                    tax_ent[2,2].set(ylabel="e*nn^pa.α-ω*nn - Tn", xlabel="e")
                         #τ_c:
                     tax_ent[2,3].plot(solution[:,3], to_plot[:,3])
-                    tax_ent[2,3].set(ylabel="e*nn^pa.α-ω*e*nn - Tn - z", xlabel="e")
+                    tax_ent[2,3].set(ylabel="e*nn^pa.α-ω*nn - Tn - z", xlabel="e")
 
+
+                    #Restricción del z:
+                    rest = Array{Float64}(undef,Nspan,1);
+                    fill!(rest,NaN)
+
+                    rest[:] = controls[:,2].^pa.α.*(1.0.-pa.β*controls[:,1].^pa.σ)
+
+                    fig, restricz=plt.subplots(1,1)
+                    fig.suptitle("Restriction")
+                        #τ_c:
+                    restricz.plot(θspan[:], rest[:,1])
+                    restricz.set(ylabel="e*nn^pa.α*(1-βz^σ)", xlabel="θw")
 
 
                     graphs = fill(NaN,Nspan,2)
