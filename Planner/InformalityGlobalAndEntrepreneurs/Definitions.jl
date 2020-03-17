@@ -50,19 +50,27 @@ mutable struct Param
 end
 
 mutable struct State
-    e::Float64 #Threshold function
     uw::Float64 #Utility
-    ϕ_e::Float64
-    μ::Float64
-    λ::Float64
-    ω::Float64
+    μ::Float64 #Multiplier utility
+    e::Float64 #Threshold function
+    ϕe::Float64 #Multiplier e
+    Ye::Float64 #Aggregated product
+    λe::Float64 #Multiplier product
+    Le::Float64 #Labor
+    ωfe::Float64 #Multiplier labor
+    Lie::Float64 #Informal labor
+    ωie::Float64 #Multiplier informal labor market
+    wie::Float64 #Informal labor salary
+    ϕw::Float64 #Informal labor salary multiplier
 end
 
 mutable struct Control
-    n::Float64
-    p::Float64
     z::Float64
+    n::Float64
+    ni::Float64
     l::Float64
+    li::Float64
+    p::Float64
 end
 
 mutable struct StateE
@@ -73,9 +81,9 @@ mutable struct StateE
     Le::Float64 #Labor
     ωfe::Float64 #Multiplier labor
     Lie::Float64 #Informal labor
-    ωie::Float64 #Multiplier labor market
+    ωie::Float64 #Multiplier informal labor market
     wie::Float64 #Informal labor salary
-    ϕie::Float64 #Informal labor salary multiplier
+    ϕwe::Float64 #Informal labor salary multiplier
 end
 
 mutable struct ControlE

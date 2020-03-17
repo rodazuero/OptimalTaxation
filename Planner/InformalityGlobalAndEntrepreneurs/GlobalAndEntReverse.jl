@@ -18,7 +18,8 @@ include("Definitions.jl")
 #include("NewMyRungeKuttaReverse.jl")
 
 #Entrepreneurs Problem
-include("NewControlsAlgorithmE.jl")
+#include("NewControlsAlgorithmE.jl")
+include("NewControlsAlgorithmE_Grid.jl")
 include("States_NewRungeKuttaE.jl")
 include("NewMyRungeKuttaEReverse.jl")
 
@@ -41,26 +42,26 @@ pa = init_parameters();
     #Define proportion of agents in global problem
     gp     =   0.993
 
-    ue0    =   640.0
+    ue0    =   640.0 #guess
     μe0    =   0.0 - 1.0e-10
     ye0    =   0.0
     λe0    =   1.0
     le0    =   0.0
-    ωfe0   =   1.343
+    ωfe0   =   1.343 #guess
     lie0   =   0.0
-    ωie0   =   1.343
-    wie0   =   1.343
-    ϕie0   =   0.0
+    ωie0   =   1.343 #guess
+    wie0   =   1.343 #guess
+    ϕwe0   =   0.0
 
     Nspan = 500
-    y_end = [ue0, μe0, ye0, λe0, le0, ωfe0, lie0, ωie0, wie0, ϕie0, 0.0, 0.0, 0.0];
+    y_end = [ue0, μe0, ye0, λe0, le0, ωfe0, lie0, ωie0, wie0, ϕwe0, 0.0, 0.0, 0.0];
     elb = pa.θ_e_ub - ((1-gp)*(pa.θ_e_ub-pa.θ_e_a)*(1.0-pa.constant_w_lw*pa.constant_e_lw));
     eub = pa.θ_e_ub;
     estep = (eub - elb)/(Nspan - 1);
     espan = eub:-estep:elb;
     solutione = Array{Float64}(undef,Nspan,16);
     fill!(solutione,NaN);
-    my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
+    @time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
 
     #solutione[end,:]
     #using DelimitedFiles
@@ -117,20 +118,30 @@ pa = init_parameters();
     #CSV.write("marginal_taxes_e.csv",taxes2e)
 
 #Global Problem (Reverse)
-    uw_end    = solutione[1,1] #guess
-    μ_end     = solutione[1,2]
-    e_end     = elb;
-    he_ub     = pa.he(pa.θ_w_ub,e_end)
-    ϕ_e_end   = -(pa.indicator*solutione[1,1]^pa.ϕ*he_ub+solutione[1,4]*(e_end*controlse[1,2]^pa.α -(pa.β/(1.0+pa.σ))*controlse[1,1]^(1.0+pa.σ)
-                - solutione[1,1])*he_ub - solutione[1,6]*controlse[1,2]*he_ub + solutione[1,2]*controlse[1,2]^pa.α*(1.0-pa.β*controlse[1,1]^pa.σ))
-    y_agg_end = solutione[1,3]
-    λ_end     = 1.0 #guess
-    l_agg_end = solutione[1,5]
-    ω_end     = solutione[1,6] #guess=#
-    l_new_end = 0.0
-    y_new_end = 0.0
-    ystar_end = 0.0
-    lstar_end = 0.0
+
+    uw_end     = solutione[1,1]
+    μ_end      = solutione[1,2]
+    e_end      = elb
+    he_ub      = pa.he(pa.θ_w_ub,e_end)
+    ϕ_e_end    = -(( pa.indicator*solutione[1,1]^pa.ϕ +solutione[1,4]*(e_end*controlse[1,2]^pa.α- pa.δ/(1.0+pa.γ)*controlse[1,3]^(1.0+pa.γ)
+                 - pa.β/(1.0+pa.σ)*controlse[1,1]^(1.0+pa.σ) - solutione[1,1]) - solutione[1,6]*(controlse[1,2]-controlse[1,3])
+                 - solutione[1,8]*controlse[1,3])*he_ub  + solutione[1,2]*controlse[1,2]^pa.α*(1.0 - pa.β*controlse[1,1]^pa.σ))
+    y_agg_end  = solutione[1,3]
+    λ_end      = 1.0
+    l_agg_end  = solutione[1,5]
+    ωf_end     = solutione[1,6]
+    li_agg_end = solutione[1,7]
+    ωi_end     = solutione[1,8]
+    wi_end     = solutione[1,9]
+    ϕw_end    = solutione[1,10]
+    l_new_end  = solutione[1,11]
+    li_new_end = solutione[1,12]
+    y_new_end  = solutione[1,13]
+    lstar_end  = 0.0
+    listar_end = 0.0
+    ystar_end  = 0.0
+
+
 
     Nspan = 500
     y_end= [uw_end, μ_end, e_end, ϕ_e_end, y_agg_end, λ_end, l_agg_end, ω_end, l_new_end, y_new_end, 0, 0 ];

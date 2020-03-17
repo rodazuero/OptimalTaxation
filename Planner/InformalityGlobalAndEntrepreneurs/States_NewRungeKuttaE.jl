@@ -8,8 +8,8 @@ function find_statese!(du::Array{Float64,1},u::Array{Float64,1},pa,θ::Float64,�
     lie_agg = u[7];
     ωie     = u[8];
     wie     = u[9];
-    ϕie     = u[10];
-    
+    ϕwe     = u[10];
+
     le_new  = u[11];
     lie_new = u[12];
     ye_new  = u[13];
@@ -36,7 +36,7 @@ function find_statese!(du::Array{Float64,1},u::Array{Float64,1},pa,θ::Float64,�
     du[7] = -nie*h_e;
     du[8] = 0.0;
     du[9] = 0.0;
-    du[10] = 0.0;
+    du[10] = -1.0/(pa.δ*pa.γ)*nie^((1.0-pa.γ)/pa.γ)*(λe*pa.δ*nie^pa.γ-ωfe+ωie)*h_e ;
 
     du[11] = (ne-nie)*h_e;
     du[12] = nie*h_e;
