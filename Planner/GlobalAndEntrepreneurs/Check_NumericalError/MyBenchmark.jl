@@ -1,10 +1,9 @@
-cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
-cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Check_NumericalError")
+module MySimpleModel
 
 using Roots
 using NLopt
 using Statistics
-using PyPlot
+#using PyPlot
 using DataFrames
 using CSV
 using NLsolve
@@ -145,3 +144,5 @@ pa = init_parameters();
         figura_RK[2].plot(θspan[:], diff_estimated[:,4])
         figura_RK[2].legend(["e from package", "e from our RK"],loc="upper right")
         figura_RK[2].set(ylabel="e", xlabel="θw")
+
+end  # module MySimpleModel

@@ -1,4 +1,3 @@
-
 function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,θw; verbose = false)
 
     # θw is the upper bound of workers distribution. It´s taken from the global problem.
@@ -18,9 +17,9 @@ function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,�
     (Nspan,) =  size(xspan);
 
     #Loop over values of θ_e:
-    for i=Nspan:-1:1
+    for i=1:Nspan
 
-        println("i = ", i)
+        #println("i = ", i)
         #Current value for θ_e
         x = xspan[i];
         #θ = exp(xspan[i]);
@@ -60,4 +59,6 @@ function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,�
             solution[i-1,10]  = solution[i-1,3]./solution[i-1,8]
         end
     end
+
+
 end

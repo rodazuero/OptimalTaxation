@@ -29,7 +29,7 @@ function dhe(s,e,pa)
     dhe=-(pdf(Normal(pa.μ_e,((pa.σ2_e)^0.5)), log(e))*(1/e)*(1+((log(e)-pa.μ_e)/pa.σ2_e)))*cdf(Normal(pa.μ_w + pa.σ_we*((pa.σ2_w)^0.5)/((pa.σ2_e)^0.5)*(log(e)-pa.μ_e),((1.0-pa.σ_we^2.0)*pa.σ2_w)^0.5), log(s))*(1/e)
 end
 
-function find_statese!(du::Array{Float64},u,pa,θ,θe,ini)
+function find_statese!(du,u,pa,θe)
     ue     = u[1];
     μe     = u[2];
     ye_agg = u[3];
@@ -38,14 +38,13 @@ function find_statese!(du::Array{Float64},u,pa,θ,θe,ini)
     ωe     = u[6];
     le_new = u[7];
     ye_new = u[8];
+    θ = pa.θ_w_ub;
 
     #Construct state object
-    #sse = State(ue, μe, λe, ωe);
-    sse = StateE(ini[1], ini[2], ini[4], ini[6]);
+    sse = StateE(ue, μe, λe, ωe);
 
     #Find optimal controls
-    (ze, ne) = new_find_controlse( θ, ini[9], sse, pa);
-    println("zeRK = ", ze, "neRK = ", ne)
+    (ze, ne) = new_find_controlse( θ, θe, sse, pa);
     any(isnan,(ze, ne)) && error("Function find_statese gets NaN controls")
 
     h_e=  pa.he(θ, θe);

@@ -55,7 +55,8 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step, pa, 
 end
 
 function my_runge_kutta_reverse_RKPack!(du,u,p,θ)
-    pp = (1.0+p[1])*p[2]*(θ-p[3])^p[1];
+
+    pp = (1.0+p[1])*p[2]*(θ-p[3])^p[1]
 
     #Defining the variables we are solving:
     μ     = u[1];

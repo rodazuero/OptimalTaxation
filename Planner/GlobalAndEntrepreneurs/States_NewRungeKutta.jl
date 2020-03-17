@@ -31,7 +31,7 @@ function dhe(s,e,pa)
     dhe=-(pdf(Normal(pa.μ_e,((pa.σ2_e)^0.5)), log(e))*(1/e)*(1+((log(e)-pa.μ_e)/pa.σ2_e)))*cdf(Normal(pa.μ_w + pa.σ_we*((pa.σ2_w)^0.5)/((pa.σ2_e)^0.5)*(log(e)-pa.μ_e),((1.0-pa.σ_we^2.0)*pa.σ2_w)^0.5), log(s))*(1/e)
 end
 
-function find_states!(du,u,pa,θ,ini)
+function find_states!(du,u,pa,θ)
     uw    = u[1];
     μ     = u[2];
     e     = u[3];
@@ -44,13 +44,11 @@ function find_states!(du,u,pa,θ,ini)
     y_new = u[10];
 
     #Construct state object
-    #ss = State(e, uw, ϕ_e, μ, λ, ω);
-    ss = State(ini[3], ini[1], ini[4], ini[2], ini[6], ini[8]);
+    ss = State(e, uw, ϕ_e, μ, λ, ω);
 
     #Find optimal controls
-    #(z, n, l, p) = new_find_controls( ini[11], ss, pa);
-    (z, n, l, p) = new_find_controls( ini[11], ss, pa);
-    println("z = ", z, "n = ", n, "l = ", l, "p = ", p)
+    (z, n, l, p) = new_find_controls( θ, ss, pa);
+    #println("z = ", z, "n = ", n, "l = ", l, "p = ", p)
     any(isnan,(z, n, l, p)) && error("Function find_states gets NaN controls")
 
     h_e=  pa.he( θ, e);
@@ -70,7 +68,6 @@ function find_states!(du,u,pa,θ,ini)
     #Uniform distribution
     ∂he_de = 0.0;
     ∂hw_de = pa.gg(θ,e);
-    #∂hw_de = pa.gg(θ,e); #In the uniform case.
 
     du[1] = pa.χ*l^(1.0+pa.ψ)/θ;
     if uw > 0.0

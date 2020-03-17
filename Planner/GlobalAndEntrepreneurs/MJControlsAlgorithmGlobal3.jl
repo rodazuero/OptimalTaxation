@@ -2,17 +2,17 @@ function new_find_controls( θ, ss, pa)
 	verbose=true
     #INPUT: states and parameters
     #OUTPUT: optimal controls
-# 0.0 Preallocating 
+# 0.0 Preallocating
     corner_nn::Float64=NaN
 	corner_zz::Float64=NaN
 	corner_ll::Float64=NaN
 	corner_pp::Float64=NaN
-	corner_hamiltonian::Float64=NaN	
+	corner_hamiltonian::Float64=NaN
 	nn::Float64=NaN
 	zz::Float64=NaN
 	ll::Float64=NaN
 	pp::Float64=NaN
-	max_hamiltonian::Float64=-Inf	
+	max_hamiltonian::Float64=-Inf
 
 # 0.1 Recover densities:
     h_e::Float64 = pa.he(θ, ss.e);
@@ -36,11 +36,11 @@ function new_find_controls( θ, ss, pa)
     ll_opt(nvar,zvar) 	= (ss.ω*θ*h_w/den_l(nvar,zvar))^(1.0/pa.ψ)
     den_p(nvar,zvar)  	= θ*nvar^pa.α*(1.0-pa.β*zvar^pa.σ)
 
-    objective(lvar, nvar, pvar, zvar) = ( pa.indicator*ss.uw^pa.ϕ*(h_w+pvar*h_e) + ss.μ*pa.χ/θ*lvar^(1.0+pa.ψ) 
-						    	+ ss.λ*pvar*h_e*( ss.e*nvar^pa.α - pa.β/(1.0+pa.σ)*zvar^(1.0+pa.σ) - ss.uw ) 
+    objective(lvar, nvar, pvar, zvar) = ( pa.indicator*ss.uw^pa.ϕ*(h_w+pvar*h_e) + ss.μ*pa.χ/θ*lvar^(1.0+pa.ψ)
+						    	+ ss.λ*pvar*h_e*( ss.e*nvar^pa.α - pa.β/(1.0+pa.σ)*zvar^(1.0+pa.σ) - ss.uw )
     							- ss.λ*h_w*( ss.uw + pa.χ/(1.0+pa.ψ)*lvar^(1.0+pa.ψ) )
     							+ ss.ω*(θ*lvar*h_w-(nvar-pa.ς)*pvar*h_e) + ss.ϕ_e*pvar ) # Hamiltonian. big parenthesis needed for multline
-    
+
 # 1. Define cases
     # verbose && println("Inside the loop")
     if nn_z0 >= n_full_info
@@ -56,8 +56,8 @@ function new_find_controls( θ, ss, pa)
         z_2     = ((1.0+pa.σ)/(ss.λ*pa.β)*(A_cons+(1.0-pa.α)/pa.α*ss.ω*n_full_info))^(1.0/(1.0+pa.σ))
         #Keep the lower number:
         z_upbar = min(z_upbar,z_2);
-        z_int_lwbar = max(0.0, (A_cons + pa.ς*ss.ω*(1.0-pa.α)/pa.α)/(ss.λ*pa.β)*(1.0+pa.σ) )^(1.0/(1.0+pa.σ)) # min z for interior n 
-        weirdinterior = z_int_lwbar<pre_tax_profits_at_nmin/ss.λ && zfoc_at_nmin(z_int_lwbar)>=0 # Boolean for when A is not that big 
+        z_int_lwbar = max(0.0, (A_cons + pa.ς*ss.ω*(1.0-pa.α)/pa.α)/(ss.λ*pa.β)*(1.0+pa.σ) )^(1.0/(1.0+pa.σ)) # min z for interior n
+        weirdinterior = z_int_lwbar<pre_tax_profits_at_nmin/ss.λ && zfoc_at_nmin(z_int_lwbar)>=0 # Boolean for when A is not that big
         if nn_z0 >= pa.ς || weirdinterior
 
             verbose && println("Case 1: Interior n")
@@ -92,18 +92,18 @@ function new_find_controls( θ, ss, pa)
 	                nn=corner_nn
 	                ll=corner_ll
 	                pp=corner_pp
-	                max_hamiltonian=corner_hamiltonian 
-			end  
+	                max_hamiltonian=corner_hamiltonian
+			end
         else
 	        verbose && print("Case 2: n at lower bound. ")
-	        # 1.2 Evaluate n=nmin 
+	        # 1.2 Evaluate n=nmin
 	        z_upbar = min(z_int_lwbar, pre_tax_profits_at_nmin/ss.λ, z_upbar) # z_upbar just for the case \bar m > n_full_info
-	        nn = pa.ς	       
-	        # verbose && println("Lower=",zfoc_at_nmin(z_lwbar), "  Upper=", zfoc_at_nmin(z_upbar), "  n=", nn)	   
-	        # 1.2.1 Interior z 
+	        nn = pa.ς
+	        # verbose && println("Lower=",zfoc_at_nmin(z_lwbar), "  Upper=", zfoc_at_nmin(z_upbar), "  n=", nn)
+	        # 1.2.1 Interior z
 	        if zfoc_at_nmin(z_lwbar)*zfoc_at_nmin(z_upbar)<0
 	            zz = find_zero(zfoc_at_nmin, (z_lwbar,z_upbar), Bisection())
-	            if den_l(nn,zz) > 0.0 
+	            if den_l(nn,zz) > 0.0
 	            	# verbose && print("Interior z feasible. ")
 	                ll = ll_opt(nn,zz);
 	                pp = (pa.χ*ll^(1.0+pa.ψ))/den_p(nn,zz);

@@ -10,21 +10,23 @@ fig_graphs && using PyPlot
 using DataFrames
 using CSV
 using NLsolve
+using DifferentialEquations
 #using Plots
-#using DifferentialEquations
 
 #Global Problem
 include("Definitions2.jl")
 include("MJControlsAlgorithmGlobal3.jl")
-include("States_NewRungeKutta.jl")
+#include("States_NewRungeKutta.jl")
 #include("NewMyRungeKuttaReverse.jl")
-include("TryGlobal.jl")
+include("original_RK.jl")
+include("original_States.jl")
 
 #Entrepreneurs Problem
 include("NewControlsAlgorithmE.jl")
-include("States_NewRungeKuttaE.jl")
+#include("States_NewRungeKuttaE.jl")
 #include("NewMyRungeKuttaEReverse.jl")
-include("TryEntrepreneurs.jl")
+include("original_RKEnt.jl")
+include("original_StatesEnt.jl")
 
 #The file for the function that computes everything:
 include("ProblemFunction.jl")
@@ -38,7 +40,8 @@ include("Integrals.jl")
 
 #Define values for the model parameters
 pa = init_parameters();
-
+alg = Tsit5() #Algorithm to solve differencial equations.
+alg = Rosenbrock23()
 #Entrepreneurs Problem
     #Initial boundary conditions (states from the global problem)
 
@@ -52,7 +55,7 @@ pa = init_parameters();
     ye0    =   0.0
     λe0    =   1.0
     le0    =   0.0
-    ωe0    =   1.342970 #mbar=1.0   ω_min=1.342555  ω_max=1.342625  
+    ωe0    =   1.342970 #mbar=1.0   ω_min=1.342555  ω_max=1.342625
     ωe0    =   1.338945
     #mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.341374 e(θw_lb)=θe_lb (but bunching not addressed)
 
@@ -64,7 +67,12 @@ pa = init_parameters();
     espan = elb:estep:eub;
     solutione = Array{Float64}(undef,Nspan,10);
     fill!(solutione,NaN);
-    my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
+    @time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
+    #@time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,alg)
+
+    fill!(solutione,NaN);
+    @time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
+    #@time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,alg)
 
     #solutione[end,:]
     #using DelimitedFiles
@@ -125,7 +133,12 @@ pa = init_parameters();
     xspan = xlb:xstep:xub;
     solution = Array{Float64}(undef,Nspan,12);
     fill!(solution,NaN);
-    my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)
+    @time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)
+    #@time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa,alg)
+
+    fill!(solution,NaN);
+    @time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)
+    #@time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa,alg)
 
     #using DelimitedFiles
     #writedlm("SolutionNew.csv",solution,';')
