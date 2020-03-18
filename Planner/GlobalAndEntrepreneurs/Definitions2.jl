@@ -50,31 +50,31 @@ mutable struct Param
 end
 
 mutable struct State
-    e::Float64 #Threshold function
-    uw::Float64 #Utility
-    ϕ_e::Float64
-    μ::Float64
-    λ::Float64
-    ω::Float64
+    e::Real #Threshold function
+    uw::Real #Utility
+    ϕ_e::Real
+    μ::Real
+    λ::Real
+    ω::Real
 end
 
 mutable struct Control
-    n::Float64
-    p::Float64
-    z::Float64
-    l::Float64
+    n::Real
+    p::Real
+    z::Real
+    l::Real
 end
 
 mutable struct StateE
-    ue::Float64 #Utility
-    μe::Float64
-    λe::Float64
-    ωe::Float64
+    ue::Real #Utility
+    μe::Real
+    λe::Real
+    ωe::Real
 end
 
 mutable struct ControlE
-    ze::Float64
-    ne::Float64
+    ze::Real
+    ne::Real
 end
 
 

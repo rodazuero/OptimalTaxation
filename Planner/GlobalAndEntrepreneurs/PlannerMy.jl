@@ -37,7 +37,8 @@ include("Integrals.jl")
 
 #Define values for the model parameters
 pa  = init_parameters();
-alg = Rosenbrock23(); #Define the algorithm we are using to solve the differencial equations.
+#alg = Rosenbrock23(autodiff=false); #Define the algorithm we are using to solve the differencial equations.
+alg = Rosenbrock23();
 #alg = alg_hints=[:stiff]
 println("alg = ", alg)
 

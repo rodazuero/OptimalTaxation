@@ -23,6 +23,8 @@ include("NewMyRungeKuttaEReverse.jl")
 
 #Define values for the model parameters
 pa = init_parameters();
+alg = RK4() #Algorithm to solve the differencial equations.
+println("alg = ", alg)
 
 #Entrepreneurs Problem
     #Define proportion of agents in global problem
@@ -41,7 +43,10 @@ pa = init_parameters();
     estep = (eub - elb)/(Nspan - 1);
     espan = eub:-estep:elb;
     solutione = Array{Float64}(undef,Nspan,10);
-    my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
+    fill!(solutione,NaN);
+    @time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
+    fill!(solutione,NaN);
+    @time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
 
 #Global Problem (Reverse)
     μ_end = solutione[1,2];
@@ -58,8 +63,11 @@ pa = init_parameters();
     xstep = (xub - xlb)/(Nspan - 1);
     xspan = xub:-xstep:xlb;
     solution = Array{Float64}(undef,Nspan,2);
-    my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa, par, cons)
-
+    fill!(solutione,NaN);
+    @time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa, par, cons)
+    fill!(solutione,NaN);
+    @time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa, par, cons)
+    
     θspan = Array{Float64,1}
     θspan = collect(xlb:xstep:xub)
 

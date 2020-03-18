@@ -32,23 +32,41 @@ function dhe(s,e,pa)
 end
 
 function find_states!(du,u,pa,θ)
-    uw    = u[1];
-    μ     = u[2];
-    e     = u[3];
-    ϕ_e   = u[4];
-    y_agg = u[5];
-    λ     = u[6];
-    l_agg = u[7];
-    ω     = u[8];
-    l_new = u[9];
-    y_new = u[10];
+    uw    = first(u[1]);
+    μ     = first(u[2]);
+    e     = first(u[3]);
+    ϕ_e   = first(u[4]);
+    y_agg = first(u[5]);
+    λ     = first(u[6]);
+    l_agg = first(u[7]);
+    ω     = first(u[8]);
+    l_new = first(u[9]);
+    y_new = first(u[10]);
+
+    println(typeof(uw), ", uw = ", uw)
+    println("μ = ", μ, ", e = ", e)
+
+    if isa(u,Array{Float64})
+        println(u)
+    else
+        println(fieldnames(u))
+        println(fieldnames(u[1]))
+        println(fieldnames(uw))
+        varinfo()
+    end
 
     #Construct state object
     ss = State(e, uw, ϕ_e, μ, λ, ω);
+    println("ss = ", ss)
 
     #Find optimal controls
     (z, n, l, p) = new_find_controls( θ, ss, pa);
     #println("z = ", z, "n = ", n, "l = ", l, "p = ", p)
+    zz = first(z)
+    nn = first(n)
+    ll = first(l)
+    pp = first(p)
+    #println("zz = ", zz, "nn = ", nn, "ll = ", ll, "pp = ", pp)
     any(isnan,(z, n, l, p)) && error("Function find_states gets NaN controls")
 
     h_e=  pa.he( θ, e);

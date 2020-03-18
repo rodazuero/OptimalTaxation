@@ -11,7 +11,7 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa,al
     #Loop over values of θw:
     for i = Nspan:-1:2
 
-        #println("i = ", i) #Actual θw
+        println("i = ", i) #Actual θw
 
         #Current value for θw:
         x   = xspan[i];
@@ -33,7 +33,7 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa,al
         initial_val = [uw0, μ0, e0, ϕ_e0, y_agg0, λ0, l_agg0, ω0, l_new0, y_new0];
         θ_limits    = (θ,θ_1); #The limits to solve the differencial equation.
 
-        prob = ODEProblem(find_states!,initial_val,θ_limits,pa)
+        prob  = ODEProblem(find_states!,initial_val,θ_limits,pa)
         #solution_RKPack = solve(prob)
         solution_RKPack = solve(prob,alg)
         #solution_RKPack = solve(prob,alg_hints=[:stiff])

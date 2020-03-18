@@ -16,10 +16,10 @@ using DifferentialEquations
 #Global Problem
 include("Definitions2.jl")
 include("MJControlsAlgorithmGlobal3.jl")
-#include("States_NewRungeKutta.jl")
-#include("NewMyRungeKuttaReverse.jl")
-include("original_RK.jl")
-include("original_States.jl")
+include("States_NewRungeKutta.jl")
+include("NewMyRungeKuttaReverse.jl")
+#include("original_RK.jl")
+#include("original_States.jl")
 
 #Entrepreneurs Problem
 include("NewControlsAlgorithmE.jl")
@@ -41,7 +41,7 @@ include("Integrals.jl")
 #Define values for the model parameters
 pa = init_parameters();
 alg = Tsit5() #Algorithm to solve differencial equations.
-alg = Rosenbrock23()
+alg = Rosenbrock23(autodiff=false)
 #Entrepreneurs Problem
     #Initial boundary conditions (states from the global problem)
 
@@ -133,8 +133,10 @@ alg = Rosenbrock23()
     xspan = xlb:xstep:xub;
     solution = Array{Float64}(undef,Nspan,12);
     fill!(solution,NaN);
-    @time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)
-    #@time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa,alg)
+    #@time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)
+    @time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa,alg)
+
+    step = xstep
 
     fill!(solution,NaN);
     @time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)

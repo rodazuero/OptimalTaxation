@@ -16,7 +16,7 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step, pa, 
     #Loop over values of θw
     for i = 1:Nspan
 
-        println("i = ", i)
+        #println("i = ", i)
         #Current value for theta
         x = xspan[i];
         θ = xspan[i];
