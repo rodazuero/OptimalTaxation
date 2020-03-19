@@ -37,14 +37,14 @@ rm(list=ls(all=TRUE))
 
 
 #Obtaining the empirical moments#
-source('/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/EmpiricalMoments/Momentos.R')
+source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/EmpiricalMoments/Momentos.R')
 
 
 
 #In this section we modify the directory to specify where are we going to extract the parameters and theoretical
 #moments that will be compared with the empircal ones. 
 
-CD<-'/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/'
+CD<-'/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/'
 setwd(CD)
 
 
@@ -211,9 +211,10 @@ EverythingEquilibrium<-EverythingEq
 
 
 
-#Specify if you want to do a subset of the moments:
+#Specify if you want to do a subset of the moments. For example:
+#limiting equilibria where entrepreneurs >0.2, etc. 
 
-SUBSET=FALSE
+SUBSET=TRUE
 
 if(SUBSET==TRUE){
   #Exclude predictions that do not have positive labor supply informal
@@ -259,7 +260,7 @@ Comparing$Decile<-c(seq(1,9,1),seq(1,9,1))
 
 
 
-for(i in 1:1){
+for(i in 1:19){
   #Deciding which observation to be analyzed
   #i=1
 
