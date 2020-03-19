@@ -2106,7 +2106,7 @@ void SobolRun(arma::vec WagesVectorIn,
     
     std::ifstream theFile ("/home/ec2-user/InAws/SobolDim15.csv");
     cout << " hello"<< endl;
-    int SIZEOBS=50000;
+    int SIZEOBS=200000;
     int NVAR=15;
     double MYARRAY[SIZEOBS][NVAR];
     // ...
