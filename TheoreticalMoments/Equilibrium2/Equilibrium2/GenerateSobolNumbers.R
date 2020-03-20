@@ -31,7 +31,7 @@ Rand <- Rand[rows, ]
 #The C++ file is actually reading a 15 dimension sobol, we need to put them correctly
 #And rho12
 Rand<-round(Rand,2)
-sobolsdir="/Users/razuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/AWS/InAws/Sobol3/SobolDim15.csv"
+sobolsdir="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/AWS/InAws/SobolDim15.csv"
 
 write.table(Rand,file = sobolsdir, sep=",",  col.names=FALSE,row.names = FALSE)
 
