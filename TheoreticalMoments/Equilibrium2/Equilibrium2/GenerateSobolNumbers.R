@@ -8,7 +8,7 @@ library(randtoolbox)
 
 #Naive sobol with huge range. Very few equilibria found
 set.seed(2581633)
-Rand<-sobol(200000,dim=15,seed=2581633)
+Rand<-sobol(2000000,dim=15,seed=2581633)
 Rand[,1]<-Rand[,1]*(0.85-0.6)+0.6  #aalpha between 0.6 and 0.85
 Rand[,2]<-Rand[,2]*(1-0.01)+0.01 ###ggamma between 0.01 and 1
 Rand[,3]<-Rand[,3]*(10-0.01)+0.01 #ddelta between 0.1 and 10 (Originally 0-700)
