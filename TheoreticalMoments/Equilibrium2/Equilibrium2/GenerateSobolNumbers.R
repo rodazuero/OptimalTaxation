@@ -8,14 +8,15 @@ library(randtoolbox)
 
 #Naive sobol with huge range. Very few equilibria found
 set.seed(2581633)
-Rand<-sobol(2000000,dim=15,seed=2581633)
+Rand<-sobol(200000,dim=15,seed=2581633)
 Rand[,1]<-Rand[,1]*(0.85-0.6)+0.6  #aalpha between 0.6 and 0.85
 Rand[,2]<-Rand[,2]*(1-0.01)+0.01 ###ggamma between 0.01 and 1
 Rand[,3]<-Rand[,3]*(10-0.01)+0.01 #ddelta between 0.1 and 10 (Originally 0-700)
 Rand[,4]<-Rand[,4]*(700-0.1)+0.01 #bbeta  between 0.1 and 2
 Rand[,5]<-Rand[,5]*(1-0.01)+0.01 ###ssigma  between 0.01 and 1
 Rand[,6]<-Rand[,6]*(10-0.01)+0.01 #Kappa between 0.01 and 10
-Rand[,7]<-Rand[,7]*(1-0.01)+0.01 #rrho between 0.01 and 1. Update: We haveLarger than psi
+Rand[,7]<-Rand[,2] #Gamma = rrho as suggested by juan manuel. 
+#Rand[,7]<-Rand[,7]*(1-0.01)+0.01 #rrho between 0.01 and 1. Update: We haveLarger than psi
 Rand[,8]<-Rand[,8]*(1-0.01)+0.01  ###psi between 0.01 and 1
 Rand[,9]<-Rand[,9]*(10-0.1)+0.01 #chi between 0.1 and 10 (Originally 0-700 but no eq>200)
 Rand[,10]<-Rand[,10]*(3-0.3)+0.3 #Mmu1 between 0.3 and 3
