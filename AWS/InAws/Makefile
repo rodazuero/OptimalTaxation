@@ -65,7 +65,7 @@ HOME=/home/ec2-user/
 DLIB=-lgsl -lgslcblas
 
 #7. Set number of threads	
-export OMP_NUM_THREADS=14
+export OMP_NUM_THREADS=1
 
 #-------------------------------------
 #3. Include directories:
