@@ -11,7 +11,7 @@ Three functions are created and called with the Calibration:: framework. The pac
 sudo yum install nlopt Boost
 ```
 
-Modifications in the local Makevars file might be necessary depending on the location of the RcppArmadillo headers. 
+Modifications in the locadl Makevars file might be necessary depending on the location of the RcppArmadillo headers. 
 The package generates three functions: `DistanceEstimator`, `EqWages`, and `EqWagesNumericVector`. They are called in the following way:
 
 

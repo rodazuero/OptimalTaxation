@@ -1620,11 +1620,11 @@ double DistanceEstimator(arma::vec Others, arma::vec WagesInit,
     IncomeEmpirical[7]=394.568/225.682;
     IncomeEmpirical[8]=595.318/225.682;
     
-    //Transforming theoretical income in proportion in terms of median:
-    for(int it=0; it<9; it++){
-        Theomoments[it][4]=Theomoments[it][4]/max(Theomoments[4][4],0.001);
-        Theomoments[it][0]=Theomoments[it][0]/max(Theomoments[4][0],0.001);
-    }
+    //Transforming theoretical income in proportion in terms of median as well as production:
+    //for(int it=0; it<9; it++){
+    //    Theomoments[it][4]=Theomoments[it][4]/max(Theomoments[4][4],0.001);
+    //    Theomoments[it][0]=Theomoments[it][0]/max(Theomoments[4][0],0.001);
+    //}
     
     //Production
     vector<double> Production(9);

@@ -65,11 +65,11 @@ HOME=/home/ec2-user/
 DLIB=-lgsl -lgslcblas
 
 #7. Set number of threads	
-export OMP_NUM_THREADS=4
+export OMP_NUM_THREADS=1
 
 #-------------------------------------
 #3. Include directories:
-INCDIR1=/usr/lib64/R/library/RcppArmadillo/incilude/
+INCDIR1=/usr/lib64/R/library/RcppArmadillo/include/
 INCDIR2=$(HOME)install/include/
 INCDIR3=/home/ec2-user/R/x86_64-koji-linux-gnu-library/3.4/Rcpp/include/
 INCDIR4=/usr/lib64/R/include/
