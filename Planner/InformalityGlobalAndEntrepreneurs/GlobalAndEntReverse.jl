@@ -22,12 +22,17 @@ include("Definitions.jl")
 include("NewControlsAlgorithmE_Grid.jl")
 include("States_NewRungeKuttaE.jl")
 include("NewMyRungeKuttaEReverse.jl")
+#Entrepreneurs problem without informality
+include("NotInfRungeKuttaEntrepreneurs.jl")
+include("NotInfStatesEntrepreneurs.jl")
+include("NotInfControlsEntrepreneurs.jl")
+include("NotInfTaxes.jl")
 
 #The file for the function that computes everything:
 include("ProblemFunction.jl")
 
-#Marginal taxes:
-#include("marginal_taxes.jl")
+#Taxes:
+include("Taxes.jl")
 
 #Propositions:
 #include("Propositions.jl")
@@ -40,21 +45,22 @@ pa = init_parameters();
     #Initial boundary conditions (states from the global problem)
 
     #Define proportion of agents in global problem
-    gp     =   0.993
+    #gp     =   0.993
+    gp     =   0.8
 
     ue0    =   640.0 #guess
     μe0    =   0.0 - 1.0e-10
     ye0    =   0.0
     λe0    =   1.0
-    le0    =   0.0
-    ωfe0   =   1.343 #guess
+    lfe0   =   0.0
+    ωfe0   =   1.342 #guess
     lie0   =   0.0
-    ωie0   =   1.343 #guess
-    wie0   =   1.343 #guess
+    ωie0   =   1.342 #guess
+    wie0   =   1.342 #guess
     ϕwe0   =   0.0
 
     Nspan = 500
-    y_end = [ue0, μe0, ye0, λe0, le0, ωfe0, lie0, ωie0, wie0, ϕwe0, 0.0, 0.0, 0.0];
+    y_end = [ue0, μe0, ye0, λe0, lfe0, ωfe0, lie0, ωie0, wie0, ϕwe0, 0.0, 0.0, 0.0];
     elb = pa.θ_e_ub - ((1-gp)*(pa.θ_e_ub-pa.θ_e_a)*(1.0-pa.constant_w_lw*pa.constant_e_lw));
     eub = pa.θ_e_ub;
     estep = (eub - elb)/(Nspan - 1);
@@ -62,17 +68,6 @@ pa = init_parameters();
     solutione = Array{Float64}(undef,Nspan,16);
     fill!(solutione,NaN);
     @time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
-
-    #solutione[end,:]
-    #using DelimitedFiles
-    #writedlm("SolutionNewE.csv",solution,';')
-
-    #For log-normal distribution
-    #=xlb= log(pa.θ_w_lb);
-    xub = log(pa.θ_w_ub);
-    xstep = (xub - xlb)/(Nspan - 1);
-    xspan = xlb:xstep:xub;
-    θspan = exp.(xspan);=#
 
     θespan = Array{Float64,1}
     θespan = collect(elb:estep:eub)
@@ -82,43 +77,221 @@ pa = init_parameters();
     recover_controlse!(controlse, pa.θ_w_ub ,θespan, solutione);
     controlse
 
+    #States
+    fig, estados_e=plt.subplots(5,2)
+    fig.suptitle("Optimal States - Entrepreneurs Problem")
+        #ue:
+    estados_e[1,1].plot(θespan[:], solutione[:,1])
+    #estados_e[1,1].set_title("u_e")
+    estados_e[1,1].set(ylabel="ue")
+        #μe:
+    estados_e[1,2].plot(θespan[:], solutione[:,2])
+    estados_e[1,2].plot(θespan[:], repeat([0],500), "tab:green")
+    #estados_e[1,2].set_title("μe")
+    estados_e[1,2].set(ylabel="μe")
+        #Ye:
+    estados_e[2,1].plot(θespan[:], solutione[:,3])
+    estados_e[2,1].plot(θespan[:], repeat([0.15],500), "tab:green")
+    estados_e[2,1].set(ylabel="Ye")
+        #λe:
+    estados_e[2,2].plot(θespan[:], solutione[:,4])
+    estados_e[2,2].set(ylabel="λe")
+        #Lfe:
+    estados_e[3,1].plot(θespan[:], solutione[:,5])
+    estados_e[3,1].plot(θespan[:], repeat([0],500), "tab:green")
+    #estados_e[3,1].set_title("Le")
+    estados_e[3,1].set(ylabel="Lfe")
+        #ωf:
+    estados_e[3,2].plot(θespan[:], solutione[:,6])
+    estados_e[3,2].set(ylabel="ωfe")
+        #Li_e:
+    estados_e[4,1].plot(θespan[:], solutione[:,7])
+    estados_e[4,1].plot(θespan[:], repeat([0],500), "tab:green")
+    estados_e[4,1].set(ylabel="Lie")
+        #ωie:
+    estados_e[4,2].plot(θespan[:], solutione[:,8])
+    estados_e[4,2].set(ylabel="ωie")
+        #wie:
+    estados_e[5,1].plot(θespan[:], solutione[:,9])
+    estados_e[5,1].plot(θespan[:], repeat([0],500), "tab:green")
+    estados_e[5,1].set(ylabel="wie")
+        #ϕwe:
+    estados_e[5,2].plot(θespan[:], solutione[:,10])
+    estados_e[5,2].set(ylabel="φwe")
 
-        #Controls
-        fig, controles_e=plt.subplots(1,3)
-        fig.suptitle("Optimal Controls - Entrepreneurs Problem")
-            #ze:
-        controles_e[1].plot(θespan[1:500], controlse[:,1])
-        #controles_e[1,1].set_title("ze")
-        controles_e[1].set(ylabel="ze")
-            #ne:
-        controles_e[2].plot(θespan[1:500], controlse[:,2])
-        #controles_e[2].plot(θespan[1:500], n_full_e[1:500], linestyle="--")
-        #controles_e[1].set_title("ne")
-        controles_e[2].set(ylabel="ne")
-        controles_e[2].legend(["n","n full info"],loc="upper left")
-            #ne:
-        controles_e[3].plot(θespan[1:500], controlse[:,3])
-        controles_e[1].set_title("nie")
+    #Controls
+    fig, controles_e=plt.subplots(1,3)
+    fig.suptitle("Optimal Controls - Entrepreneurs Problem")
+        #ze:
+    controles_e[1].plot(θespan[:], controlse[:,1])
+    controles_e[1].set(ylabel="ze")
+        #ne:
+    controles_e[2].plot(θespan[:], controlse[:,2])
+    controles_e[2].set(ylabel="ne")
+    #controles_e[2].legend(["n","n full info"],loc="upper left")
+        #nie:
+    controles_e[3].plot(θespan[:], controlse[:,3])
+    controles_e[3].set_title("nie")
 
-
-    E= DataFrame(controlse)
-    names!(E,[:z, :n, :ni] )
-    CSV.write("ControlsEntrepreneurs.csv", E)
-    #RungeKuttaE=hcat(DataFrame(solutione),E, DataFrame(thetae=θespan))
-    #CSV.write("RungeKuttaNewE.csv", RungeKuttaE)
-
-    #Marginal taxes and taxes path:
-    τ_prime_e = Array{Float64}(undef,Nspan,2);
+    #Marginal taxes:
+    τ_prime_e = Array{Float64}(undef,Nspan,3);
     fill!(τ_prime_e,NaN);
-    marginal_taxese(controlse, θespan, solutione, pa);
+    marginal_taxese!(τ_prime_e,solutione,controlse, θespan, pa);
 
-    #taxese = DataFrame(τ_prime_e)
-    #names!(taxese,[:tau_c, :tau_n] )
-    #taxes2e=hcat(DataFrame(theta=θespan),taxese)
-    #CSV.write("marginal_taxes_e.csv",taxes2e)
+    #Marginal taxes:
+    fig, margtax_e=plt.subplots(1,3)
+    fig.suptitle("Marginal Taxes")
+        #τc prime:
+    margtax_e[1].plot(θespan[:], τ_prime_e[:,1])
+    margtax_e[1].set(ylabel="τ_c'")
+        #τn prime:
+    margtax_e[2].plot(θespan[:], τ_prime_e[:,2])
+    margtax_e[2].set(ylabel="τ_n'")
+        #τn prime:
+    margtax_e[3].plot(θespan[:], τ_prime_e[:,3])
+    margtax_e[3].set(ylabel="τ_n' (eq ni)")
 
-#Global Problem (Reverse)
+    #Solving entrepreneurs without informality:
+    Nspan = 500
+    y_end= [ue0, μe0, ye0, λe0, lfe0, ωfe0, 0.0, 0.0];
+    elb = pa.θ_e_ub - ((1-gp)*(pa.θ_e_ub-pa.θ_e_a)*(1.0-pa.constant_w_lw*pa.constant_e_lw));
+    eub = pa.θ_e_ub;
+    estep = (eub - elb)/(Nspan - 1);
+    espan = eub:-estep:elb;
+    NotInfsolutione = Array{Float64}(undef,Nspan,10);
+    fill!(NotInfsolutione,NaN);
+    NotInfmy_runge_kuttae_reverse!(NotInfsolutione,y_end,espan,estep,pa,pa.θ_w_ub)
 
+    θespan = Array{Float64,1}
+    θespan = collect(elb:estep:eub)
+
+    NotInfcontrolse = Array{Float64}(undef,Nspan,2);
+    fill!(NotInfcontrolse,NaN);
+    NotInfrecover_controlse!(NotInfcontrolse, pa.θ_w_ub ,θespan, solutione);
+    NotInfcontrolse
+
+    #Gráficos comparando:
+    #States
+    fig, estados_e=plt.subplots(5,2)
+    fig.suptitle("Optimal States - Entrepreneurs Problem")
+        #ue:
+    estados_e[1,1].plot(θespan[:], solutione[:,1],θespan[:], NotInfsolutione[:,1])
+    estados_e[1,1].legend(["ue with informality", "ue without informality"],loc="upper right")
+    estados_e[1,1].set(ylabel="ue", xlabel = "θe")
+        #μe:
+    estados_e[1,2].plot(θespan[:], solutione[:,2], θespan[:], NotInfsolutione[:,2])
+    estados_e[1,2].plot(θespan[:], repeat([0],500), "tab:green")
+    estados_e[1,2].legend(["μe with informality", "μe without informality"],loc="upper right")
+    estados_e[1,2].set(ylabel="μe", xlabel = "θe")
+        #Ye:
+    estados_e[2,1].plot(θespan[:], solutione[:,3], θespan[:], NotInfsolutione[:,3])
+    estados_e[2,1].plot(θespan[:], repeat([0.15],500), "tab:green")
+    estados_e[2,1].legend(["Ye with informality", "Ye without informality"],loc="upper right")
+    estados_e[2,1].set(ylabel="Ye", xlabel = "θe")
+        #λe:
+    estados_e[2,2].plot(θespan[:], solutione[:,4], θespan[:], NotInfsolutione[:,4])
+    estados_e[2,2].legend(["λe with informality", "λe without informality"],loc="upper right")
+    estados_e[2,2].set(ylabel="λe", xlabel = "θe")
+        #Lfe:
+    estados_e[3,1].plot(θespan[:], solutione[:,5], θespan[:], NotInfsolutione[:,5])
+    estados_e[3,1].plot(θespan[:], repeat([0],500), "tab:green")
+    estados_e[3,1].legend(["Lfe with informality", "Lfe without informality"],loc="upper right")
+    estados_e[3,1].set(ylabel="Lfe", xlabel = "θe")
+        #ωf:
+    estados_e[3,2].plot(θespan[:], solutione[:,6], θespan[:], NotInfsolutione[:,6])
+    estados_e[3,2].legend(["ωfe with informality", "ωfe without informality"],loc="upper right")
+    estados_e[3,2].set(ylabel="ωfe", xlabel = "θe")
+        #Li_e:
+    estados_e[4,1].plot(θespan[:], solutione[:,7])
+    estados_e[4,1].plot(θespan[:], repeat([0],500), "tab:green")
+    estados_e[4,1].set(ylabel="Lie", xlabel = "θe")
+        #ωie:
+    estados_e[4,2].plot(θespan[:], solutione[:,8])
+    estados_e[4,2].set(ylabel="ωie", xlabel = "θe")
+        #wie:
+    estados_e[5,1].plot(θespan[:], solutione[:,9])
+    estados_e[5,1].plot(θespan[:], repeat([0],500), "tab:green")
+    estados_e[5,1].set(ylabel="wie", xlabel = "θe")
+        #ϕwe:
+    estados_e[5,2].plot(θespan[:], solutione[:,10])
+    estados_e[5,2].set(ylabel="φwe", xlabel = "θe")
+
+    #Controls
+    fig, controles_e=plt.subplots(1,3)
+    fig.suptitle("Optimal Controls - Entrepreneurs Problem")
+        #ze:
+    controles_e[1].plot(θespan[:], controlse[:,1], θespan[:], NotInfcontrolse[:,1])
+    controles_e[1].legend(["ze with informality", "ze without informality"],loc="upper right")
+    controles_e[1].set(ylabel="ze", xlabel = "θe")
+        #ne:
+    controles_e[2].plot(θespan[:], controlse[:,2], θespan[:], NotInfcontrolse[:,2])
+    controles_e[1].legend(["ne with informality", "ne without informality"],loc="upper right")
+    controles_e[2].set(ylabel="ne", xlabel = "θe")
+    #controles_e[2].legend(["n","n full info"],loc="upper left")
+        #nie:
+    controles_e[3].plot(θespan[:], controlse[:,3])
+    controles_e[3].set(ylabel="nie", xlabel = "θe")
+
+    #Marginal taxes:
+    NIτ_prime_e = Array{Float64}(undef,Nspan,2);
+    fill!(NIτ_prime_e,NaN);
+    NotInfmarginal_taxese(NIτ_prime_e,NotInfcontrolse,θespan,NotInfsolutione, pa);
+
+    #Marginal taxes:
+    fig, margtax_e=plt.subplots(1,3)
+    fig.suptitle("Marginal Taxes")
+        #τc prime:
+    margtax_e[1].plot(θespan[:], τ_prime_e[:,1],θespan[:], NIτ_prime_e[:,1])
+    margtax_e[1].legend(["τ_c' with informality", "τ_c' without informality"],loc="upper right")
+    margtax_e[1].set(ylabel="τ_c'",xlabel = "θe")
+        #τn prime:
+    margtax_e[2].plot(θespan[:], τ_prime_e[:,2],θespan[:], NIτ_prime_e[:,2])
+    margtax_e[2].legend(["τ_n' with informality", "τ_n' without informality"],loc="upper right")
+    margtax_e[2].set(ylabel="τ_n'", xlabel = "θe")
+        #τn prime:
+    margtax_e[3].plot(θespan[:], τ_prime_e[:,3])
+    margtax_e[3].set(ylabel="τ_n' (eq ni)")
+
+    difference = Array{Float64}(undef,Nspan,8);
+    fill!(difference,NaN);
+    difference[:,1:6] = solutione[:,1:6] - NotInfsolutione[:,1:6]
+    difference[:,7:8] = controlse[:,1:2] - NotInfcontrolse[:,1:2]
+
+    #States
+    fig, estados_e=plt.subplots(4,2)
+    fig.suptitle("Optimal States - Entrepreneurs Problem")
+        #ue:
+    estados_e[1,1].plot(θespan[:], difference[:,1])
+    estados_e[1,1].set(ylabel="ue inf - ue without inf", xlabel = "θe")
+        #μe:
+    estados_e[1,2].plot(θespan[:], difference[:,2])
+    estados_e[1,2].set(ylabel="μe inf - μe without inf", xlabel = "θe")
+        #Ye:
+    estados_e[2,1].plot(θespan[:], difference[:,3])
+    estados_e[2,1].set(ylabel="Ye inf - Ye without inf", xlabel = "θe")
+        #λe:
+    estados_e[2,2].plot(θespan[:], difference[:,4])
+    estados_e[2,2].set(ylabel="λe inf - λe without inf", xlabel = "θe")
+        #Lfe:
+    estados_e[3,1].plot(θespan[:], difference[:,5])
+    estados_e[3,1].set(ylabel="Lfe inf - λe without inf", xlabel = "θe")
+        #ωf:
+    estados_e[3,2].plot(θespan[:], difference[:,6])
+    estados_e[3,2].set(ylabel="ωfe inf - ωfe without inf", xlabel = "θe")
+        #z_e:
+    estados_e[4,1].plot(θespan[:], difference[:,7])
+    estados_e[4,1].set(ylabel="ze inf - ze without inf", xlabel = "θe")
+        #n_e:
+    estados_e[4,2].plot(θespan[:], difference[:,8])
+    estados_e[4,2].set(ylabel="ne inf - ne without inf", xlabel = "θe")
+
+
+
+
+
+
+
+#Global Problem (Reverse):
     uw_end     = solutione[1,1]
     μ_end      = solutione[1,2]
     e_end      = elb
@@ -128,23 +301,23 @@ pa = init_parameters();
                  - solutione[1,8]*controlse[1,3])*he_ub  + solutione[1,2]*controlse[1,2]^pa.α*(1.0 - pa.β*controlse[1,1]^pa.σ))
     y_agg_end  = solutione[1,3]
     λ_end      = 1.0
-    l_agg_end  = solutione[1,5]
+    lf_agg_end  = solutione[1,5]
     ωf_end     = solutione[1,6]
     li_agg_end = solutione[1,7]
     ωi_end     = solutione[1,8]
     wi_end     = solutione[1,9]
-    ϕw_end    = solutione[1,10]
-    l_new_end  = solutione[1,11]
+    ϕw_end     = solutione[1,10]
+    lf_new_end  = solutione[1,11]
     li_new_end = solutione[1,12]
     y_new_end  = solutione[1,13]
-    lstar_end  = 0.0
+    lfstar_end  = 0.0
     listar_end = 0.0
     ystar_end  = 0.0
 
 
 
     Nspan = 500
-    y_end= [uw_end, μ_end, e_end, ϕ_e_end, y_agg_end, λ_end, l_agg_end, ω_end, l_new_end, y_new_end, 0, 0 ];
+    y_end= [uw_end, μ_end, e_end, ϕ_e_end, y_agg_end, λ_end, lf_agg_end, ω_end, lf_new_end, y_new_end, 0.0, 0.0];
     xlb= pa.θ_w_lb;
     xub = pa.θ_w_ub;
     xstep = (xub - xlb)/(Nspan - 1);

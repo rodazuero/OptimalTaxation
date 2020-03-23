@@ -15,10 +15,13 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
     z_upbar = min(z_1,z_2);
 
     #Defining the functions we are using:
+    #fun_ni: entrepreneurs FOC wrt ni
     fun_ni(n)   = ((pa.α*θe*n^(pa.α-1.0)-sse.wie)/pa.δ)^(1.0/pa.γ);
+    #n_opt: solving n from planner's Entrepreneurs FOC wrt z
     n_opt(z)    = (-sse.λe*z*h_e/(pa.σ*sse.μe))^(1.0/pa.α);
-    fun_nz(z,n) = (sse.λe*pa.α*θe*h_e - sse.ωfe*h_e*n^(1.0-pa.α) + pa.α*sse.μe*(1.0-pa.β*z^pa.σ)+
-                   fun_ni(n)^(1.0-pa.γ)/n*pa.α*(1.0-pa.α)*θe/(pa.δ*pa.γ)*(sse.λe*pa.δ*fun_ni(n)^pa.γ+sse.ωie-sse.ωfe)*h_e);
+    #n_opt: Planner's Entrepreneurs FOC wrt n
+    fun_nz(z,n) = (sse.λe*pa.α*θe*n^(pa.α-1.0)*h_e - sse.ωfe*h_e + pa.α*sse.μe*(1.0-pa.β*z^pa.σ)+
+                   fun_ni(n)^(1.0-pa.γ)/n^(2.0-pa.α)*pa.α*(1.0-pa.α)*θe/(pa.δ*pa.γ)*(sse.λe*pa.δ*fun_ni(n)^pa.γ+sse.ωie-sse.ωfe)*h_e);
     fun_z(z)    = fun_nz(z,n_opt(z));
 
     #Hamiltonian:

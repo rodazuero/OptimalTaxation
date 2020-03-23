@@ -53,14 +53,14 @@ mutable struct State
     uw::Float64 #Utility
     μ::Float64 #Multiplier utility
     e::Float64 #Threshold function
-    ϕe::Float64 #Multiplier e
-    Ye::Float64 #Aggregated product
-    λe::Float64 #Multiplier product
-    Le::Float64 #Labor
-    ωfe::Float64 #Multiplier labor
-    Lie::Float64 #Informal labor
-    ωie::Float64 #Multiplier informal labor market
-    wie::Float64 #Informal labor salary
+    ϕ::Float64 #Multiplier e
+    Y::Float64 #Aggregated product
+    λ::Float64 #Multiplier product
+    Lf::Float64 #Labor
+    ωf::Float64 #Multiplier labor
+    Li::Float64 #Informal labor
+    ωi::Float64 #Multiplier informal labor market
+    wi::Float64 #Informal labor salary
     ϕw::Float64 #Informal labor salary multiplier
 end
 
@@ -78,7 +78,7 @@ mutable struct StateE
     μe::Float64 #Multiplier utility
     Ye::Float64 #Aggregated product
     λe::Float64 #Multiplier product
-    Le::Float64 #Labor
+    Lfe::Float64 #Labor
     ωfe::Float64 #Multiplier labor
     Lie::Float64 #Informal labor
     ωie::Float64 #Multiplier informal labor market
@@ -89,8 +89,20 @@ end
 mutable struct ControlE
     ze::Float64
     ne::Float64
+    nie::Float64
 end
 
+mutable struct NotInfStateE
+    ue::Float64 #Utility
+    μe::Float64
+    λe::Float64
+    ωe::Float64
+end
+
+mutable struct NotInfControlE
+    ze::Float64
+    ne::Float64
+end
 
 #Constructor for the parameters
 function init_parameters()
@@ -104,6 +116,7 @@ function init_parameters()
     α= 0.73;
     δ= 0.12873;
     γ= 0.7341;
+    γ= 10.0;
     β= 0.2135;
     σ= 0.1827;
     ϵ= 0.0;

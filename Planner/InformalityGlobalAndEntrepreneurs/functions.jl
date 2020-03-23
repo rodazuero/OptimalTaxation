@@ -96,4 +96,7 @@ sse = StateE(ue, μe, ye_agg, λe, le_agg, ωfe, lie_agg, ωie, wie, ϕwe);
 
 #Correr entrepreneurs problem and bounds for global problem
 
-ss = State(uw_end, μ_end,e_end, ϕ_e_end, y_agg_end, λ_end, l_agg_end, ωf_end, li_agg_end, ωi_end, wi_end, ϕw_end);
+ss = State(uw_end, μ_end,e_end, ϕ_e_end, y_agg_end, λ_end, lf_agg_end, ωf_end, li_agg_end, ωi_end, wi_end, ϕw_end);
+
+fun_ni(n) = ((pa.α*ss.e*n^(pa.α-1.0)-ss.wi)/pa.δ)^(1.0/pa.γ)
+foc_z(n)

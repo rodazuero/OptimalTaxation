@@ -1,18 +1,17 @@
-function my_runge_kuttae_reverse!(solution::Array{Float64,2},y_end::Array{Float64,1},xspan,step::Float64,pa,θw::Float64; verbose = false)
+function my_runge_kuttae_reverse!(solution::Array{Float64,2},y_end::Array{Float64,1},xspan,step::Float64,pa; verbose = false)
 #The states vector is given in the following order:
-# ue, μe, ye, λe, le, ωfe, lie, ωie, wie and ϕwe.
-# We get the following auxiliary states: le_new, lie_new and ye_new.
+# uw, μ, e, ϕe, y, λ, l, ωf, li, ωi, wi and ϕw.
+# We get the following auxiliary states: l_new, li_new and y_new.
 
-    # θw is the upper bound of workers distribution. It´s taken from the global problem.
     (Nspan,columns) = size(solution);
-    num_states = columns - 3;
+    num_states      = columns - 3;
     solution[end,1:num_states] = y_end;
 
     #Defining the vectors for Ruge-Kutta:
-    z1  = Array{Float64,1}(undef,num_states);
-    z2  = Array{Float64,1}(undef,num_states);
-    z3  = Array{Float64,1}(undef,num_states);
-    z4  = Array{Float64,1}(undef,num_states);
+    z1 = Array{Float64,1}(undef,num_states);
+    z2 = Array{Float64,1}(undef,num_states);
+    z3 = Array{Float64,1}(undef,num_states);
+    z4 = Array{Float64,1}(undef,num_states);
     y   = Array{Float64,1}(undef,num_states);
     ini = Array{Float64,1}(undef,num_states+1);
 
@@ -20,33 +19,29 @@ function my_runge_kuttae_reverse!(solution::Array{Float64,2},y_end::Array{Float6
         fill!(i,NaN);
     end
 
-    #Loop over values of θ_e:
+    #Loop over values of θ_w:
     for i=Nspan:-1:1
 
         println("i = ", i)
-        #Current value for θ_e
+        #Current value for θ_w
         x  = xspan[i];
-        θe = xspan[i];
-        #println("it = ", i, " x = ", x, " theta_e = ", θe)
+        θw = xspan[i];
+        #println("it = ", i, " x = ", x, " θ_w = ", θw)
 
         for j = 1:num_states
             y[j]   = solution[i,j];
             ini[j] = solution[i,j];
         end
-            ini[num_states+1] = θe;  #Actual θe;
+            ini[num_states+1] = θw;  #Actual θw;
 
         #We save the approximation of the derivative of the states, according to the order 4 Runge-Kutta method:
-        #println("z1")
-        find_statese!(z1, y, pa, θw, θe, ini);
+        find_states!(z1, y, pa, θw, ini);
         any(isnan,z1) && error("z1 is NaN ")
-        #println("z2")
-        find_statese!(z2, y+0.5*step*z1, pa, θw, x+0.5*step, ini);
+        find_states!(z2, y+0.5*step*z1, pa, θw+0.5*step, ini);
         any(isnan,z2) && error("z2 is NaN ")
-        #println("z3")
-        find_statese!(z3, y+0.5*step*z2, pa, θw, x+0.5*step, ini);
+        find_states!(z3, y+0.5*step*z2, pa, θw+0.5*step, ini);
         any(isnan,z3) && error("z3 is NaN ")
-        #println("z4")
-        find_statese!(z4, y+step*z3, pa, θw, x+step, ini);
+        find_states!(z4, y+step*z3, pa, θw+step, ini);
         any(isnan,z4) && error("z4 is NaN ")
 
         #Update vector of states
@@ -57,6 +52,7 @@ function my_runge_kuttae_reverse!(solution::Array{Float64,2},y_end::Array{Float6
             solution[i-1,14] = solution[i-1,5]./solution[i-1,11];
             solution[i-1,15] = solution[i-1,7]./solution[i-1,12];
             solution[i-1,16] = solution[i-1,3]./solution[i-1,13];
+
         end
 
         if i==Nspan
