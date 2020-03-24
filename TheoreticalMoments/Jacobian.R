@@ -298,7 +298,7 @@ for(i in 1:46){
   write.csv(EverythingEqDistance[i,],file='Everything.csv')
   
   
-  #1. Production a
+  #1. Production 
   
   
   
@@ -313,8 +313,10 @@ for(i in 1:46){
                 EverythingEqDistance$ProductionV9[i])
   
   
-  Comparing$Production <-  c(ProductionTheoretical, MOMENTO7A$Produccion[1:9]/MOMENTO7A$Produccion[5])
+  Comparing$Production <-  c(ProductionTheoretical/EverythingEqDistance$ProductionV5[i], MOMENTO7A$Produccion[1:9]/MOMENTO7A$Produccion[5])
   
+  
+  Comparing$ProductionReal <-  c(ProductionTheoretical, MOMENTO7A$Produccion[1:9])
   
   #2. Taxes Proportionally cumulative
   
@@ -349,7 +351,7 @@ for(i in 1:46){
   
   Comparing$TotalDemandWorkers <-  c(DemandTotalWorkers/DemandTotalWorkers[5],MOMENTO2$`Numero de trabajadores`[1:9]/MOMENTO2$`Numero de trabajadores`[5] )
   
-  
+  Comparing$TotalDemandWorkersReal <-  c(DemandTotalWorkers,MOMENTO2$`Numero de trabajadores`[1:9] )
   
   
   #4. Informal Demand proportion
@@ -380,7 +382,10 @@ for(i in 1:46){
   
   
   
-  Comparing$IncomeDistribution <-  c(Income,as.numeric(M5.3A[4:12,2]) )
+  Comparing$IncomeDistribution <-  c(Income/EverythingEqDistance$IncomeDistributionV5[i],as.numeric(M5.3A[4:12,2])/as.numeric(M5.3A[8,2]) )
+  
+  
+  Comparing$IncomeDistributionReal <-  c(Income,as.numeric(M5.3A[4:12,2]) )
   
   
   #6. Informal labor supply
@@ -447,8 +452,32 @@ for(i in 1:46){
   #Size of line
   sizeline=10
   sizerel=7
-  #Production
+  
+  
+  #Production relative to median
   Production<-ggplot(data=Comparing,aes(x=Decile,y=Production,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  Production<-Production+scale_colour_discrete(labels=c("Data","Model")  )
+  Production<-Production+ theme_bw()
+  Production<-Production+scale_x_continuous(breaks = seq(1,9,1))
+  Production<-Production + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  Production<-Production+ggtitle(" ") +ylab("Relative to median")
+  Production
+  
+  dev.set()
+  png(file="Production.png",width=1600,height=850)
+  print(Production)
+  dev.off()
+
+
+  #Production real
+  Production<-ggplot(data=Comparing,aes(x=Decile,y=ProductionReal,colour=Sample))+geom_line(size=sizeline)+geom_point()
   Production<-Production+scale_colour_discrete(labels=c("Data","Model")  )
   Production<-Production+ theme_bw()
   Production<-Production+scale_x_continuous(breaks = seq(1,9,1))
@@ -464,11 +493,9 @@ for(i in 1:46){
   Production
   
   dev.set()
-  png(file="Production.png",width=1600,height=850)
+  png(file="ProductionReal.png",width=1600,height=850)
   print(Production)
   dev.off()
-  print("haha")
-
   
   
   
@@ -498,7 +525,7 @@ for(i in 1:46){
   
   #Total demand workers
   
-  #DemandWorkers
+  #DemandWorkers median
   DemandWorkers<-ggplot(data=Comparing,aes(x=Decile,y=TotalDemandWorkers,colour=Sample))+geom_line(size=sizeline)+geom_point()
   DemandWorkers<-DemandWorkers+scale_colour_discrete(labels=c("Data","Model")  )
   DemandWorkers<-DemandWorkers+ theme_bw()
@@ -511,7 +538,7 @@ for(i in 1:46){
     legend.text=element_text(size = rel(sizerel)),
     legend.title=element_text(size=rel(0)))
   
-  DemandWorkers<-DemandWorkers+ggtitle(" ") +ylab("#")
+  DemandWorkers<-DemandWorkers+ggtitle(" ") +ylab("relative to median")
   DemandWorkers
   
   dev.set()
@@ -520,8 +547,50 @@ for(i in 1:46){
   dev.off()
   
   
-  #IncomeDistribution
+  DemandWorkers<-ggplot(data=Comparing,aes(x=Decile,y=TotalDemandWorkersReal,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  DemandWorkers<-DemandWorkers+scale_colour_discrete(labels=c("Data","Model")  )
+  DemandWorkers<-DemandWorkers+ theme_bw()
+  DemandWorkers<-DemandWorkers+scale_x_continuous(breaks = seq(1,9,1))
+  DemandWorkers<-DemandWorkers + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  DemandWorkers<-DemandWorkers+ggtitle(" ") +ylab("relative to median")
+  DemandWorkers
+  
+  dev.set()
+  png(file="DemandWorkersReal.png",width=1600,height=850)
+  print(DemandWorkers)
+  dev.off()
+  
+  
+  #IncomeDistribution relative to median
   IncomeDistribution<-ggplot(data=Comparing,aes(x=Decile,y=IncomeDistribution,colour=Sample))+geom_line(size=sizeline)+geom_point()
+  IncomeDistribution<-IncomeDistribution+scale_colour_discrete(labels=c("Data","Model")  )
+  IncomeDistribution<-IncomeDistribution+ theme_bw()
+  IncomeDistribution<-IncomeDistribution+scale_x_continuous(breaks = seq(1,9,1))
+  IncomeDistribution<-IncomeDistribution + theme(
+    plot.title = element_text(hjust=0.5,size = rel(sizerel)),
+    axis.title=element_text(size = rel(sizerel)),
+    axis.text.x=element_text(size = rel(sizerel)),
+    axis.text.y=element_text(size = rel(sizerel)),
+    legend.text=element_text(size = rel(sizerel)),
+    legend.title=element_text(size=rel(0)))
+  
+  IncomeDistribution<-IncomeDistribution+ggtitle(" ") +ylab("Relative to median")
+  IncomeDistribution
+  
+  dev.set()
+  png(file="IncomeDistribution.png",width=1600,height=850)
+  print(IncomeDistribution)
+  dev.off()
+  
+  #IncomeDistribution real
+  IncomeDistribution<-ggplot(data=Comparing,aes(x=Decile,y=IncomeDistributionReal,colour=Sample))+geom_line(size=sizeline)+geom_point()
   IncomeDistribution<-IncomeDistribution+scale_colour_discrete(labels=c("Data","Model")  )
   IncomeDistribution<-IncomeDistribution+ theme_bw()
   IncomeDistribution<-IncomeDistribution+scale_x_continuous(breaks = seq(1,9,1))
@@ -537,7 +606,7 @@ for(i in 1:46){
   IncomeDistribution
   
   dev.set()
-  png(file="IncomeDistribution.png",width=1600,height=850)
+  png(file="IncomeDistributionReal.png",width=1600,height=850)
   print(IncomeDistribution)
   dev.off()
   
