@@ -44,7 +44,7 @@ source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/Opt
 #In this section we modify the directory to specify where are we going to extract the parameters and theoretical
 #moments that will be compared with the empircal ones. 
 
-CD<-'/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/AWS/InAws/Output/V1/'
+CD<-'/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/AWS/InAws/Output/V2/'
 setwd(CD)
 
 
@@ -232,10 +232,13 @@ if(SUBSET==TRUE){
   #EverythingEq<-subset(EverythingEq,aalpha>0.46)
   
   #Exclude those with very few informal demand
-  EverythingEq<-subset(EverythingEq,InformalLaborSupplyPropV1>0.5)
+  dim(subset(EverythingEq,InformalLaborSupplyPropV1>0.01))
+  EverythingEq<-subset(EverythingEq,InformalLaborSupplyPropV1>0.01)
   
-  #Doing the restrictions necessary in the data
-  EverythingEq<-subset(EverythingEq,PropEntrepreneurs>0.25)
+  
+  dim(subset(EverythingEq,InformalDemandProportionV1>0.01))
+  
+
 }
 
 
@@ -260,7 +263,7 @@ Comparing$Decile<-c(seq(1,9,1),seq(1,9,1))
 
 
 
-for(i in 1:46){
+for(i in 1:90){
   #Deciding which observation to be analyzed
   #i=1
 
@@ -355,15 +358,16 @@ for(i in 1:46){
   
   
   #4. Informal Demand proportion
-  InformalDemandProportion<-c(EverythingEqDistance$InformalDemandProportionV4[i],
+  InformalDemandProportion<-c(EverythingEqDistance$InformalDemandProportionV1[i],
+                              EverythingEqDistance$InformalDemandProportionV4[i],
                               EverythingEqDistance$InformalDemandProportionV7[i],
                               EverythingEqDistance$InformalDemandProportionV8[i])
   
-  InformalPROPDemand <- data.table(c(MOMENTO3$Informalidad[1]/100,MOMENTO3$Informalidad[2]/100,MOMENTO3$Informalidad[3]/100,
+  InformalPROPDemand <- data.table(c(1,MOMENTO3$Informalidad[1]/100,MOMENTO3$Informalidad[2]/100,MOMENTO3$Informalidad[3]/100,
                                      InformalDemandProportion))
   
-  InformalPROPDemand$Decile<-c(4,7,8,4,7,8)
-  InformalPROPDemand$Sample<-as.factor(c(0,0,0,1,1,1))
+  InformalPROPDemand$Decile<-c(1,4,7,8,1,4,7,8)
+  InformalPROPDemand$Sample<-as.factor(c(0,0,0,0,1,1,1,1))
   
   
   
