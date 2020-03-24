@@ -44,7 +44,7 @@ source('/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/Opt
 #In this section we modify the directory to specify where are we going to extract the parameters and theoretical
 #moments that will be compared with the empircal ones. 
 
-CD<-'/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/TheoreticalMoments/Equilibrium2/Equilibrium2/SobolsGenerated/'
+CD<-'/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/AWS/InAws/Output/V1/'
 setwd(CD)
 
 
@@ -260,7 +260,7 @@ Comparing$Decile<-c(seq(1,9,1),seq(1,9,1))
 
 
 
-for(i in 1:19){
+for(i in 1:46){
   #Deciding which observation to be analyzed
   #i=1
 
