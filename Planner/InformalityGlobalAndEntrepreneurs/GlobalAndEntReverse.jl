@@ -19,7 +19,8 @@ include("Definitions.jl")
 
 #Entrepreneurs Problem
 #include("NewControlsAlgorithmE.jl")
-include("NewControlsAlgorithmE_Grid.jl")
+#include("NewControlsAlgorithmE_Grid.jl")
+include("NewControlsAlgorithmE_Merge.jl")
 include("States_NewRungeKuttaE.jl")
 include("NewMyRungeKuttaEReverse.jl")
 #Entrepreneurs problem without informality
@@ -46,7 +47,7 @@ pa = init_parameters();
 
     #Define proportion of agents in global problem
     #gp     =   0.993
-    gp     =   0.8
+    gp     =   0.7
 
     ue0    =   640.0 #guess
     μe0    =   0.0 - 1.0e-10
@@ -76,6 +77,13 @@ pa = init_parameters();
     fill!(controlse,NaN);
     recover_controlse!(controlse, pa.θ_w_ub ,θespan, solutione);
     controlse
+
+    checkue = Array{Float64}(undef,Nspan,2);
+    fill!(checkuw,NaN);
+    for j=1:Nspan
+        checkue[j,1] = controlse[j,2]^pa.α*(1.0-pa.β*controlse[j,1]^pa.σ)
+    end
+    checkue[:,2] = checkue[:,1]-solutione[:,1]
 
     #States
     fig, estados_e=plt.subplots(5,2)
@@ -225,7 +233,7 @@ pa = init_parameters();
     controles_e[1].set(ylabel="ze", xlabel = "θe")
         #ne:
     controles_e[2].plot(θespan[:], controlse[:,2], θespan[:], NotInfcontrolse[:,2])
-    controles_e[1].legend(["ne with informality", "ne without informality"],loc="upper right")
+    controles_e[2].legend(["ne with informality", "ne without informality"],loc="upper right")
     controles_e[2].set(ylabel="ne", xlabel = "θe")
     #controles_e[2].legend(["n","n full info"],loc="upper left")
         #nie:
@@ -286,9 +294,9 @@ pa = init_parameters();
     estados_e[4,2].set(ylabel="ne inf - ne without inf", xlabel = "θe")
 
 
-
-
-
+ttt = controlse[:,2].^pa.α.*(1.0.-pa.β*controlse[:,1].^pa.σ)
+ttt1 = NotInfcontrolse[:,2].^pa.α.*(1.0.-pa.β*NotInfcontrolse[:,1].^pa.σ)
+difff = ttt-ttt1
 
 
 #Global Problem (Reverse):

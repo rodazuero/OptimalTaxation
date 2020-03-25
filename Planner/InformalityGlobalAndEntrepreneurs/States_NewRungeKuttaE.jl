@@ -16,9 +16,10 @@ function find_statese!(du::Array{Float64,1},u::Array{Float64,1},pa,θ::Float64,�
 
     #Construct state object
     sse = StateE(ini[1], ini[2], ini[3], ini[4], ini[5], ini[6], ini[7], ini[8], ini[9], ini[10]);
-
+    println(sse)
     #Find optimal controls
     (ze, ne, nie) = new_find_controlse(θ, ini[end], sse, pa);
+    #println("ze = ", ze, "ne = ", ne, "nie = ", nie)
     any(isnan,(ze, ne, nie)) && error("Function find_statese gets NaN controls.")
 
     h_e = pa.he(θ, θe);
@@ -36,11 +37,17 @@ function find_statese!(du::Array{Float64,1},u::Array{Float64,1},pa,θ::Float64,�
     du[7] = -nie*h_e;
     du[8] = 0.0;
     du[9] = 0.0;
-    du[10] = -1.0/(pa.δ*pa.γ)*nie^(1.0-pa.γ)*(λe*pa.δ*nie^pa.γ-ωfe+ωie)*h_e ;
+
+    if nie == 0.0;
+        du[10] = 0.0;
+    else
+        du[10] = -1.0/(pa.δ*pa.γ)*nie^(1.0-pa.γ)*(λe*pa.δ*nie^pa.γ-ωfe+ωie)*h_e;
+    end
 
     du[11] = (ne-nie)*h_e;
     du[12] = nie*h_e;
     du[13] = ( θe*ne^pa.α - pa.δ/(1.0+pa.γ)*nie^(1.0+pa.γ) - pa.β/(1+pa.σ)*ze^(1+pa.σ) )*h_e;
 
+    #println(du)
     nothing
 end

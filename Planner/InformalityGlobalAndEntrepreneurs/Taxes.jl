@@ -41,24 +41,24 @@ function marginal_taxese!(τ_prime_e::Array{Float64,2},solvec::Array{Float64,2},
       #Definition of states and controls:
       θe = θvec[j];
 
-      ue  = solvec[1];
-      μe  = solvec[2];
-      ye  = solvec[3];
-      λe  = solvec[4];
-      lfe = solvec[5];
-      ωfe = solvec[6];
-      lie = solvec[7];
-      ωie = solvec[8];
-      wie = solvec[9];
-      ϕwe = solvec[10];
+      ue  = solvec[j,1];
+      μe  = solvec[j,2];
+      ye  = solvec[j,3];
+      λe  = solvec[j,4];
+      lfe = solvec[j,5];
+      ωfe = solvec[j,6];
+      lie = solvec[j,7];
+      ωie = solvec[j,8];
+      wie = solvec[j,9];
+      ϕwe = solvec[j,10];
 
       zze = ctrlvec[j,1];
       nne = ctrlvec[j,2];
-      nni = ctrlvec[j,2];
+      nni = ctrlvec[j,3];
 
       #Find the marginal taxes:
       τ_prime_e[j,1] = pa.β*zze^pa.σ; #τc prime
-      τ_prime_e[j,2] = (λe*θe*nne^(pa.α-1.0) - ωfe)/ωfe; #τn prime
+      τ_prime_e[j,2] = (λe*pa.α*θe*nne^(pa.α-1)-ωfe0)/ωfe0; #τn prime
       τ_prime_e[j,3] = (λe*pa.δ*nni^pa.γ+λe*wie-ωfe)/ωfe; #τn prime (formula from ni)
 
     end

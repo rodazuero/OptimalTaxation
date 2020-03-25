@@ -19,7 +19,8 @@ include("States_NewRungeKutta.jl")
 include("NewMyRungeKuttaReverse.jl")
 
 #Entrepreneurs Problem
-include("NewControlsAlgorithmE.jl")
+#include("NewControlsAlgorithmE.jl")
+include("NewControlsAlgorithmE_Merge.jl")
 include("States_NewRungeKuttaE.jl")
 #include("NewMyRungeKuttaEReverse.jl")
 include("TryEntrepreneurs.jl")

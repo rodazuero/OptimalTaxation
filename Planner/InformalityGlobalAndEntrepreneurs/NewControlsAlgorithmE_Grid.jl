@@ -8,15 +8,12 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
     #Defining bounds we use in various cases (limits of z):
     println("θe = ", θe, "μe = ", sse.μe)
     n_full_info  = ((sse.λe*pa.α*θe)/sse.ωfe)^(1.0/(1.0-pa.α));
-    ni_full_info = ((pa.α*θe*n_full_info^(pa.α-1.0)-sse.wie)/pa.δ)^(1.0/pa.γ);
-    println("n_full_info = ", n_full_info, "ni_full_info = ", ni_full_info, "ratio", ni_full_info^(1.0-pa.γ)/n_full_info)
     z_max   = (1.0/pa.β)^(1.0/pa.σ); #Max possible evasion.
     z_lwbar = eps(); #The smallest possible z.
     z_1     = z_max;
     z_2     = -pa.σ*sse.μe*n_full_info^pa.α/(sse.λe*h_e);
     #Keep the lower number:
-    z_upbar = min(z_1,z_2,z_3);
-    println("z_1 = ", z_1, "z_2 = ", z_2, "z_3 = ",z_3)
+    z_upbar = min(z_1,z_2);
 
     #Defining the functions we are using:
     #fun_ni: entrepreneurs FOC wrt ni
@@ -24,7 +21,7 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
     #n_opt: solving n from planner's Entrepreneurs FOC wrt z
     n_opt(z)    = (-sse.λe*z*h_e/(pa.σ*sse.μe))^(1.0/pa.α);
     #n_opt: Planner's Entrepreneurs FOC wrt n
-    fun_nz(z,n) = (sse.λe*pa.α*θe*n^(pa.α-1.0)*h_e - sse.ωfe*h_e + pa.α*sse.μe*(1.0-pa.β*z^pa.σ)+
+    fun_nz(z,n) = (sse.λe*pa.α*θe*n^(pa.α-1.0)*h_e - sse.ωfe*h_e + pa.α*sse.μe*n^(pa.α-1.0)*(1.0-pa.β*z^pa.σ)+
                    fun_ni(n)^(1.0-pa.γ)/n^(2.0-pa.α)*pa.α*(1.0-pa.α)*θe/(pa.δ*pa.γ)*(sse.λe*pa.δ*fun_ni(n)^pa.γ+sse.ωie-sse.ωfe)*h_e);
     fun_z(z)    = fun_nz(z,n_opt(z));
 
@@ -110,7 +107,8 @@ function recover_controlse!(ctrlvec::Array{Float64,2}, θw::Float64 ,θvec::Arra
         wie     = solvec[j,9];
         ϕwe     = solvec[j,10];
 
-        println("θe = ", θe, "μe = ", μe)
+        sse = StateE(ue, μe, ye_agg, λe, lfe_agg, ωfe, lie_agg, ωie, wie, ϕwe);
+
         (zze, nne, nnie) = new_find_controlse( θw, θe, sse, pa)
 
         ctrlvec[j,1] = zze;
