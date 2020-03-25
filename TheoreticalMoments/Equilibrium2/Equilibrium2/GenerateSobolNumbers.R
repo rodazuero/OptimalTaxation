@@ -33,7 +33,7 @@ Rand <- Rand[rows, ]
 #And rho12
 Rand<-round(Rand,2)
 #We need to do the sobol run in stages. no more than 50k is allowed in virtual memory for parallelization. 
-Rand<-Rand[1:50000,]
+Rand<-Rand[50000:100000,]
 sobolsdir="/Users/rodrigoazuero/Dropbox/OptmalTaxationShared/Data/git/LocalCopy/OptimalTaxation/AWS/InAws/SobolDim15.csv"
 
 write.table(Rand,file = sobolsdir, sep=",",  col.names=FALSE,row.names = FALSE)
