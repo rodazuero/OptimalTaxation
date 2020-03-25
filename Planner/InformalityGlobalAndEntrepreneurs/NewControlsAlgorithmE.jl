@@ -68,6 +68,8 @@ function recover_controlse!(ctrlvec::Array{Float64,2}, θw::Float64 ,θvec::Arra
     (Nspan,~)=size(solvec)
 
     for j=Nspan:-1:1
+        println(j)
+        
         θe      = θvec[j];
         ue      = solvec[j,1];
         μe      = solvec[j,2];
@@ -83,6 +85,7 @@ function recover_controlse!(ctrlvec::Array{Float64,2}, θw::Float64 ,θvec::Arra
         sse = StateE(ue, μe, ye_agg, λe, le_agg, ωfe, lie_agg, ωie, wie, ϕie);
 
         (zze, nne, nnie) = new_find_controlse( θw, θe, sse, pa)
+        println("ze = ", zze, "ne = ", nne, "nie = ", nnie)
 
         ctrlvec[j,1] = zze;
         ctrlvec[j,2] = nne;

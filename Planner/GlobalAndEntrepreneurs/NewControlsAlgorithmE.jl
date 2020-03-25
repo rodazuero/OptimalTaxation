@@ -66,6 +66,9 @@ function recover_controlse!(ctrlvec::Array{Float64}, θw::Float64 ,θvec::Array{
       sse = StateE(ue, μe, λe, ωe);
 
       (zze, nne) = new_find_controlse( θw, θe, sse, pa)
+      println("θeControls = ", θe)
+      println("ze = ", zze, "ne = ", nne)
+
       ctrlvec[j,1] = zze;
       ctrlvec[j,2] = nne;
     end

@@ -1,4 +1,3 @@
-
 cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 
@@ -19,8 +18,7 @@ include("States_NewRungeKutta.jl")
 include("NewMyRungeKuttaReverse.jl")
 
 #Entrepreneurs Problem
-#include("NewControlsAlgorithmE.jl")
-include("NewControlsAlgorithmE_Merge.jl")
+include("NewControlsAlgorithmE.jl")
 include("States_NewRungeKuttaE.jl")
 #include("NewMyRungeKuttaEReverse.jl")
 include("TryEntrepreneurs.jl")
@@ -58,7 +56,7 @@ pa = init_parameters();
     elb = pa.θ_e_ub - ((1-gp)*(pa.θ_e_ub-pa.θ_e_a)*(1.0-pa.constant_w_lw*pa.constant_e_lw));
     eub = pa.θ_e_ub;
     estep = (eub - elb)/(Nspan - 1);
-    espan = eub:-estep:elb;
+    espan = elb:estep:eub;
     solutione = Array{Float64}(undef,Nspan,10);
     fill!(solutione,NaN);
     my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
@@ -126,7 +124,7 @@ pa = init_parameters();
     xlb= pa.θ_w_lb;
     xub = pa.θ_w_ub;
     xstep = (xub - xlb)/(Nspan - 1);
-    xspan = xub:-xstep:xlb;
+    xspan = xlb:xstep:xub;
     solution = Array{Float64}(undef,Nspan,12);
     fill!(solution,NaN);
     my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)

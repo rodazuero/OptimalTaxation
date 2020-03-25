@@ -65,13 +65,15 @@ pa = init_parameters();
     elb = pa.θ_e_ub - ((1-gp)*(pa.θ_e_ub-pa.θ_e_a)*(1.0-pa.constant_w_lw*pa.constant_e_lw));
     eub = pa.θ_e_ub;
     estep = (eub - elb)/(Nspan - 1);
-    espan = eub:-estep:elb;
+    espan = elb:estep:eub;
     solutione = Array{Float64}(undef,Nspan,16);
     fill!(solutione,NaN);
-    @time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
+    controlsRK = Array{Float64}(undef,Nspan,3);
+    fill!(controlsRK,NaN);
+    @time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub,controlsRK)
 
-    θespan = Array{Float64,1}
-    θespan = collect(elb:estep:eub)
+    θespan = Array{Float64,1};
+    θespan = collect(elb:estep:eub);
 
     controlse = Array{Float64}(undef,Nspan,3);
     fill!(controlse,NaN);
@@ -79,7 +81,7 @@ pa = init_parameters();
     controlse
 
     checkue = Array{Float64}(undef,Nspan,2);
-    fill!(checkuw,NaN);
+    fill!(checkue,NaN);
     for j=1:Nspan
         checkue[j,1] = controlse[j,2]^pa.α*(1.0-pa.β*controlse[j,1]^pa.σ)
     end
@@ -282,7 +284,7 @@ pa = init_parameters();
     estados_e[2,2].set(ylabel="λe inf - λe without inf", xlabel = "θe")
         #Lfe:
     estados_e[3,1].plot(θespan[:], difference[:,5])
-    estados_e[3,1].set(ylabel="Lfe inf - λe without inf", xlabel = "θe")
+    estados_e[3,1].set(ylabel="Lfe inf - Lfe without inf", xlabel = "θe")
         #ωf:
     estados_e[3,2].plot(θespan[:], difference[:,6])
     estados_e[3,2].set(ylabel="ωfe inf - ωfe without inf", xlabel = "θe")
@@ -297,6 +299,26 @@ pa = init_parameters();
 ttt = controlse[:,2].^pa.α.*(1.0.-pa.β*controlse[:,1].^pa.σ)
 ttt1 = NotInfcontrolse[:,2].^pa.α.*(1.0.-pa.β*NotInfcontrolse[:,1].^pa.σ)
 difff = ttt-ttt1
+
+plot(θespan[:], ttt[:],θespan[:], ttt1[:])
+
+ueprime = Array{Float64}(undef,Nspan,2);
+fill!(ueprime,NaN);
+ueprime[:,1] = ttt
+ueprime[:,2] = ttt1
+
+uematrix = Array{Float64}(undef,Nspan,2);
+fill!(uematrix,NaN);
+uematrix[end,1] = ue0
+uematrix[end,2] = ue0
+
+for i=Nspan-1:-1:1
+    uematrix[i,1] = uematrix[i+1,1] + (θespan[i]-θespan[i+1])*ttt[i+1]
+    uematrix[i,2] = uematrix[i+1,2] + (θespan[i]-θespan[i+1])*ttt1[i+1]
+end
+
+
+
 
 
 #Global Problem (Reverse):

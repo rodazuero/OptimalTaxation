@@ -45,6 +45,7 @@ function find_statese!(du::Array{Float64},u,pa,θ,θe,ini)
 
     #Find optimal controls
     (ze, ne) = new_find_controlse( θ, ini[9], sse, pa);
+    println("zeRK = ", ze, "neRK = ", ne)
     any(isnan,(ze, ne)) && error("Function find_statese gets NaN controls")
 
     h_e=  pa.he(θ, θe);

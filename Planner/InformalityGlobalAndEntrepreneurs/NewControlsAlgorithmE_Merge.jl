@@ -103,7 +103,7 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
        end
 
        #Final Output:
-       println("zze = ", zze, "nne = ", nne, "nnie = ", nnie)
+       #println("zze = ", zze, "nne = ", nne, "nnie = ", nnie)
        zze, nne, nnie
    end
 
@@ -111,21 +111,24 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
        (Nspan,~)=size(solvec)
 
        for j=Nspan:-1:1
+           println(j)
            θe      = θvec[j];
            ue      = solvec[j,1];
            μe      = solvec[j,2];
            ye_agg  = solvec[j,3];
            λe      = solvec[j,4];
-           le_agg  = solvec[j,5];
+           lfe_agg  = solvec[j,5];
            ωfe     = solvec[j,6];
            lie_agg = solvec[j,7];
            ωie     = solvec[j,8];
            wie     = solvec[j,9];
-           ϕie     = solvec[j,10];
+           ϕwe     = solvec[j,10];
 
-           sse = StateE(ue, μe, ye_agg, λe, le_agg, ωfe, lie_agg, ωie, wie, ϕie);
+           sse = StateE(ue, μe, ye_agg, λe, lfe_agg, ωfe, lie_agg, ωie, wie, ϕwe);
 
            (zze, nne, nnie) = new_find_controlse( θw, θe, sse, pa)
+           println("θeControls = ", θe)
+           println("ze = ", zze, "ne = ", nne, "nie = ", nnie)
 
            ctrlvec[j,1] = zze;
            ctrlvec[j,2] = nne;

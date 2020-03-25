@@ -1,4 +1,4 @@
-function my_runge_kuttae_reverse!(solution::Array{Float64,2},y_end::Array{Float64,1},xspan,step::Float64,pa,θw::Float64; verbose = false)
+function my_runge_kuttae_reverse!(solution::Array{Float64,2},y_end::Array{Float64,1},xspan,step::Float64,pa,θw::Float64,controlsRK::Array{Float64,2}; verbose = false)
 #The states vector is given in the following order:
 # ue, μe, ye, λe, lfe, ωfe, lie, ωie, wie and ϕwe.
 # We get the following auxiliary states: le_new, lie_new and ye_new.
@@ -27,13 +27,15 @@ function my_runge_kuttae_reverse!(solution::Array{Float64,2},y_end::Array{Float6
         #Current value for θ_e
         x  = xspan[i];
         θe = xspan[i];
+        println(θe)
         #println("it = ", i, " x = ", x, " theta_e = ", θe)
 
         for j = 1:num_states
-            y[j]   = solution[i,j];
-            ini[j] = solution[i,j];
+            y[j]   = solution[i,j]; #Actual states;
+            ini[j] = solution[i,j]; #Actual states;
         end
             ini[end] = θe;  #Actual θe;
+            println("θeRK = ", ini[end])
 
         #We save the approximation of the derivative of the states, according to the order 4 Runge-Kutta method:
         #println("z1")
