@@ -6,8 +6,7 @@ function new_find_controls( θ, ss, pa)
     h_e = pa.he(θ, ss.e);
     h_w = pa.hw(θ, ss.e);
 
-    #Solutions depending on the bound of A:
-    #We have 2 major cases:
+    #Definitions we are using:
     n_full_info = ((ss.λ*pa.α*ss.e)/ss.ω)^(1.0/(1.0-pa.α));
     z_max  = (1.0/pa.β)^(1.0/pa.σ); #Max possible evasion.
     A_cons = (pa.indicator*ss.uw^pa.ϕ-ss.λ*ss.uw)+ss.ϕ_e/h_e;

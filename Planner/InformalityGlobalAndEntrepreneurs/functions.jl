@@ -98,5 +98,17 @@ sse = StateE(ue, μe, ye_agg, λe, le_agg, ωfe, lie_agg, ωie, wie, ϕwe);
 
 ss = State(uw_end, μ_end,e_end, ϕ_e_end, y_agg_end, λ_end, lf_agg_end, ωf_end, li_agg_end, ωi_end, wi_end, ϕw_end);
 
+h_e = pa.he(pa.θ_w_ub,ss.e)
+z_max   = (1.0/pa.β)^(1.0/pa.σ); #Max possible evasion.
+z_lwbar = eps()
+z_1     = z_max;
+z_2     = ((1.0+pa.σ)/(ss.λ*pa.β)*(A_cons+(1.0-pa.α)/pa.α*ss.ωf*n_full_info))^(1.0/(1.0+pa.σ));
+#Keep the lower number:
+z_upbar = min(z_1,z_2);
+
 fun_ni(n) = ((pa.α*ss.e*n^(pa.α-1.0)-ss.wi)/pa.δ)^(1.0/pa.γ)
-foc_z(n)
+plot(fun_ni)
+
+A_cons = (pa.indicator*ss.uw^pa.ϕ-ss.λ*ss.uw)+ss.ϕ/h_e;
+fun_z(n) = ((1.0+pa.σ)/(pa.α*pa.β)*((1.0-pa.α)*ss.ωf*n - pa.α*ss.λ*ss.e*(1.0-pa.α)/pa.γ*fun_ni(n)/n^(1.0-pa.α)+pa.α*(A_cons-pa.δ/(1.0+pa.γ)*fun_ni(n)^(1.0+pa.γ))))^(1.0/(1.0+pa.σ))
+plot(fun_z)

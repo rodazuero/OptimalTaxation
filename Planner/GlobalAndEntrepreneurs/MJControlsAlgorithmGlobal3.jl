@@ -172,6 +172,9 @@ function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solve
 
       #(zz, nn, ll, pp) = new_find_controls( θ, ss, pa)
       (zz, nn, ll, pp) = new_find_controls( θ, ss, pa)
+      println("θwControls = ", θ)
+      println("z = ", zz, "n = ", nn, "l = ", ll, "p = ", pp)
+
       ctrlvec[j,1] = zz;
       ctrlvec[j,2] = nn;
       ctrlvec[j,3] = ll;

@@ -1,12 +1,11 @@
-function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
+function new_find_controlse(θe::Float64, sse, pa)
     #INPUT: states and parameters
     #OUTPUT: optimal controls
 
     #Recover ditributions
-    h_e= pa.he(θ, θe);
+    h_e= pa.he(pa.θ_w_ub, θe);
 
     #Defining bounds we use in various cases (limits of z):
-    println("θe = ", θe, "μe = ", sse.μe)
     n_full_info  = ((sse.λe*pa.α*θe)/sse.ωfe)^(1.0/(1.0-pa.α));
     z_max   = (1.0/pa.β)^(1.0/pa.σ); #Max possible evasion.
     z_lwbar = eps(); #The smallest possible z.

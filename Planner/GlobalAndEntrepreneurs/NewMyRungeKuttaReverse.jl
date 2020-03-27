@@ -2,7 +2,7 @@
 function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; verbose = false)
     #
     solution[end,:] = y_end
-    #agg[1,:] = [0,0,0,0]
+
     #Allocate memory. I follow the notation in Juddm page 345.
     z1 = Array{Float64,1}(undef,10)
     z2 = Array{Float64,1}(undef,10)
@@ -14,10 +14,8 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; v
 
     (Nspan,) =  size(xspan)
 
-
-    #Loop over values of θw
-
-    for i = 1:Nspan
+    #Loop over values of θw:
+    for i = Nspan:-1:1
 
         println("i = ", i)
         #Current value for theta
@@ -49,6 +47,7 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; v
         ini[9] = solution[Nspan+1-i,9]  # l_new;
         ini[10] = solution[Nspan+1-i,10]  # y_new;
         ini[11] = θ  #Actual \theta_w;
+        println("θwRK = ", ini[end])
 
         #println(" uw = ", y[1], " mu = ", y[2], " e = ", y[3], " phie = ", y[4])
         #println(" Y = ", y[5], " lambda = ", y[6], " L = ", y[7], " omega = ", y[8])

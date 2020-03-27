@@ -53,7 +53,7 @@ mutable struct State
     uw::Float64 #Utility
     μ::Float64 #Multiplier utility
     e::Float64 #Threshold function
-    ϕ::Float64 #Multiplier e
+    ϕ_e::Float64 #Multiplier e
     Y::Float64 #Aggregated product
     λ::Float64 #Multiplier product
     Lf::Float64 #Labor

@@ -3,7 +3,9 @@ function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,�
 
     # θw is the upper bound of workers distribution. It´s taken from the global problem.
     solution[end,1:8] = y_end;
-    #agg[1,:] = [0,0,0,0]
+    solution[end,9]  = solution[end,5]/solution[end,8];
+    solution[end,10] = solution[end,3]/solution[end,7];
+
     #Allocate memory. I follow the notation in Juddm page 345.
     z1 = Array{Float64,1}(undef,8);
     z2 = Array{Float64,1}(undef,8);
@@ -31,6 +33,7 @@ function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,�
             ini[j] = solution[i,j]
         end
             ini[9] = θe  #Actual \theta_e;
+            println("θeRK = ", ini[end])
 
         #println(" ue = ", y[1], " μe = ", y[2], " ye = ", y[3], " λe = ", y[4])
         #println(" Le = ", y[5], " ωe = ", y[6], " Le_new = ", y[7], " Ye_new = ", y[8])
@@ -55,11 +58,6 @@ function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,�
             solution[i-1,1:8] = solution[i,1:8] - step*dy;
             solution[i-1,9]   = solution[i-1,5]./solution[i-1,7]
             solution[i-1,10]  = solution[i-1,3]./solution[i-1,8]
-        end
-
-        if i==Nspan
-            solution[Nspan,9]=solution[Nspan,5]./solution[Nspan,8]
-            solution[Nspan,10]=solution[Nspan,3]./solution[Nspan,7]
         end
     end
 end

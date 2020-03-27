@@ -1,13 +1,13 @@
-function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
+function new_find_controlse(θe::Float64, sse, pa)
     #INPUT: states and parameters
     #OUTPUT: optimal controls
 
     #Recover ditributions
-    h_e= pa.he(θ, θe);
+    h_e= pa.he(pa.θ_w_ub, θe);
 
     #Defining bounds we use in various cases (limits of z):
     #println("θe = ", θe, "μe = ", sse.μe)
-    n_full_info  = ((sse.λe*pa.α*θe)/sse.ωfe)^(1.0/(1.0-pa.α));
+    n_full_info = ((sse.λe*pa.α*θe)/sse.ωfe)^(1.0/(1.0-pa.α));
     z_max   = (1.0/pa.β)^(1.0/pa.σ); #Max possible evasion.
     z_lwbar = eps(); #The smallest possible z.
     z_1     = z_max;
@@ -22,8 +22,12 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
     #n_opt: solving n from planner's Entrepreneurs FOC wrt z
     n_opt(z)    = (-sse.λe*z*h_e/(pa.σ*sse.μe))^(1.0/pa.α);
     #n_opt: Planner's Entrepreneurs FOC wrt n
-    fun_nz(z,n) = (sse.λe*pa.α*θe*n^(pa.α-1.0)*h_e - sse.ωfe*h_e + pa.α*sse.μe*n^(pa.α-1.0)*(1.0-pa.β*z^pa.σ) +
-                   fun_ni(n)^(1.0-pa.γ)/n^(2.0-pa.α)*pa.α*(1.0-pa.α)*θe/(pa.δ*pa.γ)*(sse.λe*pa.δ*fun_ni(n)^pa.γ+sse.ωie-sse.ωfe)*h_e);
+    if sse.ωfe == sse.ωie
+        fun_nz(z,n) = pa.α*sse.μe*n^(pa.α-1.0)*(1.0-pa.β*z^pa.σ) + sse.λe*pa.α*θe*n^(pa.α-1.0)*h_e*(1.0 + (1.0-pa.α)/pa.γ*fun_ni(n)/n) - sse.ωfe*h_e;
+    else
+        fun_nz(z,n) = (sse.λe*pa.α*θe*n^(pa.α-1.0)*h_e - sse.ωfe*h_e + pa.α*sse.μe*n^(pa.α-1.0)*(1.0-pa.β*z^pa.σ) +
+                       fun_ni(n)^(1.0-pa.γ)/n^(2.0-pa.α)*pa.α*(1.0-pa.α)*θe/(pa.δ*pa.γ)*(sse.λe*pa.δ*fun_ni(n)^pa.γ+sse.ωie-sse.ωfe)*h_e);
+    end
     fun_z(z)    = fun_nz(z,n_opt(z));
 
     #Hamiltonian:
@@ -35,20 +39,20 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
        zgrid = range(z_lwbar, stop = z_upbar, length = Nz);
        #println("Number of z = ", Nz)
 
-       iteration=NaN
+       iteration = NaN; #Identifier in which there is a change in the derivative
        grid_z = Array{Float64}(undef,Nz,4);
        fill!(grid_z,NaN);
 
        for j = 1:Nz
 
            #println(j)
-           potential_z   = collect(zgrid)[j];
+           potential_z   = zgrid[j];
            potential_n   = n_opt(potential_z);
            potential_cpo = fun_z(potential_z);
 
-           grid_z[j,1] = potential_z
-           grid_z[j,2] = potential_n
-           grid_z[j,3] = potential_cpo
+           grid_z[j,1] = potential_z;
+           grid_z[j,2] = potential_n;
+           grid_z[j,3] = potential_cpo;
            #To see if there is a change of sign in the derivative:
            if j>1
                grid_z[j,4] = grid_z[j,3]*grid_z[j-1,3]
@@ -57,21 +61,29 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
            end
        end
 
-       interior  = grid_z[:,4].>=0
-       iteration = findall(x->x==false, interior)
+       interior  = grid_z[:,4].>= 0 #Interior = true if two consecutive points of FOC are positive or negative
+       iteration = findall(x->x==false, interior) #Count the points where there is a change in the derivative
 
        if all(x->x==true, interior)
-           #iteration  = Nz
-           #potential_z = grid_z[iteration,1]
-           potential_z  = 0.0
-           potential_n  = 0.0
-           potential_ni = 0.0
-           interior_hamiltonian = objective(potential_z,potential_n,potential_ni);
-       else
-           iteration = iteration[1]
+           #If all points in the derivative are positive or negative:
+           if grid_z[100,4] > 0 #Evaluate a random value to see if the derivative is positive or negative
+               potential_z  = z_upbar;
+               potential_n  = n_opt(potential_z);
+               potential_ni = fun_ni(potential_n);
+               interior_hamiltonian = objective(potential_z,potential_n,potential_ni);
+           else
+               potential_z  = 0.0
+               potential_n  = 0.0
+               potential_ni = 0.0
+               interior_hamiltonian = objective(potential_z,potential_n,potential_ni);
+           end
+
+       elseif grid_z[iteration[1]-1,1] > 0
+           #When there is a change in the derivative:
+           iteration = iteration[1];
            #println(iteration[1])
-           new_lwbar = grid_z[iteration-1,1]
-           new_upbar = grid_z[iteration,1]
+           new_lwbar = grid_z[iteration-1,1];
+           new_upbar = grid_z[iteration,1];
 
            if fun_z(new_lwbar)*fun_z(new_upbar)<0
                potential_z = find_zero(fun_z, (new_lwbar,new_upbar), Bisection());
@@ -81,8 +93,12 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
 
           potential_n  = n_opt(potential_z);
           potential_ni = fun_ni(potential_n);
-
           interior_hamiltonian = objective(potential_z,potential_n,potential_ni);
+        else
+            potential_z  = z_upbar;
+            potential_n  = n_opt(potential_z);
+            potential_ni = fun_ni(potential_n);
+            interior_hamiltonian = objective(potential_z,potential_n,potential_ni);
        end
 
        #2. The corner solution is:
@@ -107,7 +123,7 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
        zze, nne, nnie
    end
 
-   function recover_controlse!(ctrlvec::Array{Float64,2}, θw::Float64 ,θvec::Array{Float64}, solvec::Array{Float64,2})
+   function recover_controlse!(ctrlvec::Array{Float64,2},θvec::Array{Float64}, solvec::Array{Float64,2})
        (Nspan,~)=size(solvec)
 
        for j=Nspan:-1:1
@@ -126,7 +142,7 @@ function new_find_controlse(θ::Float64, θe::Float64, sse, pa)
 
            sse = StateE(ue, μe, ye_agg, λe, lfe_agg, ωfe, lie_agg, ωie, wie, ϕwe);
 
-           (zze, nne, nnie) = new_find_controlse( θw, θe, sse, pa)
+           (zze, nne, nnie) = new_find_controlse( θe, sse, pa)
            println("θeControls = ", θe)
            println("ze = ", zze, "ne = ", nne, "nie = ", nnie)
 

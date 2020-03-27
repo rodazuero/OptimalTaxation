@@ -15,7 +15,8 @@ using NLsolve
 include("Definitions2.jl")
 include("MJControlsAlgorithmGlobal3.jl")
 include("States_NewRungeKutta.jl")
-include("NewMyRungeKuttaReverse.jl")
+#include("NewMyRungeKuttaReverse.jl")
+include("TryGlobal.jl")
 
 #Entrepreneurs Problem
 include("NewControlsAlgorithmE.jl")
@@ -61,13 +62,6 @@ pa = init_parameters();
     fill!(solutione,NaN);
     my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
 
-
-    solution=solutione
-    xspan=espan
-    step=estep
-    θw=pa.θ_w_ub
-
-
     #solutione[end,:]
     #using DelimitedFiles
     #writedlm("SolutionNewE.csv",solution,';')
@@ -79,8 +73,8 @@ pa = init_parameters();
     xspan = xlb:xstep:xub;
     θspan = exp.(xspan);=#
 
-    θespan = Array{Float64,1}
-    θespan = collect(elb:estep:eub)
+    θespan = Array{Float64,1};
+    θespan = collect(elb:estep:eub);
 
     controlse = Array{Float64}(undef,Nspan,2);
     fill!(controlse,NaN);
@@ -132,8 +126,8 @@ pa = init_parameters();
     #using DelimitedFiles
     #writedlm("SolutionNew.csv",solution,';')
 
-    θspan = Array{Float64,1}
-    θspan = collect(xlb:xstep:xub)
+    θspan = Array{Float64,1};
+    θspan = collect(xlb:xstep:xub);
 
     controls = Array{Float64}(undef,Nspan,4);
     fill!(controls,NaN);
