@@ -1,10 +1,12 @@
 cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\InformalityGlobalAndEntrepreneurs")
 cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\InformalityGlobalAndEntrepreneurs")
 
+fig_graphs = true;
+
 using Roots
 using NLopt
 using Statistics
-using PyPlot
+fig_graphs && using PyPlot
 using DataFrames
 using CSV
 using NLsolve
@@ -20,9 +22,11 @@ include("Definitions.jl")
 #Entrepreneurs Problem
 #include("NewControlsAlgorithmE.jl")
 #include("NewControlsAlgorithmE_Grid.jl")
-include("NewControlsAlgorithmE_Merge.jl")
+#include("NewControlsAlgorithmE_Merge.jl")
+include("Final_ControlsAlgotithmE.jl")
 include("States_NewRungeKuttaE.jl")
 include("NewMyRungeKuttaEReverse.jl")
+
 #Entrepreneurs problem without informality
 include("NotInfRungeKuttaEntrepreneurs.jl")
 include("NotInfStatesEntrepreneurs.jl")
@@ -115,8 +119,8 @@ pa = init_parameters();
     difference[:,7:8] = controlse[:,1:2] - NotInfcontrolse[:,1:2]
 
     #Plots:
-     graphs!(solutione,NotInfsolutione,controlse,NotInfcontrolse, θespan, τ_prime_e,NIτ_prime_e,difference,
-             "C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\InformalityGlobalAndEntrepreneurs\\Graphs")
+     fig_graphs && graphs!(solutione,NotInfsolutione,controlse,NotInfcontrolse, θespan, τ_prime_e,NIτ_prime_e,difference,
+                   "C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\InformalityGlobalAndEntrepreneurs\\Graphs")
 
 
 
