@@ -91,70 +91,24 @@ function new_find_controls( θ, ss, pa)
 
         println("3 case: A_cons > 0.")
 
-        z_lwbar = ((1.0+pa.σ)/(ss.λ*pa.β)*A_cons)^(1.0/(1.0+pa.σ)); #Makes n==0.0
-        z_a = ((1.0+pa.σ)/(ss.λ*pa.β)*A_cons/(1.0-pa.α*(1.0+pa.σ)))^(1.0/(1.0+pa.σ));
-        n_a = pa.α/(1.0-pa.α)*1.0/ss.ω*(A_cons*pa.α*(1.0+pa.σ)/(1.0-pa.α*(1.0+pa.σ)));
+        z_lwbar = 0.0;
+        z_upbar = z_max;
 
-        z_a < z_upbar ? z_res = fun_z(z_a,n_a) : z_res = fun_nz(z_upbar)
+        nn = pa.ς;
+        if fun_nz(z_lwbar)*fun_nz(z_upbar)<0
+            zz = find_zero(fun_z(z,nn), (z_lwbar,z_upbar), Bisection());
+        else
+            error("Bisection: signs equal --> Cannot solve.")
+        end
+        ll = ll_opt(nn,zz);
+        pp = (pa.χ*ll^(1.0+pa.ψ))/den_p(nn,zz);
 
-            if z_res < 0
-
-                println("z_res <= 0")
-
-                zz      = z_lwbar;
-                nn      = 0.0;
-                nn <= 0.0 && error("The value of N is negative.")
-                den_l(nn,zz) <= 0.0 && error("Denominator of L is negative or zero.") #Stop when denominator is negative.
-                ll = ll_opt(nn,zz);
-                pp    = (pa.χ*ll^(1.0+pa.ψ))/den_p(nn,zz);
-            else
-
-                println("z_res > 0")
-
-                #Using bisection method:
-                if fun_nz(z_upbar)<0
-                    potential_z = find_zero(fun_nz, (z_a,z_upbar), Bisection());
-                else
-                    potential_z = z_upbar;
-                end
-
-                potential_n = n_opt(potential_z);
-                den_l(potential_n,potential_z) <= 0.0 && error("Denominator of L is negative or zero.") #Stop when denominator is negative.
-                potential_l = ll_opt(potential_n,potential_z);
-                potential_p = (pa.χ*potential_l^(1.0+pa.ψ))/den_p(potential_n,potential_z);
-
-                interior_hamiltonian = objective(potential_z,potential_n,potential_l,potential_p);
-
-                #2. Evaluating the small z solution:
-                small_zz = z_lwbar + eps();
-                small_nn = n_opt(small_zz);
-                small_nn <= 0.0 && error("The value of N is negative.")
-                den_l(small_nn,small_zz) <= 0.0 && error("Denominator of L (small z) is negative or zero.") #Stop when denominator is negative.
-                small_ll = ll_opt(small_nn,small_zz);
-                small_pp = (pa.χ*corner_ll^(1.0+pa.ψ))/den_p(corner_nn,corner_zz);
-
-                small_hamiltonian = objective(small_zz,small_nn,small_ll,small_pp);
-
-                #3. Defining the solution we are keeping:
-                if small_hamiltonian > interior_hamiltonian
-                    #zz = small_zz;
-                    #nn = small_nn;
-                    #ll = small_ll;
-                    #pp = small_pp;
-                    error("small_hamiltonian > interior_hamiltonian --> n=0.")
-                else
-                    zz = potential_z;
-                    nn = potential_n;
-                    ll = potential_l;
-                    pp = potential_p;
-                end
-            end
         end
     end
 
     #Final Output:
     #println("zz = ", zz, "nn = ", nn, "ll = ", ll, "pp = ", pp)
-    zz, nn, ll, pp;
+    return zz, nn, ll, pp;
 end
 
 function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solvec::Array{Float64})

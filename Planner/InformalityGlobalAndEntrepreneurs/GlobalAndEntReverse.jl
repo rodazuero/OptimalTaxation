@@ -62,6 +62,7 @@ pa = init_parameters();
     lie0   =   0.0
     ωie0   =   1.342 #guess
     wie0   =   1.342 #guess
+    wie0   =   0.7*ωfe0 #guess
     ϕwe0   =   0.0
 
     Nspan = 500

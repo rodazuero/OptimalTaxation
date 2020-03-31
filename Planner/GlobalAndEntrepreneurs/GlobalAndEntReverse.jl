@@ -1,10 +1,12 @@
 cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 
+fig_graphs = true;
+
 using Roots
 using NLopt
 using Statistics
-using PyPlot
+fig_graphs && using PyPlot
 using DataFrames
 using CSV
 using NLsolve
@@ -51,6 +53,7 @@ pa = init_parameters();
     λe0    =   1.0
     le0    =   0.0
     ωe0    =   1.3429705
+    ωe0    =   1.343
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
@@ -205,12 +208,12 @@ pa = init_parameters();
 #controls,θspan,solution,τ_prime,pa,θespan,solutione
 
         #Plots:
-        graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
-                bound_e,τ_prime,τ_prime_e,"C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
-                utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_full, taxes_ent_full)
-        graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
-                bound_e,τ_prime,τ_prime_e,"C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
-                utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_rev, taxes_rev_ent)
+        fig_graphs && graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
+                            bound_e,τ_prime,τ_prime_e,"C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
+                            utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_full, taxes_ent_full)
+        fig_graphs && graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
+                            bound_e,τ_prime,τ_prime_e,"C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs\\Graphs",
+                            utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_rev, taxes_rev_ent)
 
 
 

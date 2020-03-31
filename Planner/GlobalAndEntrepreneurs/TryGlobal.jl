@@ -31,7 +31,10 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; v
         ini[1:10] = solution[i,1:10]
 
         ini[end] = θ  #Actual θw;
-        println("θwRK = ", ini[end])
+        #println("θwRK = ", ini[end])
+        A_cons = (pa.indicator*solution[i,1]^pa.ϕ-solution[i,6]*solution[i,1])+solution[i,4]/pa.he(θ,solution[i,3]);
+        println("A_cons = ", A_cons)
+
 
         #We save the approximation of the derivative of the states, according to the order 4 Runge-Kutta method
         #println("z1")
