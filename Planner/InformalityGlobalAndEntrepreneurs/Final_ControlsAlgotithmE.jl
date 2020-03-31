@@ -75,7 +75,7 @@ function new_find_controlse(θe::Float64, sse, pa)
        end #for
 
        if candidate_cpo>0 #here the value corresponds to the last value in the grid (z_upbound)
-           candidate_z   = find_zero(fun_z, (zgrid[j-1],zgrid[j]), Bisection());
+           candidate_z   = z_upbar;
            candidate_n   = n_opt(candidate_z);
            candidate_ni  = fun_ni(candidate_n);
            candidate_ham = objective(candidate_z,candidate_n,candidate_ni);
