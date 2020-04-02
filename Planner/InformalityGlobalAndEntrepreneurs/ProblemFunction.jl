@@ -136,8 +136,8 @@ function graphs!(solutione::Array{Float64},NotInfsolutione::Array{Float64},contr
         controles_e[1].legend(["ze with informality", "ze without informality"],loc="upper right")
         controles_e[1].set(ylabel="ze", xlabel = "θe")
             #ne:
-        controles_e[2].plot(θespan[:], controlse[:,2], θespan[:], NotInfcontrolse[:,2])
-        controles_e[2].legend(["ne with informality", "ne without informality"],loc="upper right")
+        controles_e[2].plot(θespan[:], controlse[:,2], θespan[:], NotInfcontrolse[:,2], θespan[:], difference[:,9])
+        controles_e[2].legend(["ne with informality", "ne without informality", "ne full info"],loc="upper left")
         controles_e[2].set(ylabel="ne", xlabel = "θe")
             #nie:
         controles_e[3].plot(θespan[:], controlse[:,3])

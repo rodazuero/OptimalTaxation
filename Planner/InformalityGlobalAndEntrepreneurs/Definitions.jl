@@ -74,16 +74,16 @@ mutable struct Control
 end
 
 mutable struct StateE
-    ue::Float64 #Utility
-    μe::Float64 #Multiplier utility
-    Ye::Float64 #Aggregated product
-    λe::Float64 #Multiplier product
-    Lfe::Float64 #Labor
-    ωfe::Float64 #Multiplier labor
-    Lie::Float64 #Informal labor
-    ωie::Float64 #Multiplier informal labor market
-    wie::Float64 #Informal labor salary
-    ϕwe::Float64 #Informal labor salary multiplier
+    ue::Float64 #1. Utility
+    μe::Float64 #2. Multiplier utility
+    Ye::Float64 #3. Aggregated product
+    λe::Float64 #4. Multiplier product
+    Lfe::Float64 #5. Labor
+    ωfe::Float64 #6. Multiplier labor
+    Lie::Float64 #7. Informal labor
+    ωie::Float64 #8. Multiplier informal labor market
+    wie::Float64 #9. Informal labor salary
+    ϕwe::Float64 #10. Informal labor salary multiplier
 end
 
 mutable struct ControlE
@@ -117,6 +117,7 @@ function init_parameters()
     δ= 0.12873;
     #δ= 1000000000.0;
     γ= 0.7341;
+    #γ= ρ;
     #γ= 10000000.0;
     β= 0.2135;
     σ= 0.1827;

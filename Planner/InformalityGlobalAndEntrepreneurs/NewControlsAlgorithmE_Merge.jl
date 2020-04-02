@@ -25,9 +25,11 @@ function new_find_controlse(θe::Float64, sse, pa)
     if sse.ωfe == sse.ωie
         fun_nz(z,n) = pa.α*sse.μe*n^(pa.α-1.0)*(1.0-pa.β*z^pa.σ) + sse.λe*pa.α*θe*n^(pa.α-1.0)*h_e*(1.0 + (1.0-pa.α)/pa.γ*fun_ni(n)/n) - sse.ωfe*h_e;
     else
-        fun_nz(z,n) = (sse.λe*pa.α*θe*n^(pa.α-1.0)*h_e - sse.ωfe*h_e + pa.α*sse.μe*n^(pa.α-1.0)*(1.0-pa.β*z^pa.σ) +
-                       fun_ni(n)^(1.0-pa.γ)/n^(2.0-pa.α)*pa.α*(1.0-pa.α)*θe/(pa.δ*pa.γ)*(sse.λe*pa.δ*fun_ni(n)^pa.γ+sse.ωie-sse.ωfe)*h_e);
+        #fun_nz(z,n) = (sse.λe*pa.α*θe*n^(pa.α-1.0)*h_e - sse.ωfe*h_e + pa.α*sse.μe*n^(pa.α-1.0)*(1.0-pa.β*z^pa.σ) +
+                       #fun_ni(n)^(1.0-pa.γ)/n^(2.0-pa.α)*pa.α*(1.0-pa.α)*θe/(pa.δ*pa.γ)*(sse.λe*pa.δ*fun_ni(n)^pa.γ+sse.ωie-sse.ωfe)*h_e);
+        fun_nz(z,n) = 1.0
     end
+    println(fun_nz(123.0,344.54))
     fun_z(z)    = fun_nz(z,n_opt(z));
 
     #Hamiltonian:

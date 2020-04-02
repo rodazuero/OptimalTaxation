@@ -61,7 +61,13 @@ pa = init_parameters();
     ωfe0   =   1.342 #guess
     lie0   =   0.0
     ωie0   =   1.342 #guess
+<<<<<<< Updated upstream
     wie0   =   1.342 #guess
+=======
+    ωie0   =   0.7*ωfe0 #guess
+    #wie0   =   1.342 #guess
+    wie0   =   0.7*ωfe0 #guess
+>>>>>>> Stashed changes
     ϕwe0   =   0.0
 
     Nspan = 500
@@ -90,15 +96,11 @@ pa = init_parameters();
     marginal_taxese!(τ_prime_e,solutione,controlse, θespan, pa);
 
     #Solving entrepreneurs without informality:
-    Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, lfe0, ωfe0, 0.0, 0.0];
-    elb = pa.θ_e_ub - ((1-gp)*(pa.θ_e_ub-pa.θ_e_a)*(1.0-pa.constant_w_lw*pa.constant_e_lw));
-    eub = pa.θ_e_ub;
-    estep = (eub - elb)/(Nspan - 1);
-    espan = eub:-estep:elb;
+    espan1 = eub:-estep:elb;
     NotInfsolutione = Array{Float64}(undef,Nspan,10);
     fill!(NotInfsolutione,NaN);
-    NotInfmy_runge_kuttae_reverse!(NotInfsolutione,y_end,espan,estep,pa,pa.θ_w_ub)
+    NotInfmy_runge_kuttae_reverse!(NotInfsolutione,y_end,espan1,estep,pa,pa.θ_w_ub)
 
     θespan = Array{Float64,1}
     θespan = collect(elb:estep:eub)
@@ -113,16 +115,18 @@ pa = init_parameters();
     fill!(NIτ_prime_e,NaN);
     NotInfmarginal_taxese(NIτ_prime_e,NotInfcontrolse,θespan,NotInfsolutione, pa);
 
-    difference = Array{Float64}(undef,Nspan,8);
+    difference = Array{Float64}(undef,Nspan,9);
     fill!(difference,NaN);
     difference[:,1:6] = solutione[:,1:6] - NotInfsolutione[:,1:6]
     difference[:,7:8] = controlse[:,1:2] - NotInfcontrolse[:,1:2]
-
+    difference[:,9]   = ((solutione[:,4]*pa.α.*θespan[:])./solutione[:,6]).^(1.0/(1.0-pa.α))
     #Plots:
      fig_graphs && graphs!(solutione,NotInfsolutione,controlse,NotInfcontrolse, θespan, τ_prime_e,NIτ_prime_e,difference,
                    "C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\InformalityGlobalAndEntrepreneurs\\Graphs")
 
-
+    controlse[:,2] - difference[:,9]
+    difference[:,9] - NotInfcontrolse[:,2]
+    cons_ni = ((ωfe0-λe0*wie0)/(λe0*pa.δ))^(1.0/pa.γ)
 
 
 
