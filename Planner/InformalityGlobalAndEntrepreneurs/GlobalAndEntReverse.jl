@@ -62,8 +62,11 @@ pa = init_parameters();
     lie0   =   0.0
     ωie0   =   1.342 #guess
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     wie0   =   1.342 #guess
 =======
+=======
+>>>>>>> Stashed changes
     ωie0   =   0.7*ωfe0 #guess
     #wie0   =   1.342 #guess
     wie0   =   0.7*ωfe0 #guess
