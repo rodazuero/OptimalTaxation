@@ -30,6 +30,7 @@ function new_find_controls( θ, ss, pa)
 
     nn_z0 = -A_cons*1.0/ss.ω*pa.α/(1.0-pa.α);
     #Defining bounds (limits of z) for cases 1 and 3:
+    #println("Inside the loop")
     if nn_z0 >= n_full_info
 
         println("1 case: A_cons implies n>n_full_info, z==0.")
@@ -46,7 +47,7 @@ function new_find_controls( θ, ss, pa)
         #Keep the lower number:
         z_upbar = min(z_1,z_2);
 
-        if A_cons <= 0
+        if nn_z0 >= pa.ς
 
             println("1 case: A_cons<0. A_cons > OtherValue.")
             #1. Evaluating the interior solution:
@@ -95,8 +96,11 @@ function new_find_controls( θ, ss, pa)
         z_upbar = z_max;
 
         nn = pa.ς;
-        if fun_nz(z_lwbar)*fun_nz(z_upbar)<0
-            zz = find_zero(fun_z(z,nn), (z_lwbar,z_upbar), Bisection());
+        other(z)= fun_z(z,nn)
+        #println("Lower=",other(z_lwbar), "  Upper=", other(z_upbar), "  n=", nn)
+        if other(z_lwbar)*other(z_upbar)<0
+            zz = find_zero(other, (z_lwbar,z_upbar), Bisection());
+            #println("z=", zz, "l_den", den_l(nn,zz))
         else
             error("Bisection: signs equal --> Cannot solve.")
         end
@@ -126,8 +130,8 @@ function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solve
 
       #(zz, nn, ll, pp) = new_find_controls( θ, ss, pa)
       (zz, nn, ll, pp) = new_find_controls( θ, ss, pa)
-      println("θwControls = ", θ)
-      println("z = ", zz, "n = ", nn, "l = ", ll, "p = ", pp)
+      #println("θwControls = ", θ)
+      #println("z = ", zz, "n = ", nn, "l = ", ll, "p = ", pp)
 
       ctrlvec[j,1] = zz;
       ctrlvec[j,2] = nn;

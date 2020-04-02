@@ -87,7 +87,7 @@ function find_states!(du,u,pa,θ,ini)
     du[9] = θ*l*h_w + (n-pa.ς)*p*h_e;
     du[10]= e*n^pa.α*p*h_e - pa.β*z^(1+pa.σ)/(1+pa.σ)*p*h_e; #Production - evasion
 
-    println("ϕ_e' =", du[4], "u_w' =", du[1])
+    #println("ϕ_e' =", du[4], "u_w' =", du[1])
 
     nothing
 end
