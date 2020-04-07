@@ -104,6 +104,13 @@ function new_find_controls( θ, ss, pa)
         else
             error("Bisection: signs equal --> Cannot solve.")
         end
+
+        #Evaluating if the evasion is bigger than the pre-tax profits:
+        pre_tax_profits = ss.λ*ss.e*nn^pa.α - ss.ω*nn;
+        if (zz - pre_tax_profits) > 0
+            zz = pre_tax_profits;
+        end
+        
         ll = ll_opt(nn,zz);
         pp = (pa.χ*ll^(1.0+pa.ψ))/den_p(nn,zz);
 

@@ -327,7 +327,7 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             Z_graphs[2,2].set(ylabel="z",xlabel="θe")
             #Combined:
             Z_graphs[2,3].plot(θespan[:], mat_z[:,3], θespan[:], mat_z[:,4])
-            Z_graphs[2,3].set(ylabel="λen^α - ωn or z", xlabel="θw")
+            Z_graphs[2,3].set(ylabel="λen^α - ωn or z", xlabel="θe")
             plt.legend(["λen^α - ωn","z"],loc="upper right")
 
         savefig("zGraphs.png")
