@@ -44,7 +44,8 @@ function find_statese!(du,u,pa,θe)
     sse = StateE(ue, μe, λe, ωe);
 
     #Find optimal controls
-    (ze, ne) = new_find_controlse( θ, θe, sse, pa);
+    (ze, ne) = new_find_controlse( θ, ini[9], sse, pa);
+    #println("zeRK = ", ze, "neRK = ", ne)
     any(isnan,(ze, ne)) && error("Function find_statese gets NaN controls")
 
     h_e=  pa.he(θ, θe);

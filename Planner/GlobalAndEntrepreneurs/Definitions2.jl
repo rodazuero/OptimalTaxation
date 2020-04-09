@@ -137,12 +137,16 @@ function init_parameters()
         θ_e_x  = quantile(dist_marginal_e,constant_e_ub)
         θ_e_ub = exp(θ_e_x)
 
-    cons_mod_dis = 1.0/(1.0-constant_w_lw*constant_e_lw);
-    hw(θ,e)   = (((e-θ_e_a)/(θ_e_ub-θ_e_a))*(1/(θ_w_ub-θ_w_a)))*cons_mod_dis; # h_w(θ)= F_e|w(e|θ) fw(θ)
-    he(θ,e)   = (((θ-θ_w_a)/(θ_w_ub-θ_w_a))*(1/(θ_e_ub-θ_e_a)))*cons_mod_dis; # h_e(e)= F_w|e(θ|e) fe(e)
-    hh(θ,e,p) = hw(θ,e) + p*he(θ,e);
+    #cons_mod_dis = 1.0/(1.0-constant_w_lw*constant_e_lw-constant_w_ub*constant_e_ub);
+    #hw(θ,e)= (1/θ) * ( cdf(dist_e_given_w(log(θ)) ,log(e) )*( pdf(dist_marginal_w, log(θ)) ) ); # h_w(θ)= F_e|w(e|θ) fw(θ)
+    #he(θ,e)= (1/e) * ( cdf(dist_w_given_e(log(e)), log(θ) )*( pdf(dist_marginal_e, log(e)) ) ); # h_e(e)= F_w|e(θ|e) fe(e)
 
-    gg(θ,e) = (1.0/((pa.θ_w_ub-pa.θ_w_a)*(pa.θ_e_ub-pa.θ_e_a)))*cons_mod_dis; #For uniform case.
+    hw(θ,e) = ( pdf(dist_marginal_w, log(θ))*cdf(dist_marginal_e, log(e)) ); # h_w(θ)= f_θw(θ) F_θe(e)
+    he(θ,e) = ( pdf(dist_marginal_w, log(θ))*cdf(dist_marginal_e, log(e)) ); # h_e(e)= f_θe(e) F_θw(θ|e)
+    hh(θ,e,p) = hw(θ,e) + p*he(θ,e);
+    cov = σ_we*σ_w*σ_e;
+    d   = MvNormal([μ_w, μ_e], [σ2_w cov; cov σ2_e]);
+    gg(θ,e) = pdf(d,[log(θ),log(e)]) /(θ*e);
 
     weights, nodes = gausslegendre(25);
 
