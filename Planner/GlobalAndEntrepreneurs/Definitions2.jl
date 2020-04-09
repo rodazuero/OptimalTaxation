@@ -101,19 +101,50 @@ function init_parameters()
     #indicator = 1; #The Utilitarian case
 
     ## Distributions:
-    #μ_w = 1.7626;
-    #μ_e = 1.2528;
-    #σ2_w = 1.0921; σ_w=σ2_w^0.5;
-    #σ2_e = 1.1675; σ_e=σ2_e^0.5;
-    #σ_we = 0.0;
-
-    μ_w = 10.0;
-    μ_e = 10.0;
-    σ2_w = 6.0; σ_w=σ2_w^0.5;
-    σ2_e = 6.0; σ_e=σ2_e^0.5;
+    μ_w = 1.7626;
+    μ_e = 1.2528;
+    σ2_w = 1.0921; σ_w=σ2_w^0.5;
+    σ2_e = 1.1675; σ_e=σ2_e^0.5;
     σ_we = 0.0;
+
+    #μ_w = 10.0;
+    #μ_e = 10.0;
+    #σ2_w = 6.0; σ_w=σ2_w^0.5;
+    #σ2_e = 6.0; σ_e=σ2_e^0.5;
+    #σ_we = 0.0;
     constant_w_lw = 1.0e-2;
     constant_e_lw = 1.0e-2;
+    constant_w_ub = 1.0-1.0e-2;
+    constant_e_ub = 1.0-1.0e-2;
+
+    #Log normal distribution
+        dist_marginal_w = Normal(μ_w,σ_w); #This is the distribution for ln(θ_w)
+        dist_marginal_e = Normal(μ_e,σ_e); #This is the distribution for ln(θ_e)
+
+        #Lower bounds:
+            #θw
+            θ_w_x  = quantile(dist_marginal_w,constant_w_lw);
+            θ_w_lb = exp(θ_w_x)
+            #θe
+            θ_e_x  = quantile(dist_marginal_e,constant_e_lw);
+            θ_e_lb = exp(θ_e_x)
+
+        #Upper bounds:
+            #θw
+            θ_w_x  = quantile(dist_marginal_w,constant_w_ub)
+            θ_w_lb = exp(θ_w_x)
+            #θe
+            θ_e_x  = quantile(dist_marginal_e,constant_e_lw)
+            θ_e_lb = exp(θ_e_x)
+
+        #theta_e_lb
+        quantile_theta_e_lb(k) = cdf(dist_marginal_e,k) - 0.3
+        x_e_lb = find_zero(quantile_theta_e_lb, (-100.0,100.0))
+        θ_e_lb= exp(x_e_lb)
+        #theta_e_ub
+        quantile_theta_e_ub(k) = cdf(dist_marginal_e,k) - 0.7
+        x_e_ub = find_zero(quantile_theta_e_ub, (-100.0,100.0))
+        θ_e_ub= exp(x_e_ub)
 
 #Uniform distribution
     θ_e_a  = μ_e-((12.0^0.5)/2)*(σ2_e^0.5);
@@ -131,6 +162,33 @@ function init_parameters()
 
     #theta_e_lb
     θ_e_lb = quantile(dist_marginal_e,constant_e_lw);
+
+
+
+    #Log normal distribution
+        dist_marginal_w=Normal(μ_w,σ_w); #This is the distribution for ln(θ_w)
+        dist_marginal_e=Normal(μ_e,σ_e); #This is the distribution for ln(θ_e)
+
+        #theta_w_lb
+        quantile_theta_w_lb(k) = cdf(dist_marginal_w,k) - 0.3
+        x_w_lb = find_zero(quantile_theta_w_lb, (-100.0,100.0))
+        θ_w_lb= exp(x_w_lb)
+        #theta_w_ub
+        quantile_theta_w_ub(k) = cdf(dist_marginal_w,k) - 0.7
+        x_w_ub = find_zero(quantile_theta_w_ub, (-100.0,100.0))
+        θ_w_ub= exp(x_w_ub)
+
+
+        #theta_e_lb
+        quantile_theta_e_lb(k) = cdf(dist_marginal_e,k) - 0.3
+        x_e_lb = find_zero(quantile_theta_e_lb, (-100.0,100.0))
+        θ_e_lb= exp(x_e_lb)
+        #theta_e_ub
+        quantile_theta_e_ub(k) = cdf(dist_marginal_e,k) - 0.7
+        x_e_ub = find_zero(quantile_theta_e_ub, (-100.0,100.0))
+        θ_e_ub= exp(x_e_ub)
+
+
 
     cons_mod_dis = 1.0/(1.0-constant_w_lw*constant_e_lw);
     hw(θ,e)   = (((e-θ_e_a)/(θ_e_ub-θ_e_a))*(1/(θ_w_ub-θ_w_a)))*cons_mod_dis; # h_w(θ)= F_e|w(e|θ) fw(θ)
