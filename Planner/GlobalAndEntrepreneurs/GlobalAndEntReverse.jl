@@ -60,7 +60,7 @@ alg = Tsit5()
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
-    elb = pa.θ_e_ub - ((1-gp)*(pa.θ_e_ub-pa.θ_e_a)*(1.0-pa.constant_w_lw*pa.constant_e_lw));
+    elb = pa.θ_e_ub - ((1-gp)*(pa.θ_e_ub-pa.θ_e_lb)*(1.0-pa.constant_w_lw*pa.constant_e_lw));
     eub = pa.θ_e_ub;
     estep = (eub - elb)/(Nspan - 1);
     espan = elb:estep:eub;
