@@ -46,7 +46,7 @@ function complete_problem!(solution::Array{Float64},solutione::Array{Float64},co
 end
 
 
-function graphs!(solution::Array{Float64}, solutione::Array{Float64}, controls::Array{Float64}, controlse::Array{Float64}, θspan::Array{Float64}, θespan::Array{Float64}, 
+function graphs!(solution::Array{Float64}, solutione::Array{Float64}, controls::Array{Float64}, controlse::Array{Float64}, θspan::Array{Float64}, θespan::Array{Float64},
                     thetaw_ub, bound_e, τ_prime::Array{Float64}, τ_prime_e::Array{Float64}, dir::AbstractString, utilities_prime::Array{Float64}, A_mat::Array{Float64},
                     mat_z::Array{Float64}, proposition1::Array{Float64}, proposition2::Array{Float64}, proposition3::Array{Float64}, taxes::Array{Float64}, taxes_ent::Array{Float64})
 
@@ -61,6 +61,8 @@ function graphs!(solution::Array{Float64}, solutione::Array{Float64}, controls::
             #Full information
             n_full = Array{Float64}(undef,Nspan,1);
             l_full = Array{Float64}(undef,Nspan,1);
+            fill!(n_full,NaN);
+            fill!(l_full,NaN);
             for i=1:Nspan
                 n_full[i]=(pa.α*solution[i,3]/solution[i,8])^(1.0/(1.0-pa.α))
                 l_full[i]=((θspan[i]*solution[i,8])/(solution[i,6]*pa.χ))^(1.0/pa.ψ)
@@ -80,6 +82,7 @@ function graphs!(solution::Array{Float64}, solutione::Array{Float64}, controls::
                 #e:
             estados[2,1].plot(θspan[1:500], solution[1:500,3])
             estados[2,1].plot(θspan[1:500], repeat([pa.θ_e_ub],500), "tab:green")
+            estados[2,1].plot(θspan[1:500], repeat([e_end],500), "tab:blue")
             #estados[2,1].set_title("e")
             estados[2,1].set(ylabel="e")
                 #ϕe:
@@ -417,7 +420,7 @@ function graphs!(solution::Array{Float64}, solutione::Array{Float64}, controls::
 
             #States
             fig, estados_e=plt.subplots(3,2)
-            fig.suptitle("Optimal States")
+            fig.suptitle("Optimal States with span of entrepreneurs")
                 #u_e:
             estados_e[1,1].plot(θe_all, vcat(solution[1:500,1],solutione[1:500,1]))
             #estados_e[1,1].set_title("u_e")

@@ -25,29 +25,34 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; v
         #println("it = ", i, " x = ", x, " theta = ", θ)
 
         #Convert state object into a vector
-        y[1] = solution[Nspan+1-i,1]  # uw
-        y[2] = solution[Nspan+1-i,2]  # μ
-        y[3] = solution[Nspan+1-i,3]  # e;
-        y[4] = solution[Nspan+1-i,4]  # ϕ_e;
-        y[5] = solution[Nspan+1-i,5]  # y_agg;
-        y[6] = solution[Nspan+1-i,6]  # λ;
-        y[7] = solution[Nspan+1-i,7]  # l_agg;
-        y[8] = solution[Nspan+1-i,8]  # ω;
-        y[9] = solution[Nspan+1-i,9]  # l_new;
-        y[10] = solution[Nspan+1-i,10]  # y_new;
+        #y[1] = solution[Nspan+1-i,1]  # uw
+        #y[2] = solution[Nspan+1-i,2]  # μ
+        #y[3] = solution[Nspan+1-i,3]  # e;
+        #y[4] = solution[Nspan+1-i,4]  # ϕ_e;
+        #y[5] = solution[Nspan+1-i,5]  # y_agg;
+        #y[6] = solution[Nspan+1-i,6]  # λ;
+        #y[7] = solution[Nspan+1-i,7]  # l_agg;
+        #y[8] = solution[Nspan+1-i,8]  # ω;
+        #y[9] = solution[Nspan+1-i,9]  # l_new;
+        #y[10] = solution[Nspan+1-i,10]  # y_new;
 
-        ini[1] = solution[Nspan+1-i,1]  # uw
-        ini[2] = solution[Nspan+1-i,2]  # μ
-        ini[3] = solution[Nspan+1-i,3]  # e;
-        ini[4] = solution[Nspan+1-i,4]  # ϕ_e;
-        ini[5] = solution[Nspan+1-i,5]  # y_agg;
-        ini[6] = solution[Nspan+1-i,6]  # λ;
-        ini[7] = solution[Nspan+1-i,7]  # l_agg;
-        ini[8] = solution[Nspan+1-i,8]  # ω;
-        ini[9] = solution[Nspan+1-i,9]  # l_new;
-        ini[10] = solution[Nspan+1-i,10]  # y_new;
-        ini[11] = θ  #Actual \theta_w;
+        #ini[1] = solution[Nspan+1-i,1]  # uw
+        #ini[2] = solution[Nspan+1-i,2]  # μ
+        #ini[3] = solution[Nspan+1-i,3]  # e;
+        #ini[4] = solution[Nspan+1-i,4]  # ϕ_e;
+        #ini[5] = solution[Nspan+1-i,5]  # y_agg;
+        #ini[6] = solution[Nspan+1-i,6]  # λ;
+        #ini[7] = solution[Nspan+1-i,7]  # l_agg;
+        #ini[8] = solution[Nspan+1-i,8]  # ω;
+        #ini[9] = solution[Nspan+1-i,9]  # l_new;
+        #ini[10] = solution[Nspan+1-i,10]  # y_new;
         #println("θwRK = ", ini[end])
+
+        for j = 1:10
+            y[j] = solution[Nspan+1-i,j]
+            ini[j] = solution[Nspan+1-i,j]  # uw
+        end
+        ini[11] = θ  #Actual θw;
 
         #println(" uw = ", y[1], " mu = ", y[2], " e = ", y[3], " phie = ", y[4])
         #println(" Y = ", y[5], " lambda = ", y[6], " L = ", y[7], " omega = ", y[8])

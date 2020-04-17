@@ -58,19 +58,10 @@ function find_states!(du,u,pa,θ,ini)
     h_tot= h_w + p*h_e;
 
     Vw = pa.indicator*uw^pa.ϕ + θ*l*ω - λ*uw - λ*pa.χ*l^(1.0+pa.ψ)/(1.0+pa.ψ);
-    #Ve = uw^pa.ϕ + λ*e*n^pa.α - λ*pa.β*(z^(1+pa.σ))/(1+pa.σ) - ω*n - λ*uw;
     Ve = pa.indicator*uw^pa.ϕ + λ*e*n^pa.α - λ*pa.β*z^(1.0+pa.σ)/(1.0+pa.σ) - ω*(n-pa.ς) - λ*uw;
-    #Non independent distributions
-    #dhw_de = pa.gg( θ , e);
-    #dhe_de=  integrate_dg_de(θ,e,pa); #Non independent distributions
-    #=Independent distributions
-    dhe_de= dhe(θ,e,pa)
-    dhw_de= (pdf(Normal(pa.μ_e,((pa.σ2_e)^0.5)), log(e))*(1/e))*((pdf(Normal(pa.μ_w,((pa.σ2_w)^0.5)), log(θ)))*(1/θ))
-    #dVe_de= λ*n^pa.α;=#
-    #Uniform distribution
-    ∂he_de = 0.0;
-    ∂hw_de = pa.gg(θ,e);
-    #∂hw_de = pa.gg(θ,e); #In the uniform case.
+    #Independent distributions (log-normal distribution):
+    ∂hw∂e =  pdf(Normal(pa.μ_e,pa.σ2_e^0.5), log(e))/e*pdf(Normal(pa.μ_w,pa.σ2_w^0.5), log(θ))/θ; #f_θw(θ) f_θe(e)
+    ∂he∂e = -pdf(Normal(pa.μ_e,pa.σ2_e^0.5), log(e))/e*(1.0+(log(e)-pa.μ_e)/pa.σ2_e)*cdf(Normal(pa.μ_w,pa.σ2_w^0.5), log(θ));
 
     du[1] = pa.χ*l^(1.0+pa.ψ)/θ;
     if uw > 0.0
@@ -79,7 +70,7 @@ function find_states!(du,u,pa,θ,ini)
         du[2] = Inf;
     end
     du[3] = p;
-    du[4] = -( Vw*∂hw_de + Ve*p*∂he_de + λ*n^pa.α*p*h_e);
+    du[4] = -( Vw*∂hw∂e + Ve*p*∂he∂e + λ*n^pa.α*p*h_e);
     du[5] = ( e*n^pa.α - pa.β*z^(1.0+pa.σ)/(1.0+pa.σ) )*p*h_e - uw*h_tot - pa.χ*l^(1.0+pa.ψ)/(1.0+pa.ψ)*h_w;
     du[6] = 0.0;
     du[7] = θ*l*h_w - (n-pa.ς)*p*h_e;

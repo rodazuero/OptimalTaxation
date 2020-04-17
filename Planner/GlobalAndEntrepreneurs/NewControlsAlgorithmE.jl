@@ -1,6 +1,12 @@
 function new_find_controlse( θ, θe, sse, pa)
     #INPUT: states and parameters
     #OUTPUT: optimal controls
+    potential_n::Float64 = NaN;
+    potential_z::Float64 = NaN;
+    zze::Float64 = NaN;
+    nne::Float64 = NaN;
+    corner_zz::Float64 = NaN;
+    corner_nn::Float64 = NaN;
 
     #Recover ditributions
     h_e= pa.he(θ, θe);
@@ -32,6 +38,7 @@ function new_find_controlse( θ, θe, sse, pa)
 
     potential_n = n_opt(potential_z);
 
+    println("n = ", potential_n, "z = ", potential_z, "States = ", sse)
     interior_hamiltonian = objective(potential_z,potential_n);
 
     #2. The corner solution is:
