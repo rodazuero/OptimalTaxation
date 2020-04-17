@@ -1,5 +1,5 @@
 function new_find_controls!(controls::Array{Float64,1}, θ::Float64, ss::State, pa, verbose=false)
-	
+
     #INPUT: states and parameters
     #OUTPUT: optimal controls
 # 0.0 Preallocating
@@ -72,7 +72,7 @@ function new_find_controls!(controls::Array{Float64,1}, θ::Float64, ss::State, 
         controls[4] = 0.0 # zz
         controls[2] = nn_z0 # nn
         den_l(controls[2],controls[4]) <= 0.0 && error("Denominator of L is negative or zero.") #Stop when denominator is negative.
-        controls[1] = ll_opt(controls[2],controls[4]) 
+        controls[1] = ll_opt(controls[2],controls[4])
         controls[3] = (pa.χ*controls[1]^(1.0+pa.ψ))/den_p(controls[2],controls[4]);
 
     else
@@ -172,7 +172,7 @@ function new_find_controls!(controls::Array{Float64,1}, θ::Float64, ss::State, 
 
     #Final Output:
     verbose && println("z = ", controls[4], ",  n = ", controls[2], ",  l = ", controls[1], ",  p = ", controls[3])
-    
+
 end
 
 function new_find_controls(θ::Float64, ss::State, pa, verbosebool::Bool=false)
@@ -194,7 +194,7 @@ function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solve
       ω     = solvec[j,8];
       ss    = State(e, uw, ϕ_e, μ, λ, ω);
 
-      
+
       (ll, nn, pp, zz) = new_find_controls( θ, ss, pa)
       # println("θwControls = ", θ)
       # println("z = ", zz, "n = ", nn, "l = ", ll, "p = ", pp)

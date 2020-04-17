@@ -4,6 +4,8 @@
 fig_graphs   = true     #Indicator to print figures.
 RK_algorithm = true    #true is when we use the RK package from Julia.
 
+fig_graphs = true;
+
 using Roots
 using NLopt
 using Statistics
@@ -46,6 +48,7 @@ alg = Tsit5()
 
     #Define proportion of agents in global problem
     gp     =   0.993
+    gp     =   1.0-0.3 #Ent problem with 20%
 
     #ue0    =   100.0
     ue0    =   640.0
@@ -60,7 +63,7 @@ alg = Tsit5()
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
-    elb = pa.θ_e_ub - ((1-gp)*(pa.θ_e_ub-pa.θ_e_lb)*(1.0-pa.constant_w_lw*pa.constant_e_lw));
+    elb = exp(quantile(Normal(pa.μ_e,pa.σ2_e^0.5), gp))
     eub = pa.θ_e_ub;
     estep = (eub - elb)/(Nspan - 1);
     espan = elb:estep:eub;
@@ -121,7 +124,7 @@ alg = Tsit5()
 
     Nspan = 500
     y_end= [uw_end, μ_end, e_end, ϕ_e_end, y_agg_end, λ_end, l_agg_end, ω_end, l_new_end, y_new_end, 0, 0 ];
-    xlb= pa.θ_w_lb;
+    xlb = pa.θ_w_lb;
     xub = pa.θ_w_ub;
     xstep = (xub - xlb)/(Nspan - 1);
     xspan = collect(xlb:xstep:xub)

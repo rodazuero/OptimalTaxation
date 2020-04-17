@@ -1,7 +1,7 @@
 function my_runge_kutta_reverse!(states::Array{Float64,2}, xspan::Array{Float64,1}, y_end::Array{Float64,1}, step, pa, alg, verbose::Bool = false)
 
     verbose && println("Solving differential equations with RK package from Julia.")
-    
+
     #θw is the upper bound of workers distribution:
     states[end,:] = y_end;
     (Nspan,) =  size(xspan);

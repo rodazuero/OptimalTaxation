@@ -114,39 +114,40 @@ function init_parameters()
     #σ_we = 0.0;
     constant_w_lw = 1.0e-2;
     constant_e_lw = 1.0e-2;
-    constant_w_ub = 1.0-1.0e-2;
-    constant_e_ub = 1.0-1.0e-2;
+    #constant_w_lw = 0.2;
+    #constant_e_lw = 0.2;
+    #constant_w_ub = 1.0-1.0e-2;
+    #constant_e_ub = 1.0-1.0e-2;
+    constant_w_ub = 1.0-0.15;
+    constant_e_ub = 1.0-0.15;
 
-#Log normal distribution
+#Normal distribution for ln(θ) and log-normal for θw
     dist_marginal_w = Normal(μ_w,σ_w); #This is the distribution for ln(θ_w)
     dist_marginal_e = Normal(μ_e,σ_e); #This is the distribution for ln(θ_e)
 
     #Lower bounds:
         #θw
-        θ_w_x  = quantile(dist_marginal_w,constant_w_lw);
-        θ_w_lb = exp(θ_w_x)
+        log_θ_w_lb  = quantile(dist_marginal_w,constant_w_lw); #ln(θw)_lb
+        θ_w_lb      = exp(log_θ_w_lb)
         #θe
-        θ_e_x  = quantile(dist_marginal_e,constant_e_lw);
-        θ_e_lb = exp(θ_e_x)
+        log_θ_e_lb  = quantile(dist_marginal_e,constant_e_lw); #ln(θe)_lb
+        θ_e_lb      = exp(log_θ_e_lb)
 
     #Upper bounds:
         #θw
-        θ_w_x  = quantile(dist_marginal_w,constant_w_ub)
-        θ_w_ub = exp(θ_w_x)
+        log_θ_w_ub = quantile(dist_marginal_w,constant_w_ub) #ln(θw)_ub
+        θ_w_ub     = exp(log_θ_w_ub)
         #θe
-        θ_e_x  = quantile(dist_marginal_e,constant_e_ub)
-        θ_e_ub = exp(θ_e_x)
+        log_θ_e_ub = quantile(dist_marginal_e,constant_e_ub) #ln(θe)_ub
+        θ_e_ub     = exp(log_θ_e_ub)
 
-    #cons_mod_dis = 1.0/(1.0-constant_w_lw*constant_e_lw-constant_w_ub*constant_e_ub);
-    #hw(θ,e)= (1/θ) * ( cdf(dist_e_given_w(log(θ)) ,log(e) )*( pdf(dist_marginal_w, log(θ)) ) ); # h_w(θ)= F_e|w(e|θ) fw(θ)
-    #he(θ,e)= (1/e) * ( cdf(dist_w_given_e(log(e)), log(θ) )*( pdf(dist_marginal_e, log(e)) ) ); # h_e(e)= F_w|e(θ|e) fe(e)
-
-    hw(θ,e) = ( pdf(dist_marginal_w, log(θ))*cdf(dist_marginal_e, log(e)) ); # h_w(θ)= f_θw(θ) F_θe(e)
-    he(θ,e) = ( pdf(dist_marginal_w, log(θ))*cdf(dist_marginal_e, log(e)) ); # h_e(e)= f_θe(e) F_θw(θ|e)
+    #When distributions are independent:
+    hw(θ,e) = 1.0/θ*( pdf(dist_marginal_w, log(θ))*cdf(dist_marginal_e, log(e)) ); # h_w(θ)= f_θw(θ) F_θe(e)
+    he(θ,e) = 1.0/e*( pdf(dist_marginal_e, log(e))*cdf(dist_marginal_w, log(θ)) ); # h_e(e)= f_θe(e) F_θw(θ)
     hh(θ,e,p) = hw(θ,e) + p*he(θ,e);
     cov = σ_we*σ_w*σ_e;
     d   = MvNormal([μ_w, μ_e], [σ2_w cov; cov σ2_e]);
-    gg(θ,e) = pdf(d,[log(θ),log(e)]) /(θ*e);
+    gg(θ,e) = pdf(d,[log(θ),log(e)])/(θ*e);
 
     weights, nodes = gausslegendre(25);
 
