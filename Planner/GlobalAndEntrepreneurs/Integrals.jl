@@ -1,4 +1,5 @@
 function my_integral_lb!(sol_int::Array{Float64,1},intvec::Array{Float64,1},θvec::Array{Float64,1},y0::Float64)
+#We are integrating from the lower bound to the upper bound.
 
     (Nspan,) = size(θvec);
 
@@ -14,6 +15,7 @@ function my_integral_lb!(sol_int::Array{Float64,1},intvec::Array{Float64,1},θve
 end
 
 function my_integral_ub!(sol_int::Array{Float64,1},intvec::Array{Float64,1},θvec::Array{Float64,1},yend::Float64)
+#We are integrating from the upper bound to the lower bound (in reverse).
 
     (Nspan,) = size(θvec);
 

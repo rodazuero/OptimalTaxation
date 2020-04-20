@@ -47,7 +47,7 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; v
         ini[9] = solution[Nspan+1-i,9]  # l_new;
         ini[10] = solution[Nspan+1-i,10]  # y_new;
         ini[11] = θ  #Actual \theta_w;
-        println("θwRK = ", ini[end])
+        #println("θwRK = ", ini[end])
 
         #println(" uw = ", y[1], " mu = ", y[2], " e = ", y[3], " phie = ", y[4])
         #println(" Y = ", y[5], " lambda = ", y[6], " L = ", y[7], " omega = ", y[8])

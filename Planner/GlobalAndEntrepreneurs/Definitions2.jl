@@ -17,8 +17,7 @@ mutable struct Param
     γ::Float64 #Informal demand elasticity
     β::Float64 #Scale parameter for evasion
     σ::Float64 #Elasticity of evasion
-    ϵ::Float64 #self-employed labor supply
-    ς::Float64 #New parameter for e
+    ς::Float64 #self-employed entrepreneurs
 
     #Planner parameters
     ϕ::Float64 #Concave utilitarian parameter
@@ -93,13 +92,12 @@ function init_parameters()
     γ= 0.7341;
     β= 0.2135;
     σ= 0.1827;
-    ϵ= 0.0;
-    ς= 1.0;
+    ς= 10.0;
 
     #Planner parameters
     ϕ = 0.1;
     G = 0.15;
-    indicator = 0; #The Rawlsian case
+    indicator = 0.0; #The Rawlsian case
     #indicator = 1; #The Utilitarian case
 
     ## Distributions:
@@ -143,5 +141,5 @@ function init_parameters()
 
     weights, nodes = gausslegendre(25);
 
-    Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ϵ, ς, ϕ, G, indicator, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, weights, nodes, θ_e_a, θ_w_a, θ_w_lb, θ_w_ub, θ_e_lb, θ_e_ub, constant_w_lw, constant_e_lw);
+    Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ς, ϕ, G, indicator, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, weights, nodes, θ_e_a, θ_w_a, θ_w_lb, θ_w_ub, θ_e_lb, θ_e_ub, constant_w_lw, constant_e_lw);
 end

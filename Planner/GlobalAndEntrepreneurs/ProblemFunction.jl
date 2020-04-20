@@ -46,7 +46,9 @@ function complete_problem!(solution::Array{Float64},solutione::Array{Float64},co
 end
 
 
-function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Array{Float64},controlse::Array{Float64}, θspan::Array{Float64}, θespan::Array{Float64}, thetaw_ub, bound_e, τ_prime::Array{Float64},τ_prime_e::Array{Float64},dir::AbstractString,utilities_prime::Array{Float64},A_mat::Array{Float64},mat_z::Array{Float64},proposition1::Array{Float64},proposition2::Array{Float64},proposition3::Array{Float64},taxes::Array{Float64},taxes_ent::Array{Float64})
+function graphs!(solution::Array{Float64}, solutione::Array{Float64}, controls::Array{Float64}, controlse::Array{Float64}, θspan::Array{Float64}, θespan::Array{Float64}, 
+                    thetaw_ub, bound_e, τ_prime::Array{Float64}, τ_prime_e::Array{Float64}, dir::AbstractString, utilities_prime::Array{Float64}, A_mat::Array{Float64},
+                    mat_z::Array{Float64}, proposition1::Array{Float64}, proposition2::Array{Float64}, proposition3::Array{Float64}, taxes::Array{Float64}, taxes_ent::Array{Float64})
 
         rc("font", family="serif")
         original_dir=pwd()
@@ -109,22 +111,22 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             savefig("States.png")
 
             #Auxiliar states
-            fig, estados_aux=plt.subplots(1,2)
-            fig.suptitle("Auxiliar States - Global Problem")
+            #fig, estados_aux=plt.subplots(1,2)
+            #fig.suptitle("Auxiliar States - Global Problem")
                 #L*:
-            estados_aux[1,1].plot(θspan[1:500], solution[1:500,11])
-            estados_aux[1,1].plot(θspan[1:500], repeat([0],500), "tab:green")
+            #estados_aux[1,1].plot(θspan[1:500], solution[1:500,11])
+            #estados_aux[1,1].plot(θspan[1:500], repeat([0],500), "tab:green")
             #estados_aux[1,1].set_title("L*")
-            estados_aux[1,1].set(ylabel="L*")
+            #estados_aux[1,1].set(ylabel="L*")
                 #Y*:
-            estados_aux[2].plot(θspan[1:500], solution[1:500,12])
-            estados_aux[2].plot(θspan[1:500], repeat([0.15],500), "tab:green")
+            #estados_aux[2].plot(θspan[1:500], solution[1:500,12])
+            #estados_aux[2].plot(θspan[1:500], repeat([0.15],500), "tab:green")
             #estados_aux[2].set_title("Y*")
-            estados_aux[2].set(ylabel="Y*")
+            #estados_aux[2].set(ylabel="Y*")
 
             #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\StatesAux.png")
             #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\StatesAux.png")
-            savefig("StatesAux.png")
+            #savefig("StatesAux.png")
 
             #Controls
             fig, controles=plt.subplots(2,2)
@@ -227,22 +229,22 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         savefig("StatesEntrepreneurs.png")
 
         #Auxiliar states
-        fig, estados_auxE=plt.subplots(1,2)
-        fig.suptitle("Auxiliar States - Global Problem")
-            #L*:
-        estados_auxE[1,1].plot(θespan[1:500], solutione[1:500,9])
-        estados_auxE[1,1].plot(θespan[1:500], repeat([0],500), "tab:green")
-        #estados_auxE[1,1].set_title("L*")
-        estados_auxE[1,1].set(ylabel="L*")
-            #Y*:
-        estados_auxE[2].plot(θespan[1:500], solutione[1:500,10])
-        estados_auxE[2].plot(θespan[1:500], repeat([0.15],500), "tab:green")
-        #estados_auxE[2].set_title("Y*")
-        estados_auxE[2].set(ylabel="Y*")
+        # fig, estados_auxE=plt.subplots(1,2)
+        # fig.suptitle("Auxiliar States - Global Problem")
+        #     #L*:
+        # estados_auxE[1,1].plot(θespan[1:500], solutione[1:500,9])
+        # estados_auxE[1,1].plot(θespan[1:500], repeat([0],500), "tab:green")
+        # #estados_auxE[1,1].set_title("L*")
+        # estados_auxE[1,1].set(ylabel="L*")
+        #     #Y*:
+        # estados_auxE[2].plot(θespan[1:500], solutione[1:500,10])
+        # estados_auxE[2].plot(θespan[1:500], repeat([0.15],500), "tab:green")
+        # #estados_auxE[2].set_title("Y*")
+        # estados_auxE[2].set(ylabel="Y*")
 
-        #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\StatesAuxEntrepreneurs.png")
-        #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\StatesAuxEntrepreneurs.png")
-        savefig("StatesAuxEntrepreneurs.png")
+        # #savefig("C:\\Users\\marya\\Dropbox\\OptimalTaxation\\PlannerMaryan\\Results\\StatesAuxEntrepreneurs.png")
+        # #savefig("C:\\Users\\mariagon\\Dropbox\\Results\\StatesAuxEntrepreneurs.png")
+        # savefig("StatesAuxEntrepreneurs.png")
 
         #Controls
         fig, controles_e=plt.subplots(1,2)
@@ -282,14 +284,15 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
         fig, utilities=plt.subplots(1,2)
         fig.suptitle("Change in Utilities")
             #ue_prime:
-        utilities[1].plot(solution[:,3], A_mat[:,3])
-        utilities[1].set(ylabel="ue' in global")
-        utilities[1].set(xlabel="e(θ_w)")
+        utilities[1].plot(θspan, utilities_prime[:,1])
+        utilities[1].set(ylabel="uw' in global")
+        utilities[1].set(xlabel="θ_w")
             #ue_prime:
-        utilities[2].plot(θespan[1:500], utilities_prime[:,2])
+        utilities[2].plot(solution[:,3], utilities_prime[:,2])
         utilities[2].set(ylabel="ue'")
+        utilities[2].set(xlabel="θ_e")
 
-        savefig("ChangeUtilities.png")
+        savefig("MargUtility.png")
 
         #Graphs for A:
         fig, A_graphs=plt.subplots(1,2)
@@ -327,7 +330,7 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             Z_graphs[2,2].set(ylabel="z",xlabel="θe")
             #Combined:
             Z_graphs[2,3].plot(θespan[:], mat_z[:,3], θespan[:], mat_z[:,4])
-            Z_graphs[2,3].set(ylabel="λen^α - ωn or z", xlabel="θw")
+            Z_graphs[2,3].set(ylabel="λen^α - ωn or z", xlabel="θe")
             plt.legend(["λen^α - ωn","z"],loc="upper right")
 
         savefig("zGraphs.png")
@@ -378,8 +381,9 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
             fig, prop2=plt.subplots(1)
             fig.suptitle("Proposition 2")
                 prop2.plot(θspan[:], proposition2[:,1])
-                #prop2[3].plot(θspan[:], proposition2[:,2])
-                prop2.set(ylabel="εz z/n^α or e/(1-Tc') Tn'/(1+Tn)",xlabel="θw")
+                prop2.set(xlabel="θw")
+                prop2.plot(θspan[:], proposition2[:,2])
+                prop2.legend(["εz z/n^α", "e/(1-Tc') Tn'/(1+Tn)"], loc="upper right")
 
             savefig("proposition2.png")
 
@@ -403,7 +407,7 @@ function graphs!(solution::Array{Float64},solutione::Array{Float64},controls::Ar
                 prop3.plot(θspan[:], proposition3[:,1])
                 prop3.plot(θspan[:], proposition3[:,2])
                 prop3.plot(θspan[:], proposition3[:,3])
-                prop3.legend(["λ he p", "1/λ [Ve-Vw] g 1/ue'", "εz z/n^α he"],loc="upper right")
+                prop3.legend(["εz z/n^α he", "1/λ [Ve-Vw] g 1/ue'", "λ he p"],loc="upper right")
                 prop3.set(xlabel="θw")
 
             savefig("proposition3.png")
