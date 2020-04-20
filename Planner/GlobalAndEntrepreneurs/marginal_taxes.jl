@@ -60,7 +60,7 @@ function taxes_path(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Array{
     #Defining the taxes in the θ_w_lb: the order: Tc, Tn and Tl (first for θw, then Entrepreneurs θe).
     #Taxes    = Array{Float64}(undef,Nspan,5)
     Taxes_gb      = fill(NaN,Nspan,3)
-    Taxes_gb[1,1] = solvec[1,3]*ctrlvec[1,2]^pa.α-solvec[1,8]/solvec[1,6]*ctrlvec[1,2]-pa.β/(1.0+pa.σ)*ctrlvec[1,1]^(1.0+pa.σ)-solvec[1,1]; #T_c
+    Taxes_gb[1,1] = solvec[1,3]*ctrlvec[1,2]^pa.α-solvec[1,8]/solvec[1,6]*(ctrlvec[1,2]-pa.ς)-pa.β/(1.0+pa.σ)*ctrlvec[1,1]^(1.0+pa.σ)-solvec[1,1]; #T_c
     Taxes_gb[1,2] = 0.0; #T_n
     Taxes_gb[1,3] = θvec[1]*solvec[1,8]/solvec[1,6]*ctrlvec[1,3]-pa.χ/(1.0+pa.ψ)*ctrlvec[1,3]^(1.0+pa.ψ)-solvec[1,1]; #T_l
 
@@ -85,7 +85,7 @@ function taxes_path(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Array{
       my_integral_lb!(sol_int,to_integrate,base,Taxes_gb[1,i]);
       Taxes_gb[:,i] = sol_int[:];
     end
-    println("Taxes Tn = ", Taxes_gb[:,2], "Taxes Tl = ", Taxes_gb[:,3])
+    # println("Taxes Tn = ", Taxes_gb[:,2], "Taxes Tl = ", Taxes_gb[:,3])
 
     #Calculating for Tc:
     for j = 1:Nspan
@@ -115,7 +115,7 @@ function taxes_path(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Array{
     for j = 1:Nspan
       ωe = solvece[j,6];
       nn = ctrlvece[j,2];
-      tax_base_ent[j,2] = ωe*nn; #Tn
+      tax_base_ent[j,2] = ωe*(nn-pa.ς); #Tn
     end
 
     i=2

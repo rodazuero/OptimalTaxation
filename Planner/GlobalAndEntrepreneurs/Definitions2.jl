@@ -92,12 +92,12 @@ function init_parameters()
     γ= 0.7341;
     β= 0.2135;
     σ= 0.1827;
-    ς= 5.0;
+    ς= 10.0;
 
     #Planner parameters
     ϕ = 0.1;
     G = 0.15;
-    indicator = 0; #The Rawlsian case
+    indicator = 0.0; #The Rawlsian case
     #indicator = 1; #The Utilitarian case
 
     ## Distributions:

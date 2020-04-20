@@ -43,7 +43,7 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
       T_lpr = tax_prime[j,3];
 
       Vw = (pa.indicator*uw - λ*uw) + ω*ll*θ - λ*pa.χ/(1.0+pa.ψ)*ll^(1.0+pa.ψ);
-      Ve = (pa.indicator*uw - λ*uw) + λ*e*nn^pa.α - λ*pa.β/(1.0+pa.σ)*zz^(1.0+pa.σ) - ω*nn;
+      Ve = (pa.indicator*uw - λ*uw) + λ*e*nn^pa.α - λ*pa.β/(1.0+pa.σ)*zz^(1.0+pa.σ) - ω*(nn-pa.ς);
 
       #Solving the elements of the propositions:
       #1:
@@ -57,7 +57,7 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
 
         #3:
         proposition3[j,1] = ε_z_Tcpr*zz/nn^pa.α*h_e;
-        proposition3[j,2] = 1.0/λ*(Ve-Vw)*gg*1.0/(nn^pa.α*(1.0-pa.β*zz^pa.σ));
+        proposition3[j,2] = 1.0/λ*(Ve-Vw)*gg/(nn^pa.α*(1.0-pa.β*zz^pa.σ));
         proposition3[j,3] = (1.0-pa.indicator*pa.ϕ*uw^(pa.ϕ-1.0)/λ)*h_e*pp;
     end
 

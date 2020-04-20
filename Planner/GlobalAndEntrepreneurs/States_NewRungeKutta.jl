@@ -59,7 +59,7 @@ function find_states!(du,u,pa,θ,ini)
 
     Vw = pa.indicator*uw^pa.ϕ + θ*l*ω - λ*uw - λ*pa.χ*l^(1.0+pa.ψ)/(1.0+pa.ψ);
     #Ve = uw^pa.ϕ + λ*e*n^pa.α - λ*pa.β*(z^(1+pa.σ))/(1+pa.σ) - ω*n - λ*uw;
-    Ve = pa.indicator*uw^pa.ϕ + λ*e*n^pa.α - λ*pa.β*z^(1.0+pa.σ)/(1.0+pa.σ) - ω*n - λ*uw;
+    Ve = pa.indicator*uw^pa.ϕ + λ*e*n^pa.α - λ*pa.β*z^(1.0+pa.σ)/(1.0+pa.σ) - ω*(n-pa.ς) - λ*uw;
     #Non independent distributions
     #dhw_de = pa.gg( θ , e);
     #dhe_de=  integrate_dg_de(θ,e,pa); #Non independent distributions
