@@ -1,5 +1,8 @@
 
 function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa,alg; verbose = false)
+
+    println("Solving differencial equations with RK package from Julia.")
+    
     #θw is the upper bound of workers distribution:
     solution[end,:] = y_end;
     (Nspan,) =  size(xspan);
@@ -16,7 +19,7 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa,al
         #Current value for θw:
         x   = xspan[i];
         θ   = xspan[i];
-        θ_1 = xspan[i-1]; #This is the previous value of θw.
+        θ_1 = xspan[i-1]; #Previous θw (we are iterating backwards).
 
         #The initial values of the states:
         uw0    = solution[i,1];
@@ -40,8 +43,8 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa,al
 
         #Update vector of states:
         solution[i-1,1:10] = solution_RKPack(θ_1);
-        solution[i-1,11]=solution[i-1,7]./solution[i-1,9];
-        solution[i-1,12]=solution[i-1,5]./solution[i-1,10];
+        solution[i-1,11]   = solution[i-1,7]./solution[i-1,9];
+        solution[i-1,12]   = solution[i-1,5]./solution[i-1,10];
 
     end
 end

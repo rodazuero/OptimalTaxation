@@ -3,6 +3,9 @@
 
 fig_graphs = true
 
+fig_graphs   = true; #Indicator to print figures.
+RK_algorithm = true; #true is when we use the RK package from Julia.
+
 using Roots
 using NLopt
 using Statistics
@@ -10,23 +13,19 @@ fig_graphs && using PyPlot
 using DataFrames
 using CSV
 using NLsolve
-using DifferentialEquations
+RK_algorithm && using DifferentialEquations
 #using Plots
 
 #Global Problem
 include("Definitions2.jl")
 include("MJControlsAlgorithmGlobal3.jl")
-include("States_NewRungeKutta.jl")
-include("NewMyRungeKuttaReverse.jl")
-#include("original_RK.jl")
-#include("original_States.jl")
+RK_algorithm == true ? include("States_NewRungeKutta.jl") : include("original_States.jl")
+RK_algorithm == true ? include("NewMyRungeKuttaReverse.jl") : include("original_RK.jl")
 
 #Entrepreneurs Problem
 include("NewControlsAlgorithmE.jl")
-#include("States_NewRungeKuttaE.jl")
-#include("NewMyRungeKuttaEReverse.jl")
-include("original_RKEnt.jl")
-include("original_StatesEnt.jl")
+RK_algorithm == true ? include("States_NewRungeKuttaE.jl") : include("original_StatesEnt.jl")
+RK_algorithm == true ? include("NewMyRungeKuttaEReverse.jl") : include("original_RKEnt.jl")
 
 #The file for the function that computes everything:
 include("ProblemFunction.jl")
@@ -38,10 +37,11 @@ include("marginal_taxes.jl")
 include("Propositions.jl")
 include("Integrals.jl")
 
-#Define values for the model parameters
-pa = init_parameters();
-alg = Tsit5() #Algorithm to solve differencial equations.
-alg = Rosenbrock23(autodiff=false)
+#Define values for the model parameters:
+pa  = init_parameters();
+#Algorithm to solve differencial equations:
+alg = Tsit5()
+#alg = Rosenbrock23(autodiff=false)
 #Entrepreneurs Problem
     #Initial boundary conditions (states from the global problem)
 
@@ -50,7 +50,7 @@ alg = Rosenbrock23(autodiff=false)
 
     #ue0    =   100.0
     ue0    =   640.0
-    #ue0    =   600.0
+    ue0    =   640.7
     μe0    =   0.0 - 1.0e-10
     ye0    =   0.0
     λe0    =   1.0
@@ -67,12 +67,7 @@ alg = Rosenbrock23(autodiff=false)
     espan = elb:estep:eub;
     solutione = Array{Float64}(undef,Nspan,10);
     fill!(solutione,NaN);
-    @time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
-    #@time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,alg)
-
-    fill!(solutione,NaN);
-    @time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
-    #@time my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,alg)
+    RK_algorithm == true ? my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,alg) : my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
 
     #solutione[end,:]
     #using DelimitedFiles
@@ -133,14 +128,7 @@ alg = Rosenbrock23(autodiff=false)
     xspan = xlb:xstep:xub;
     solution = Array{Float64}(undef,Nspan,12);
     fill!(solution,NaN);
-    #@time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)
-    @time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa,alg)
-
-    step = xstep
-
-    fill!(solution,NaN);
-    @time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)
-    #@time my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa,alg)
+    RK_algorithm == true ? my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa,alg) : my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)
 
     #using DelimitedFiles
     #writedlm("SolutionNew.csv",solution,';')
@@ -226,9 +214,6 @@ alg = Rosenbrock23(autodiff=false)
         fig_graphs && graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
                             bound_e,τ_prime,τ_prime_e,".\\Graphs",
                             utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_full, taxes_ent_full)
-        # fig_graphs && graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
-        #                     bound_e,τ_prime,τ_prime_e,".\\Graphs",
-        #                     utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_rev, taxes_rev_ent)
 
 
 

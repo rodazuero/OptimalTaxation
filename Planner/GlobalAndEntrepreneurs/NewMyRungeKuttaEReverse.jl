@@ -1,5 +1,7 @@
 function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,alg; verbose = false)
 
+    println("Solving differencial equations with RK package from Julia.")
+
     # θe is the upper bound of entrepreneurs distribution:
     solution[end,1:8] = y_end;
     (Nspan,) =  size(xspan);
@@ -13,9 +15,9 @@ function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,a
 
         #println("i = ", i) #Actual θe
 
-        #Current value for θ_e
+        #Current value for θe
         θe   = xspan[i]
-        θe_1 = xspan[i-1]
+        θe_1 = xspan[i-1] #Previous θe (we are iterating backwards)
 
         #The values of the initial point:
         ue0     = solution[i,1];

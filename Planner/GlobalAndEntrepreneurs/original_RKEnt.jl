@@ -1,5 +1,7 @@
 function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,θw; verbose = false)
 
+    println("Solving differencial equations with our RK.")
+
     # θw is the upper bound of workers distribution. It´s taken from the global problem.
     solution[end,1:8] = y_end;
     solution[end,9]  = solution[end,5]/solution[end,8];

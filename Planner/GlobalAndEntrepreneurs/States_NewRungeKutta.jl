@@ -43,21 +43,21 @@ function find_states!(du,u,pa,θ)
     l_new = first(u[9]);
     y_new = first(u[10]);
 
-    println(typeof(uw), ", uw = ", uw)
-    println("μ = ", μ, ", e = ", e)
+    #println(typeof(uw), ", uw = ", uw)
+    #println("μ = ", μ, ", e = ", e)
 
-    if isa(u,Array{Float64})
-        println(u)
-    else
-        println(fieldnames(u))
-        println(fieldnames(u[1]))
-        println(fieldnames(uw))
-        varinfo()
-    end
+    #if isa(u,Array{Float64})
+    #    println(u)
+    #else
+    #    println(fieldnames(u))
+    #    println(fieldnames(u[1]))
+    #    println(fieldnames(uw))
+    #    varinfo()
+    #end
 
     #Construct state object
     ss = State(e, uw, ϕ_e, μ, λ, ω);
-    println("ss = ", ss)
+    #println("ss = ", ss)
 
     #Find optimal controls
     (z, n, l, p) = new_find_controls( θ, ss, pa);
@@ -101,8 +101,6 @@ function find_states!(du,u,pa,θ)
     du[8] = 0.0;
     du[9] = θ*l*h_w + (n-pa.ς)*p*h_e;
     du[10]= e*n^pa.α*p*h_e - pa.β*z^(1+pa.σ)/(1+pa.σ)*p*h_e; #Production - evasion
-
-    #println("ϕ_e' =", du[4], "u_w' =", du[1])
 
     nothing
 end

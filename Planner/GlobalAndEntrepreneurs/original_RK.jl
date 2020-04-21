@@ -1,5 +1,7 @@
 function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; verbose = false)
-    #
+
+    println("Solving differencial equations with our RK.")
+
     solution[end,:] = y_end
     #agg[1,:] = [0,0,0,0]
     #Allocate memory. I follow the notation in Juddm page 345.
