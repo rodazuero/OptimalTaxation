@@ -1,8 +1,6 @@
 #cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 #cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 
-fig_graphs = true
-
 fig_graphs   = true; #Indicator to print figures.
 RK_algorithm = true; #true is when we use the RK package from Julia.
 
@@ -14,6 +12,7 @@ using DataFrames
 using CSV
 using NLsolve
 RK_algorithm && using DifferentialEquations
+import ForwardDiff
 #using Plots
 
 #Global Problem
@@ -39,9 +38,9 @@ include("Integrals.jl")
 
 #Define values for the model parameters:
 pa  = init_parameters();
-#Algorithm to solve differencial equations:
-alg = Tsit5()
-#alg = Rosenbrock23(autodiff=false)
+# Algorithm to solve differencial equations:
+# alg = Tsit5()
+alg = Rosenbrock23()
 #Entrepreneurs Problem
     #Initial boundary conditions (states from the global problem)
 
@@ -56,8 +55,8 @@ alg = Tsit5()
     λe0    =   1.0
     le0    =   0.0
     ωe0    =   1.342970 #mbar=1.0   ω_min=1.342555  ω_max=1.342625
-    ωe0    =   1.338945
-    #mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.341374 e(θw_lb)=θe_lb (but bunching not addressed)
+    ωe0    =   1.343049
+    #mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.343049 e(θw_lb)=θe_lb (but bunching not addressed)
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];

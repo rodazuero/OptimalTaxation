@@ -1,5 +1,5 @@
-function new_find_controls( θ, ss, pa)
-	verbose=true
+function new_find_controls!(controls::Array{Float64,1}, θ::Float64, ss::State, pa, verbose=false)
+	
     #INPUT: states and parameters
     #OUTPUT: optimal controls
 # 0.0 Preallocating
@@ -8,20 +8,16 @@ function new_find_controls( θ, ss, pa)
 	corner_ll::Float64=NaN
 	corner_pp::Float64=NaN
 	corner_hamiltonian::Float64=NaN
-	nn::Float64=NaN
-	zz::Float64=NaN
-	ll::Float64=NaN
-	pp::Float64=NaN
 	max_hamiltonian::Float64=-Inf
-
+    verbose && println("θ: ", θ,", e: ",ss.e )
 # 0.1 Recover densities:
     h_e::Float64 = pa.he(θ, ss.e);
-    h_w::Float64 = pa.hw(θ, ss.e);
+    h_w::Float64 = pa.hw(θ, ss.e)
 
-# 0.2 Initialize constatns
+# 0.2 Initialize constants
     n_full_info::Float64 = ((ss.λ*pa.α*ss.e)/ss.ω)^(1.0/(1.0-pa.α));
     z_lwbar::Float64 	= 0.0
-    z_upbar::Float64 	= (1.0/pa.β)^(1.0/pa.σ); #Max possible evasion.
+    z_upbar::Float64 	= (1.0/pa.β)^(1.0/pa.σ)*(1 - 1e-12) #Max possible evasion.
     A_cons::Float64 	= ss.ω*pa.ς+ pa.indicator*ss.uw^pa.ϕ-ss.λ*ss.uw+ss.ϕ_e/h_e;
     nn_z0::Float64 		= -A_cons*1.0/ss.ω*pa.α/(1.0-pa.α);
 	pre_tax_profits_at_nmin::Float64 = ss.λ*ss.e*pa.ς^pa.α # - ss.ω*pa.ς
@@ -46,11 +42,11 @@ function new_find_controls( θ, ss, pa)
     if nn_z0 >= n_full_info
     # Case 0: n_opt(z=0)>n_full_info.
         verbose && println("Case 0: n_opt(z=0)>n_full_info.")
-        zz = 0.0;
-        nn = nn_z0;
-        den_l(nn,zz) <= 0.0 && error("Denominator of L is negative or zero.") #Stop when denominator is negative.
-        ll = ll_opt(nn,zz);
-        pp = (pa.χ*ll^(1.0+pa.ψ))/den_p(nn,zz);
+        controls[4] = 0.0 # zz
+        controls[2] = nn_z0 # nn
+        den_l(controls[2],controls[4]) <= 0.0 && error("Denominator of L is negative or zero.") #Stop when denominator is negative.
+        controls[1] = ll_opt(controls[2],controls[4]) 
+        controls[3] = (pa.χ*controls[1]^(1.0+pa.ψ))/den_p(controls[2],controls[4]);
 
     else
         z_2     = ((1.0+pa.σ)/(ss.λ*pa.β)*(A_cons+(1.0-pa.α)/pa.α*ss.ω*n_full_info))^(1.0/(1.0+pa.σ))
@@ -64,17 +60,19 @@ function new_find_controls( θ, ss, pa)
             # 1.1 Evaluating the interior solution:
             # Using bisection method:
             if zfoc_at_nopt(z_int_lwbar)*zfoc_at_nopt(z_upbar)<0
-                zz = find_zero(zfoc_at_nopt, (z_int_lwbar,z_upbar), Bisection());
+                controls[4] = find_zero(zfoc_at_nopt, (z_int_lwbar,z_upbar), Bisection());
             else
+                println("e: ", ss.e," z_2: ", z_2)
+                println("z_int_lwbar: ",z_int_lwbar, " z_upbar: ", z_upbar, " zfoc(z_upbar): ", zfoc_at_nopt(z_upbar))
                 error("Bisection: signs equal --> Cannot solve.")
             end
 
-            nn = n_opt(zz);
-            den_l(nn,zz) <= 0.0 && error("Denominator of L is negative or zero.") #Stop when denominator is negative.
-            ll = ll_opt(nn,zz);
-            pp = (pa.χ*ll^(1.0+pa.ψ))/den_p(nn,zz);
+            controls[2] = n_opt(controls[4]);
+            den_l(controls[2],controls[4]) <= 0.0 && error("Denominator of L is negative or zero.") #Stop when denominator is negative.
+            controls[1] = ll_opt(controls[2],controls[4]);
+            controls[3] = (pa.χ*controls[1]^(1.0+pa.ψ))/den_p(controls[2],controls[4]);
 
-            max_hamiltonian = objective(ll,nn,pp,zz)
+            max_hamiltonian = objective(controls[1],controls[2],controls[3],controls[4])
 
             # 1.1.2 Evaluating the corner solution:
             corner_zz = min(z_int_lwbar, pre_tax_profits_at_nmin/ss.λ, z_upbar)
@@ -88,39 +86,39 @@ function new_find_controls( θ, ss, pa)
             #3. Defining the solution we are keeping:
             if corner_hamiltonian>max_hamiltonian
             	verbose && println("Case 1.b Corner n and z.")
-	                zz=corner_zz
-	                nn=corner_nn
-	                ll=corner_ll
-	                pp=corner_pp
+	                controls[4]=corner_zz
+	                controls[2]=corner_nn
+	                controls[1]=corner_ll
+	                controls[3]=corner_pp
 	                max_hamiltonian=corner_hamiltonian
 			end
         else
 	        verbose && print("Case 2: n at lower bound. ")
 	        # 1.2 Evaluate n=nmin
 	        z_upbar = min(z_int_lwbar, pre_tax_profits_at_nmin/ss.λ, z_upbar) # z_upbar just for the case \bar m > n_full_info
-	        nn = pa.ς
-	        # verbose && println("Lower=",zfoc_at_nmin(z_lwbar), "  Upper=", zfoc_at_nmin(z_upbar), "  n=", nn)
+	        controls[2] = pa.ς
+	        # verbose && println("Lower=",zfoc_at_nmin(z_lwbar), "  Upper=", zfoc_at_nmin(z_upbar), "  n=", controls[2])
 	        # 1.2.1 Interior z
 	        if zfoc_at_nmin(z_lwbar)*zfoc_at_nmin(z_upbar)<0
-	            zz = find_zero(zfoc_at_nmin, (z_lwbar,z_upbar), Bisection())
-	            if den_l(nn,zz) > 0.0
+	            controls[4] = find_zero(zfoc_at_nmin, (z_lwbar,z_upbar), Bisection())
+	            if den_l(controls[2],controls[4]) > 0.0
 	            	# verbose && print("Interior z feasible. ")
-	                ll = ll_opt(nn,zz);
-	                pp = (pa.χ*ll^(1.0+pa.ψ))/den_p(nn,zz);
-	                max_hamiltonian = objective(ll, nn, pp, zz)
+	                controls[1] = ll_opt(controls[2],controls[4]);
+	                controls[3] = (pa.χ*controls[1]^(1.0+pa.ψ))/den_p(controls[2],controls[4]);
+	                max_hamiltonian = objective(controls[1], controls[2], controls[3], controls[4])
 	            end
 	        end
 	        # 1.2.2 True corner
-	        if z_upbar>0.0 && den_l(nn, z_upbar)>0.0
-	            corner_ll=ll_opt(nn, z_upbar);
-	            corner_pp = (pa.χ*corner_ll^(1.0+pa.ψ))/den_p(nn, z_upbar);
-	            corner_hamiltonian = objective(corner_ll, nn, corner_pp, z_upbar)
+	        if z_upbar>0.0 && den_l(controls[2], z_upbar)>0.0
+	            corner_ll=ll_opt(controls[2], z_upbar);
+	            corner_pp = (pa.χ*corner_ll^(1.0+pa.ψ))/den_p(controls[2], z_upbar);
+	            corner_hamiltonian = objective(corner_ll, controls[2], corner_pp, z_upbar)
 	            if corner_hamiltonian>max_hamiltonian
 	            	verbose && println("Case 2.b Corner z.")
-	                zz=z_upbar
-	                # nn=nn
-	                ll=corner_ll
-	                pp=corner_pp
+	                controls[4]=z_upbar
+	                # controls[2]=controls[2]
+	                controls[1]=corner_ll
+	                controls[3]=corner_pp
 	                max_hamiltonian=corner_hamiltonian
 	            else
 	            	verbose && println("Case 2.a Interior z.")
@@ -129,25 +127,31 @@ function new_find_controls( θ, ss, pa)
 
 	        # 1.2.3. Evaluating the z-corner solutions (this shouldn't be the answer)
 	        corner_zz = 0.0
-	        # corner_nn = nn;
-	        den_l(nn, corner_zz) <= 0.0 && error("Denominator of L (corner) is negative or zero.") #Stop when denominator is negative.
-	        corner_ll = ll_opt(nn, corner_zz)
-	        corner_pp = (pa.χ*corner_ll^(1.0+pa.ψ))/den_p(nn, corner_zz);
-	        corner_hamiltonian = objective(corner_ll, nn, corner_pp, corner_zz)
+	        # corner_nn = controls[2];
+	        den_l(controls[2], corner_zz) <= 0.0 && error("Denominator of L (corner) is negative or zero.") #Stop when denominator is negative.
+	        corner_ll = ll_opt(controls[2], corner_zz)
+	        corner_pp = (pa.χ*corner_ll^(1.0+pa.ψ))/den_p(controls[2], corner_zz);
+	        corner_hamiltonian = objective(corner_ll, controls[2], corner_pp, corner_zz)
 	        if corner_hamiltonian > max_hamiltonian
-	            zz = corner_zz
-	            # nn = corner_nn;
-	            ll = corner_ll
-	            pp = corner_pp
+	            controls[4] = corner_zz
+	            # controls[2] = corner_nn;
+	            controls[1] = corner_ll
+	            controls[3] = corner_pp
 	            max_hamiltonian=corner_hamiltonian
-	            warning("Case 2.c Corner n z=0.")
+	            @warn("Case 2.c Corner n z=0.")
 	        end
         end
     end
 
     #Final Output:
-    #verbose && println("zz = ", zz, "nn = ", nn, "ll = ", ll, "pp = ", pp)
-    return zz, nn, ll, pp;
+    verbose && println("z = ", controls[4], ",  n = ", controls[2], ",  l = ", controls[1], ",  p = ", controls[3])
+    
+end
+
+function new_find_controls(θ::Float64, ss::State, pa, verbosebool::Bool=false)
+    controls=Array{Float64}(undef,4)
+    new_find_controls!(controls, θ::Float64, ss::State, pa, verbosebool)
+    return Tuple(controls)
 end
 
 function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solvec::Array{Float64})
@@ -163,10 +167,10 @@ function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solve
       ω     = solvec[j,8];
       ss    = State(e, uw, ϕ_e, μ, λ, ω);
 
-      #(zz, nn, ll, pp) = new_find_controls( θ, ss, pa)
-      (zz, nn, ll, pp) = new_find_controls( θ, ss, pa)
-      #verbose && println("θwControls = ", θ)
-      #verbose && println("z = ", zz, "n = ", nn, "l = ", ll, "p = ", pp)
+      
+      (ll, nn, pp, zz) = new_find_controls( θ, ss, pa)
+      # println("θwControls = ", θ)
+      # println("z = ", zz, "n = ", nn, "l = ", ll, "p = ", pp)
 
       ctrlvec[j,1] = zz;
       ctrlvec[j,2] = nn;
