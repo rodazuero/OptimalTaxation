@@ -72,8 +72,9 @@ function find_states!(du,u,pa,θ)
     Vw = pa.indicator*uw^pa.ϕ + θ*l*ω - λ*uw - λ*pa.χ*l^(1.0+pa.ψ)/(1.0+pa.ψ);
     Ve = pa.indicator*uw^pa.ϕ + λ*e*n^pa.α - λ*pa.β*z^(1.0+pa.σ)/(1.0+pa.σ) - ω*(n-pa.ς) - λ*uw;
     #Independent distributions (log-normal distribution):
-    ∂hw∂e =  pdf(Normal(pa.μ_e,pa.σ2_e^0.5), log(e))/e*pdf(Normal(pa.μ_w,pa.σ2_w^0.5), log(θ))/θ; #f_θw(θ) f_θe(e)
-    ∂he∂e = -pdf(Normal(pa.μ_e,pa.σ2_e^0.5), log(e))/e*(1.0+(log(e)-pa.μ_e)/pa.σ2_e)*cdf(Normal(pa.μ_w,pa.σ2_w^0.5), log(θ));
+    ∂hw∂e = pa.partialhw_partiale(θ,e); #f_θw(θ) f_θe(e)
+    #∂hw∂e es gg()
+    ∂he∂e = pa.partialhe_partiale(θ,e);
     #Uniform distribution
     #∂he_de = 0.0;
     #∂hw_de = pa.gg(θ,e);

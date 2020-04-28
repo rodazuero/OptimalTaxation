@@ -32,15 +32,15 @@ function my_runge_kutta_reverse!(states::Array{Float64,2}, xspan::Array{Float64,
     θ_limits    = (θ,θ_1); #The limits to solve the differencial equation.
 
     prob  = ODEProblem(find_states!,initial_val,θ_limits,pa)
-    condition_Θ_e_l(u,t,integrator)=u[3]-pa.θ_e_lb    
+    condition_Θ_e_l(u,t,integrator)=u[3]-pa.θ_e_lb
     callback_Θ_e_l=ContinuousCallback(condition_Θ_e_l, affect_Θ_e_l!; save_positions=(false,true) )
     solution_RKPack = solve(prob, alg, callback=callback_Θ_e_l; saveat=xspan)
     #solution_RKPack = solve(prob,alg_hints=[:stiff])
     (nstates, lenght_sol)=size(solution_RKPack)
-    
+
     xspan[1:Nspan-lenght_sol].=NaN
-    for i = 2:lenght_sol    
-        xspan[Nspan+1-i]=solution_RKPack.t[i] 
+    for i = 2:lenght_sol
+        xspan[Nspan+1-i]=solution_RKPack.t[i]
         #Update vector of states:
         states[Nspan+1-i,1:10] = solution_RKPack[i]
         states[Nspan+1-i,11]   = states[Nspan+1-i,7]./states[Nspan+1-i,9];

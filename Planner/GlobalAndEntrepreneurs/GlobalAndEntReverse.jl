@@ -48,7 +48,7 @@ alg = Tsit5()
 
     #Define proportion of agents in global problem
     gp     =   0.993
-    gp     =   1.0-0.3 #Ent problem with 20%
+    gp     =   1.0-0.23
 
     #ue0    =   100.0
     ue0    =   640.0

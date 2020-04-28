@@ -37,6 +37,10 @@ mutable struct Param
     weights::Array{Float64,1} #añadir tamaño
     nodes::Array{Float64,1}
 
+    #Derivatives for states:
+    partialhw_partiale::Function
+    partialhe_partiale::Function
+
     #Span of theta
     θ_w_lb::Float64
     θ_w_ub::Float64
@@ -80,13 +84,13 @@ end
 
 #Constructor for the parameters
 function init_parameters()
-    ##Workers parameters
+    #Workers parameters
     χ= 2.0192;
     ψ= 0.4528;
     κ= 0.1021;
     ρ= 0.0912;
 
-    ## Entrepreneurs parameters
+    #Entrepreneurs parameters
     α= 0.73;
     δ= 0.12873;
     γ= 0.7341;
@@ -107,49 +111,49 @@ function init_parameters()
     σ2_e = 1.1675; σ_e=σ2_e^0.5;
     σ_we = 0.0;
 
-    #μ_w = 10.0;
-    #μ_e = 10.0;
-    #σ2_w = 6.0; σ_w=σ2_w^0.5;
-    #σ2_e = 6.0; σ_e=σ2_e^0.5;
-    #σ_we = 0.0;
     constant_w_lw = 1.0e-2;
     constant_e_lw = 1.0e-2;
     #constant_w_lw = 0.2;
     #constant_e_lw = 0.2;
     #constant_w_ub = 1.0-1.0e-2;
     #constant_e_ub = 1.0-1.0e-2;
-    constant_w_ub = 1.0-0.15;
-    constant_e_ub = 1.0-0.15;
+    constant_w_ub = 1.0-0.2;
+    constant_e_ub = 1.0-0.2;
 
 #Normal distribution for ln(θ) and log-normal for θw
-    dist_marginal_w = Normal(μ_w,σ_w); #This is the distribution for ln(θ_w)
-    dist_marginal_e = Normal(μ_e,σ_e); #This is the distribution for ln(θ_e)
+    dist_marginal_lnθw = Normal(μ_w,σ_w); #This is the distribution for ln(θ_w)
+    dist_marginal_lnθe = Normal(μ_e,σ_e); #This is the distribution for ln(θ_e)
 
     #Lower bounds:
         #θw
-        log_θ_w_lb  = quantile(dist_marginal_w,constant_w_lw); #ln(θw)_lb
+        log_θ_w_lb  = quantile(dist_marginal_lnθw,constant_w_lw); #ln(θw)_lb
         θ_w_lb      = exp(log_θ_w_lb)
         #θe
-        log_θ_e_lb  = quantile(dist_marginal_e,constant_e_lw); #ln(θe)_lb
+        log_θ_e_lb  = quantile(dist_marginal_lnθe,constant_e_lw); #ln(θe)_lb
         θ_e_lb      = exp(log_θ_e_lb)
 
     #Upper bounds:
         #θw
-        log_θ_w_ub = quantile(dist_marginal_w,constant_w_ub) #ln(θw)_ub
+        log_θ_w_ub = quantile(dist_marginal_lnθw,constant_w_ub) #ln(θw)_ub
         θ_w_ub     = exp(log_θ_w_ub)
         #θe
-        log_θ_e_ub = quantile(dist_marginal_e,constant_e_ub) #ln(θe)_ub
+        log_θ_e_ub = quantile(dist_marginal_lnθe,constant_e_ub) #ln(θe)_ub
         θ_e_ub     = exp(log_θ_e_ub)
 
     #When distributions are independent:
-    hw(θ,e) = 1.0/θ*( pdf(dist_marginal_w, log(θ))*cdf(dist_marginal_e, log(e)) ); # h_w(θ)= f_θw(θ) F_θe(e)
-    he(θ,e) = 1.0/e*( pdf(dist_marginal_e, log(e))*cdf(dist_marginal_w, log(θ)) ); # h_e(e)= f_θe(e) F_θw(θ)
+    hw(θ,e)   = 1.0/θ*( pdf(dist_marginal_lnθw, log(θ))*cdf(dist_marginal_lnθe, log(e)) ); # h_w(θ)= f_θw(θ) F_θe(e)
+    he(θ,e)   = 1.0/e*( pdf(dist_marginal_lnθe, log(e))*cdf(dist_marginal_lnθw, log(θ)) ); # h_e(e)= f_θe(e) F_θw(θ)
     hh(θ,e,p) = hw(θ,e) + p*he(θ,e);
-    cov = σ_we*σ_w*σ_e;
-    d   = MvNormal([μ_w, μ_e], [σ2_w cov; cov σ2_e]);
+    cov     = σ_we*σ_w*σ_e;
+    d       = MvNormal([μ_w, μ_e], [σ2_w cov; cov σ2_e]);
     gg(θ,e) = pdf(d,[log(θ),log(e)])/(θ*e);
+
+    #Define the derivatives of hw and he with respect to e (whe use this in the derivative of ϕe):
+    partialhw_partiale(θ,e) =  pdf(dist_marginal_lnθe, log(e))/e*pdf(dist_marginal_lnθw, log(θ))/θ; #f_θw(θ) f_θe(e)
+    #∂hw∂e es gg()
+    partialhe_partiale(θ,e) = -pdf(dist_marginal_lnθe, log(e))/e*(1.0+(log(e)-pa.μ_e)/pa.σ2_e)*cdf(dist_marginal_lnθw, log(θ));
 
     weights, nodes = gausslegendre(25);
 
-    Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ς, ϕ, G, indicator, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, weights, nodes, θ_e_a, θ_w_a, θ_w_lb, θ_w_ub, θ_e_lb, θ_e_ub, constant_w_lw, constant_e_lw);
+    Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ς, ϕ, G, indicator, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, weights, nodes, partialhw_partiale, partialhe_partiale, θ_w_lb, θ_w_ub, θ_e_lb, θ_e_ub, constant_w_lw, constant_e_lw, constant_w_ub, constant_e_ub);
 end
