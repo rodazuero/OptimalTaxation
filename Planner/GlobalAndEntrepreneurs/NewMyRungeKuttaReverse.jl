@@ -14,6 +14,10 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; v
 
     (Nspan,) =  size(xspan)
 
+    #Replace in the last solutions:
+    solution[Nspan,11]= solution[Nspan,7]./solution[Nspan,9]
+    solution[Nspan,12]=solution[Nspan,5]./solution[Nspan,10]
+
     #Loop over values of θw:
     for i = Nspan:-1:1
 
@@ -25,29 +29,6 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; v
         #println("it = ", i, " x = ", x, " theta = ", θ)
 
         #Convert state object into a vector
-        #y[1] = solution[Nspan+1-i,1]  # uw
-        #y[2] = solution[Nspan+1-i,2]  # μ
-        #y[3] = solution[Nspan+1-i,3]  # e;
-        #y[4] = solution[Nspan+1-i,4]  # ϕ_e;
-        #y[5] = solution[Nspan+1-i,5]  # y_agg;
-        #y[6] = solution[Nspan+1-i,6]  # λ;
-        #y[7] = solution[Nspan+1-i,7]  # l_agg;
-        #y[8] = solution[Nspan+1-i,8]  # ω;
-        #y[9] = solution[Nspan+1-i,9]  # l_new;
-        #y[10] = solution[Nspan+1-i,10]  # y_new;
-
-        #ini[1] = solution[Nspan+1-i,1]  # uw
-        #ini[2] = solution[Nspan+1-i,2]  # μ
-        #ini[3] = solution[Nspan+1-i,3]  # e;
-        #ini[4] = solution[Nspan+1-i,4]  # ϕ_e;
-        #ini[5] = solution[Nspan+1-i,5]  # y_agg;
-        #ini[6] = solution[Nspan+1-i,6]  # λ;
-        #ini[7] = solution[Nspan+1-i,7]  # l_agg;
-        #ini[8] = solution[Nspan+1-i,8]  # ω;
-        #ini[9] = solution[Nspan+1-i,9]  # l_new;
-        #ini[10] = solution[Nspan+1-i,10]  # y_new;
-        #println("θwRK = ", ini[end])
-
         for j = 1:10
             y[j] = solution[Nspan+1-i,j]
             ini[j] = solution[Nspan+1-i,j]  # uw
@@ -76,11 +57,6 @@ function my_runge_kutta_reverse!(solution::Array{Float64},y_end,xspan,step,pa; v
         #println("z4")
         find_states!(z4, y+step*z3, pa, x+step, ini);
         any(isnan,z4) && error("z4 is NaN ")
-
-        if i==1
-            solution[Nspan,11]= solution[Nspan,7]./solution[Nspan,9]
-            solution[Nspan,12]=solution[Nspan,5]./solution[Nspan,10]
-        end
 
         #Update vector of states
         dy = (z1+2.0*z2+2.0*z3+z4)/6.0;

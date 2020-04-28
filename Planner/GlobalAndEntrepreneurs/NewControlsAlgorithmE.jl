@@ -38,7 +38,7 @@ function new_find_controlse( θ, θe, sse, pa)
 
     potential_n = n_opt(potential_z);
 
-    println("n = ", potential_n, "z = ", potential_z, "States = ", sse)
+    #println("n = ", potential_n, "z = ", potential_z, "States = ", sse)
     interior_hamiltonian = objective(potential_z,potential_n);
 
     #2. The corner solution is:

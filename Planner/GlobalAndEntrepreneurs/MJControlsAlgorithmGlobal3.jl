@@ -18,7 +18,7 @@ function new_find_controls( θ, ss, pa)
     h_e::Float64 = pa.he(θ, ss.e);
     h_w::Float64 = pa.hw(θ, ss.e);
 
-# 0.2 Initialize constatns
+# 0.2 Initialize constants
     n_full_info::Float64 = ((ss.λ*pa.α*ss.e)/ss.ω)^(1.0/(1.0-pa.α));
     z_lwbar::Float64 	= 0.0
     z_upbar::Float64 	= (1.0/pa.β)^(1.0/pa.σ); #Max possible evasion.

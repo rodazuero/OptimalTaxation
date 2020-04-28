@@ -1,8 +1,6 @@
 #cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 #cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 
-fig_graphs = true
-
 fig_graphs = true;
 
 using Roots
@@ -46,11 +44,12 @@ pa = init_parameters();
 
     #Define proportion of agents in global problem
     gp     =   0.993
-    gp     =   1.0-0.3 #Ent problem with 20%
+    gp     =   1.0-0.23
 
     #ue0    =   100.0
     ue0    =   640.0
-    ue0    =   1300.0
+    #ue0    =   800.0
+    #ue0    =   2500.0
     #ue0    =   1700.0
     #ue0    =   9500.0
     μe0    =   0.0 - 1.0e-10
@@ -58,8 +57,13 @@ pa = init_parameters();
     λe0    =   1.0
     le0    =   0.0
     ωe0    =   1.342970 #mbar=1.0   ω_min=1.342555  ω_max=1.342625
-    ωe0    =   1.338945
-    #mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.341374 e(θw_lb)=θe_lb (but bunching not addressed)
+    ωe0    =   0.73
+    ωe0    =   0.722999
+    ωe0    =   0.7640911
+    ωe0    =   0.73
+        #mbar=10.0, constant_ub = 1.0-0.2, gp = 1.0-0.25:
+            #ω_min=0.723080  ω_max=1.339170  -- ω_max_max=0.7640911 e(θw_lb)=θe_lb (but bunching not addressed)
+        #mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.341374 e(θw_lb)=θe_lb (but bunching not addressed)
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];

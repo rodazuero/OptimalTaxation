@@ -42,6 +42,7 @@ function find_statese!(du::Array{Float64},u,pa,θ,θe,ini)
     #Construct state object
     #sse = State(ue, μe, λe, ωe);
     sse = StateE(ini[1], ini[2], ini[4], ini[6]);
+    println("sse = ", sse)
 
     #Find optimal controls
     (ze, ne) = new_find_controlse( θ, ini[9], sse, pa);
