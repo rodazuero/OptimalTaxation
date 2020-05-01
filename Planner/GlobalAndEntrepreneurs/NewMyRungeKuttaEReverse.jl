@@ -1,4 +1,4 @@
-function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,alg; verbose = false)
+function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,alg,verbose::Bool = true)
 
     println("Solving differencial equations with RK package from Julia.")
 
@@ -13,7 +13,7 @@ function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,a
     #Loop over values of θ_e:
     for i=Nspan:-1:2
 
-        #println("i = ", i) #Actual θe
+        verbose && println("i = ", i, ) #Actual θe
 
         #Current value for θe
         θe   = xspan[i]
@@ -34,11 +34,11 @@ function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,a
 
         prob = ODEProblem(find_statese!,initial_val,θe_limits,pa);
         #solution_RKPack = solve(prob)
-        solution_RKPack = solve(prob,alg)
+        solution_RKPack = solve(prob,alg, save_everystep=false)
         #solution_RKPack = solve(prob,alg_hints=[:stiff])
 
         #Update vector of states:
-        solution[i-1,1:8] = solution_RKPack(θe_1);
+        solution[i-1,1:8] = solution_RKPack[2];
         solution[i-1,9]   = solution[i-1,5]./solution[i-1,7];
         solution[i-1,10]  = solution[i-1,3]./solution[i-1,8];
 

@@ -57,7 +57,7 @@ function new_find_controlse( θ, θe, sse, pa)
 
     #Final Output:
     #println("zze = ", zze, "nne = ", nne)
-    zze, nne
+    return zze, nne
 
 end
 

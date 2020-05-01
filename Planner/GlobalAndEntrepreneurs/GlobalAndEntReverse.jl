@@ -1,10 +1,9 @@
 #cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 #cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 
-fig_graphs   = true     #Indicator to print figures.
-RK_algorithm = true    #true is when we use the RK package from Julia.
-
-fig_graphs = true;
+fig_graphs   = true; #Indicator to print figures (true is when we print figures).
+RK_algorithm = true; #Indicator to use RK package from Julia (true is when we use package).
+uniform_dist = false; #Indicator to tell if the distribution is log-normal or uniform (true is uniform).
 
 using Roots
 using NLopt
@@ -39,7 +38,7 @@ include("Propositions.jl")
 include("Integrals.jl")
 
 #Define values for the model parameters:
-pa  = init_parameters();
+pa  = init_parameters(uniform_dist);
 # Algorithm to solve differencial equations:
 alg = Tsit5()
 # alg = Rosenbrock23()
@@ -47,29 +46,44 @@ alg = Tsit5()
     #Initial boundary conditions (states from the global problem)
 
     #Define proportion of agents in global problem
-    gp     =   0.993
-    gp     =   1.0-0.23
+    if uniform_dist == true
+        #For uniform distribution:
+        gp     =   0.993
+        ue0    =   640.0
+        μe0    =   0.0 - 1.0e-10
+        ye0    =   0.0
+        λe0    =   1.0
+        le0    =   0.0
+        ωe0    =   1.342970 #mbar=1.0   ω_min=1.342555  ω_max=1.342625
+        #mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.343049 e(θw_lb)=θe_lb (but bunching not addressed)
+    else
+        #For log-normal distribution:
+        gp     =   1.0-0.2
+        ue0    =   600.0
+        μe0    =   0.0 - 1.0e-10
+        ye0    =   0.0
+        λe0    =   1.0
+        le0    =   0.0
+        ωe0    =   0.7
+        #mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.343049 e(θw_lb)=θe_lb (but bunching not addressed)
+    end
 
-    #ue0    =   100.0
-    ue0    =   640.0
-    ue0    =   640.7
-    μe0    =   0.0 - 1.0e-10
-    ye0    =   0.0
-    λe0    =   1.0
-    le0    =   0.0
-    ωe0    =   1.342970 #mbar=1.0   ω_min=1.342555  ω_max=1.342625
-    ωe0    =   1.34318
+    #For log-normal distribution:
+    #gp     =   1.0-0.23
+    #ue0    =   290.0
+    #ωe0    =   0.76999
     #mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.343049 e(θw_lb)=θe_lb (but bunching not addressed)
 
     Nspan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
-    elb = exp(quantile(Normal(pa.μ_e,pa.σ2_e^0.5), gp))
+    uniform_dist == true ? elb = pa.θ_e_ub - ((1-gp)*(pa.θ_e_ub-pa.θ_e_a)*(1.0-pa.constant_w_lw*pa.constant_e_lw)) : elb = exp(quantile(Normal(pa.μ_e,pa.σ2_e^0.5), gp));
     eub = pa.θ_e_ub;
     estep = (eub - elb)/(Nspan - 1);
     espan = elb:estep:eub;
     solutione = Array{Float64}(undef,Nspan,10);
     fill!(solutione,NaN);
     RK_algorithm == true ? my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,alg) : my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
+    #my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
 
     #solutione[end,:]
     #using DelimitedFiles
@@ -130,8 +144,8 @@ alg = Tsit5()
     xspan = collect(xlb:xstep:xub)
     states = Array{Float64}(undef,Nspan,12);
     fill!(states,NaN)
-    if RK_algorithm == true 
-        lenght_sol=my_runge_kutta_reverse!(states, xspan, y_end,xstep,pa,alg) 
+    if RK_algorithm == true
+        lenght_sol=my_runge_kutta_reverse!(states, xspan, y_end,xstep,pa,alg)
     else
         my_runge_kutta_reverse!(states,y_end,xspan,xstep,pa)
         lenght_sol=Nspan
