@@ -1,4 +1,4 @@
-function new_find_controlse( θ, θe, sse, pa)
+function new_find_controlse( θe::Float64, sse::StateE, pa, verbose=true )
     #INPUT: states and parameters
     #OUTPUT: optimal controls
     potential_n::Float64 = NaN;
