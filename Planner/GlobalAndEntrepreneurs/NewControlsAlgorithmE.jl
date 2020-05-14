@@ -10,6 +10,7 @@ function new_find_controlse( θ, θe, sse, pa)
 
     #Recover ditributions
     h_e= pa.he(θ, θe);
+    #println(" he = ", h_e)
 
     #Defining bounds we use in various cases (limits of z):
     n_full_info = ((sse.λe*pa.α*θe)/sse.ωe)^(1.0/(1.0-pa.α));
@@ -21,6 +22,7 @@ function new_find_controlse( θ, θe, sse, pa)
     z_upbar = min(z_1,z_2);
 
     #Defining the functions we are using:
+    #println(-sse.λe*h_e/(pa.σ*sse.μe), ", μ = ", sse.μe, ", θe = ", θe)
     n_opt(z)   = (-sse.λe*z*h_e/(pa.σ*sse.μe))^(1.0/pa.α);
     fun_z(z,n) = (sse.λe*pa.α*θe*n^(pa.α-1.0)*h_e - sse.ωe*h_e + pa.α*sse.μe*n^(pa.α-1.0)*(1.0-pa.β*z^pa.σ));
     fun_nz(z)  = fun_z(z,n_opt(z));

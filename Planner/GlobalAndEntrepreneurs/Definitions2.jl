@@ -3,6 +3,7 @@
 # 2. When g is the normal distribution, we save a lot of time because the h's are normals
 using Distributions
 using FastGaussQuadrature
+using Cubature #To solve integrals numerically.
 
 mutable struct Param
     ##Workers parameters
@@ -23,6 +24,7 @@ mutable struct Param
     ϕ::Float64 #Concave utilitarian parameter
     G::Float64 #Expenditure needs
     indicator::Float64
+    uniform_ind::Bool
 
     ## Distributions and parameters
     μ_w::Float64
@@ -42,8 +44,6 @@ mutable struct Param
     partialhe_partiale::Function
 
     #Span of theta
-    θ_e_a::Float64
-    θ_w_a::Float64
     θ_w_lb::Float64
     θ_w_ub::Float64
     θ_e_lb::Float64
@@ -84,7 +84,7 @@ end
 
 
 #Constructor for the parameters
-function init_parameters(uniform_ind::Bool)
+function init_parameters()
     #Workers parameters
     χ= 2.0192;
     ψ= 0.4528;
@@ -100,16 +100,17 @@ function init_parameters(uniform_ind::Bool)
     ς= 10.0;
 
     #Planner parameters
-    ϕ = 0.1;
+    ϕ = 0.5;
     G = 0.15;
-    indicator = 0.0; #The Rawlsian case
-    #indicator = 1; #The Utilitarian case
+    #indicator = 0.0; #The Rawlsian case
+    uniform_ind = true; #true if we have a uniform distribution
+    indicator = 1; #The Utilitarian case
 
     ## Distributions:
-    constant_w_lw = 1.0e-2;
-    constant_e_lw = 1.0e-2;
-    constant_w_ub = 1.0-0.15;
-    constant_e_ub = 1.0-0.15;
+    constant_w_lw = 5.0e-2;
+    constant_e_lw = 5.0e-2;
+    constant_w_ub = 1.0-0.05;
+    constant_e_ub = 1.0-0.05;
 
     #Getting the distributions depending if we have a log-normal or a uniform:
     #First we define the parameters and bounds and then the functions we are using:
@@ -125,24 +126,19 @@ function init_parameters(uniform_ind::Bool)
             σ_we = 0.0;
 
             #Defining the bounds:
-            θ_e_a  = μ_e-((12.0^0.5)/2.0)*(σ2_e^0.5);
+            θ_e_lb = μ_e-((12.0^0.5)/2.0)*(σ2_e^0.5);
             θ_e_ub = μ_e+((12.0^0.5)/2.0)*(σ2_e^0.5);
-            θ_w_a  = μ_w-((12.0^0.5)/2.0)*(σ2_w^0.5);
+            θ_w_lb = μ_w-((12.0^0.5)/2.0)*(σ2_w^0.5);
             θ_w_ub = μ_w+((12.0^0.5)/2.0)*(σ2_w^0.5);
 
-            dist_marginal_w = Uniform(θ_w_a,θ_w_ub);
-            dist_marginal_e = Uniform(θ_e_a,θ_e_ub);
-            θ_w_lb = quantile(dist_marginal_w,constant_w_lw);
-            θ_e_lb = quantile(dist_marginal_e,constant_e_lw);
+            dist_marginal_w = Uniform(θ_w_lb,θ_w_ub);
+            dist_marginal_e = Uniform(θ_e_lb,θ_e_ub);
 
             cons_mod_dis = 1.0/(1.0-constant_w_lw*constant_e_lw);
+
     else
         #Log-Normal distribution:
         println("Using Log-Normal Distribution.")
-
-        #We do not have bounds in these distribution, so we put them in zero:
-        θ_w_a = 0.0;
-        θ_e_a = 0.0;
 
         #Parameters for distributions:
         μ_w = 1.7626;
@@ -150,6 +146,7 @@ function init_parameters(uniform_ind::Bool)
         σ2_w = 1.0921; σ_w=σ2_w^0.5;
         σ2_e = 1.1675; σ_e=σ2_e^0.5;
         σ_we = 0.2;
+        #σ_we = 0.0;
 
         #Normal distribution for ln(θ) and log-normal for θw
             dist_marginal_lnθw = Normal(μ_w,σ_w); #This is the distribution for ln(θ_w)
@@ -158,18 +155,18 @@ function init_parameters(uniform_ind::Bool)
             #Lower bounds:
                 #θw
                 log_θ_w_lb  = quantile(dist_marginal_lnθw,constant_w_lw); #ln(θw)_lb
-                θ_w_lb      = exp(log_θ_w_lb)
+                θ_w_lb      = exp(log_θ_w_lb);
                 #θe
                 log_θ_e_lb  = quantile(dist_marginal_lnθe,constant_e_lw); #ln(θe)_lb
-                θ_e_lb      = exp(log_θ_e_lb)
+                θ_e_lb      = exp(log_θ_e_lb);
 
             #Upper bounds:
                 #θw
-                log_θ_w_ub = quantile(dist_marginal_lnθw,constant_w_ub) #ln(θw)_ub
-                θ_w_ub     = exp(log_θ_w_ub)
+                log_θ_w_ub = quantile(dist_marginal_lnθw,constant_w_ub); #ln(θw)_ub
+                θ_w_ub     = exp(log_θ_w_ub);
                 #θe
-                log_θ_e_ub = quantile(dist_marginal_lnθe,constant_e_ub) #ln(θe)_ub
-                θ_e_ub     = exp(log_θ_e_ub)
+                log_θ_e_ub = quantile(dist_marginal_lnθe,constant_e_ub); #ln(θe)_ub
+                θ_e_ub     = exp(log_θ_e_ub);
 
             #Defining the conditional distributions:
                 mean_w_given_e(x_e) = μ_w + σ_we*σ_w/σ_e*(x_e-μ_e);
@@ -180,72 +177,69 @@ function init_parameters(uniform_ind::Bool)
                 var_e_given_w = (1.0-σ_we^2.0)*σ2_e;
                 dist_e_given_w(x_θ) = Normal(mean_e_given_w(x_θ),var_e_given_w^0.5);
 
-                cov     = σ_we*σ_w*σ_e;
-                d       = MvNormal([μ_w, μ_e], [σ2_w cov; cov σ2_e]);
+                cov = σ_we*σ_w*σ_e;
+                d   = MvNormal([μ_w, μ_e], [σ2_w cov; cov σ2_e]);
+                gg_original(θ,e) = pdf(d,[log(θ),log(e)])/(θ*e);
+
+            #The constant to modify the distributions:
+                function integral_1(θ) #We find the value of the first integral, then the double.
+                    (val1,err1) = hcubature(x -> gg_original(θ,x[1]), [θ_e_lb],[θ_e_ub]);
+                    return val1
+                end
+                (val,err)    = hcubature(x -> integral_1(x[1]), [θ_w_lb],[θ_w_ub]);
+                cons_mod_dis = 1.0/val;
+                println(" val_int = ", val, " cons_mod_dis = ", cons_mod_dis)
+
     end
 
     #Now we define the functions depending on the distribution we have (they cannot be defined in the conditional above):
+    function gg(θ,e)
+        if uniform_ind == true
+           f = 1.0/((θ_w_ub-θ_w_lb)*(θ_e_ub-θ_e_lb));
+        else
+           f = gg_original(θ,e)*cons_mod_dis;
+        end
+    end
+
     function hw(θ,e)
         if uniform_ind == true
-            f = (((e-θ_e_a)/(θ_e_ub-θ_e_a))*(1/(θ_w_ub-θ_w_a)))*cons_mod_dis; # h_w(θ)= F_e|w(e|θ) fw(θ)
-        elseif σ_we == 0.0
-            f = 1.0/θ*( pdf(dist_marginal_lnθw, log(θ))*cdf(dist_marginal_lnθe, log(e)) ); # h_w(θ)= f_θw(θ) F_θe(e)
+            f = (((e-θ_e_lb)/(θ_e_ub-θ_e_lb))*(1/(θ_w_ub-θ_w_lb))); # h_w(θ)= F_e|w(e|θ) fw(θ)
+        elseif σ_we==0.0
+            f = 1.0/θ*pdf(dist_marginal_lnθw, log(θ))*(cdf(dist_marginal_lnθe, log(e)) - cdf(dist_marginal_lnθe, log(θ_e_lb)))*cons_mod_dis; # h_w(θ)= f_θw(θ) F_θe(e)
         else
-            f = 1.0/θ*( pdf(dist_marginal_lnθw, log(θ))*cdf(dist_e_given_w(log(θ)), log(e)) ); # h_w(θ)= f_θw(θ) F_θe|θ(e|θ)
+            (val,err) = hcubature(x -> gg(θ,x[1]), [θ_e_lb],[e]);
+            f = val;
         end
-
-        return f
     end
 
     function he(θ,e)
-           if uniform_ind == true
-               f = (((θ-θ_w_a)/(θ_w_ub-θ_w_a))*(1/(θ_e_ub-θ_e_a)))*cons_mod_dis; # h_e(e)= F_w|e(θ|e) fe(e)
-           elseif σ_we == 0.0
-               f = 1.0/e*( pdf(dist_marginal_lnθe, log(e))*cdf(dist_marginal_lnθw, log(θ)) ); # h_e(e)= f_θe(e) F_θw(θ)
-           else
-               f = 1.0/e*( pdf(dist_marginal_lnθe, log(e))*cdf(dist_w_given_e(log(e)), log(θ)) ); # h_e(e)= f_θe(e) F_θw|e(w|e)
-          end
-
-          return f
-    end
-
-    function gg(θ,e)
-           if uniform_dist == true
-               f = (1.0/((θ_w_ub-θ_w_a)*(θ_e_ub-θ_e_a)))*cons_mod_dis;
-           else
-               f = pdf(d,[log(θ),log(e)])/(θ*e);
-          end
-
-          return f
+        if uniform_ind == true
+           f = (((θ-θ_w_lb)/(θ_w_ub-θ_w_lb))*(1/(θ_e_ub-θ_e_lb))); # h_e(e)= F_w|e(θ|e) fe(e)
+        elseif σ_we == 0.0
+           f = 1.0/e*pdf(dist_marginal_lnθe, log(e))*(cdf(dist_marginal_lnθw, log(θ)) - cdf(dist_marginal_lnθw, log(θ_w_lb)))*cons_mod_dis; # h_e(e)= f_θe(e) F_θw(θ)
+        else
+           (val,err) = hcubature(x -> gg(x[1],e), [θ_w_lb],[θ]);
+           f = val;
+        end
     end
 
     function partialhw_partiale(θ,e)
-           if uniform_dist == true
-               f = (1.0/((θ_w_ub-θ_w_a)*(θ_e_ub-θ_e_a)))*cons_mod_dis;
-           elseif σ_we == 0.0
-               f = pdf(dist_marginal_lnθe, log(e))/e*pdf(dist_marginal_lnθw, log(θ))/θ; #f_θw(θ) f_θe(e)
-           else
-               f = pdf(dist_marginal_lnθw, log(θ))/θ*pdf(d,[log(θ),log(e)])/(θ*e)/pdf(dist_marginal_lnθe, log(e))/e; #f_θw(θ) f_θe(e)
-          end
-
-          return f
+        f = gg(θ,e); #gg
     end
 
     function partialhe_partiale(θ,e)
-        if uniform_dist == true
-           f = 0.0;
-        elseif σ_we == 0.0
-           f = -pdf(dist_marginal_lnθe, log(e))/e*(1.0+(log(e)-pa.μ_e)/pa.σ2_e)*cdf(dist_marginal_lnθw, log(θ));
+        if uniform_ind == true
+            f = 0.0;
         else
-            f = -pdf(dist_marginal_lnθe, log(e))/e*(1.0+(log(e)-pa.μ_e)/pa.σ2_e)*cdf(dist_e_given_w(log(θ)), log(e));
+            f = ( - 1.0/e*(1.0 + 1.0/(1.0-σ_we^2)*(log(e) - μ_e)/σ2_e )*he(θ,e) +
+                    σ_we/(e*σ_e*σ_w*(1.0-σ_we^2))*(pdf(dist_marginal_lnθe, log(e))*(mean_w_given_e(log(e)) -
+                    var_w_given_e*pdf(dist_w_given_e(log(e)), ((log(θ) - mean_w_given_e(log(e)))/var_w_given_e))/cdf(dist_w_given_e(log(e)), ((log(θ) - mean_w_given_e(log(e)))/var_w_given_e) ) ) - μ_w*he(θ,e) ) );
         end
-
-        return f
     end
 
     hh(θ,e,p) = hw(θ,e) + p*he(θ,e);
 
     weights, nodes = gausslegendre(25);
 
-    Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ς, ϕ, G, indicator, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, weights, nodes, partialhw_partiale, partialhe_partiale, θ_e_a, θ_w_a, θ_w_lb, θ_w_ub, θ_e_lb, θ_e_ub, constant_w_lw, constant_e_lw, constant_w_ub, constant_e_ub);
+    Param(χ,ψ, κ, ρ, α, δ, γ, β, σ, ς, ϕ, G, indicator, uniform_ind, μ_w, μ_e, σ2_w, σ2_e, σ_we, he, hw, hh, gg, weights, nodes, partialhw_partiale, partialhe_partiale, θ_w_lb, θ_w_ub, θ_e_lb, θ_e_ub, constant_w_lw, constant_e_lw, constant_w_ub, constant_e_ub);
 end

@@ -81,13 +81,13 @@ function graphs!(solution::Array{Float64}, solutione::Array{Float64}, controls::
             estados[1,2].set(ylabel="μ")
                 #e:
             estados[2,1].plot(θspan[1:500], solution[1:500,3])
-            estados[2,1].plot(θspan[1:500], repeat([pa.θ_e_ub],500), "tab:green")
-            estados[2,1].plot(θspan[1:500], repeat([e_end],500), "tab:blue")
+            estados[2,1].plot(θspan[1:500], repeat([pa.θ_e_lb],500), "tab:green")
+            #estados[2,1].plot(θspan[1:500], repeat([e_end],500), "tab:blue")
             #estados[2,1].set_title("e")
             estados[2,1].set(ylabel="e")
                 #ϕe:
             estados[2,2].plot(θspan[1:500], solution[1:500,4])
-            estados[2,2].plot(θspan[1:500], repeat([bound_e],500), "tab:green")
+            estados[2,2].plot(θspan[1:500], repeat([0],500), "tab:green")
             #estados[2,2].set_title("φe")
             estados[2,2].set(ylabel="φe")
                 #Y:

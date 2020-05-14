@@ -1,4 +1,4 @@
-function new_find_controls!(controls::Array{Float64,1}, θ::Float64, ss::State, pa, verbose=false)
+function new_find_controls!(controls::Array{Float64,1}, θ::Float64, ss::State, pa, verbose::Bool)
 
     #INPUT: states and parameters
     #OUTPUT: optimal controls
@@ -15,11 +15,11 @@ function new_find_controls!(controls::Array{Float64,1}, θ::Float64, ss::State, 
     h_w::Float64 = max(pa.hw(θ, ss.e), 0.0)
     if h_e<1e-15
         h_e=0.0
-        if ss.ϕ_e<0.0 
+        if ss.ϕ_e<0.0
             controls[2]=Inf # n_foc always positive
             controls[4]=0.0 # z_foc always negative
             den_l_temp= ss.λ*pa.χ*h_w - pa.χ/θ*(1.0+pa.ψ)*ss.μ
-            if den_l_temp > 0.0 
+            if den_l_temp > 0.0
                 controls[1]=(ss.ω*θ*h_w/den_l_he0)^(1.0/pa.ψ)
                 controls[3]=0.0
             else

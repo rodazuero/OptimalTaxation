@@ -1,7 +1,7 @@
-function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,alg,verbose::Bool = true)
+function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,alg,verbose::Bool = false)
 
     println("Solving differencial equations with RK package from Julia.")
-
+    #println(xspan)
     # θe is the upper bound of entrepreneurs distribution:
     solution[end,1:8] = y_end;
     (Nspan,) =  size(xspan);
@@ -31,6 +31,7 @@ function my_runge_kuttae_reverse!(solution::Array{Float64},y_end,xspan,step,pa,a
 
         initial_val = [ue0, μe0, ye_agg0, λe0, le_agg0, ωe0,le_new0,ye_new0];
         θe_limits   = (θe,θe_1); #The limits to solve the differencial equation.
+        #println("θe_limits = ", θe_limits)
 
         prob = ODEProblem(find_statese!,initial_val,θe_limits,pa);
         #solution_RKPack = solve(prob)
