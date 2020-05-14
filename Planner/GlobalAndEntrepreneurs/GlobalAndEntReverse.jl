@@ -1,8 +1,8 @@
 #cd("C:\\Users\\marya\\Documents\\GitHub\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 #cd("C:\\Users\\mariagon\\Documents\\OptimalTaxation\\Planner\\GlobalAndEntrepreneurs")
 
-fig_graphs   = true; #Indicator to print figures.
-RK_algorithm = true; #true is when we use the RK package from Julia.
+fig_graphs   = true     #Indicator to print figures.
+RK_algorithm = true    #true is when we use the RK package from Julia.
 
 using Roots
 using NLopt
@@ -39,8 +39,8 @@ include("Integrals.jl")
 #Define values for the model parameters:
 pa  = init_parameters();
 # Algorithm to solve differencial equations:
-# alg = Tsit5()
-alg = Rosenbrock23()
+alg = Tsit5()
+# alg = Rosenbrock23()
 #Entrepreneurs Problem
     #Initial boundary conditions (states from the global problem)
 
@@ -55,7 +55,7 @@ alg = Rosenbrock23()
     λe0    =   1.0
     le0    =   0.0
     ωe0    =   1.342970 #mbar=1.0   ω_min=1.342555  ω_max=1.342625
-    ωe0    =   1.343049
+    ωe0    =   1.34318
     #mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.343049 e(θw_lb)=θe_lb (but bunching not addressed)
 
     Nspan = 500
@@ -70,7 +70,7 @@ alg = Rosenbrock23()
 
     #solutione[end,:]
     #using DelimitedFiles
-    #writedlm("SolutionNewE.csv",solution,';')
+    #writedlm("SolutionNewE.csv",states,';')
 
     #For log-normal distribution
     #=xlb= log(pa.θ_w_lb);
@@ -124,36 +124,41 @@ alg = Rosenbrock23()
     xlb= pa.θ_w_lb;
     xub = pa.θ_w_ub;
     xstep = (xub - xlb)/(Nspan - 1);
-    xspan = xlb:xstep:xub;
-    solution = Array{Float64}(undef,Nspan,12);
-    fill!(solution,NaN);
-    RK_algorithm == true ? my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa,alg) : my_runge_kutta_reverse!(solution,y_end,xspan,xstep,pa)
-
+    xspan = collect(xlb:xstep:xub)
+    states = Array{Float64}(undef,Nspan,12);
+    fill!(states,NaN)
+    if RK_algorithm == true 
+        lenght_sol=my_runge_kutta_reverse!(states, xspan, y_end,xstep,pa,alg) 
+    else
+        my_runge_kutta_reverse!(states,y_end,xspan,xstep,pa)
+        lenght_sol=Nspan
+    end
+    display(xspan)
+    display(pa.θ_e_a)
     #using DelimitedFiles
-    #writedlm("SolutionNew.csv",solution,';')
+    #writedlm("SolutionNew.csv",states,';')
 
     θspan = Array{Float64,1};
-    θspan = collect(xlb:xstep:xub);
+    θspan = xspan;
 
     controls = Array{Float64}(undef,Nspan,4);
-    fill!(controls,NaN);
-    recover_controls!(controls, θspan, solution);
-    controls
+
+    recover_controls!(controls, θspan, states);
 
     bound_e   = -(pa.indicator*solutione[1,1]^pa.ϕ*he_ub+solutione[1,4]*(e_end*controlse[1,2]^pa.α -(pa.β/(1.0+pa.σ))*controlse[1,1]^(1.0+pa.σ)
                 - solutione[1,1])*he_ub - solutione[1,6]*controlse[1,2]*he_ub + solutione[1,2]*controlse[1,2]^pa.α*(1.0-pa.β*controlse[1,1]^pa.σ))
 
     #C= DataFrame(controls)
     #names!(C,[:z, :n, :l, :p] )
-    #RungeKutta=hcat(DataFrame(solution),C, DataFrame(theta=θspan))
+    #RungeKutta=hcat(DataFrame(states),C, DataFrame(theta=θspan))
     #CSV.write("RungeKuttaNew.csv", RungeKutta)
 
         #Marginal taxes and taxes path:
         τ_prime = Array{Float64}(undef,Nspan,3);
         fill!(τ_prime,NaN);
-        marginal_taxes(controls, θspan, solution, pa)
+        marginal_taxes(controls, θspan, states, pa)
 
-        (taxes, taxes_ent, taxes_rev, taxes_rev_ent) = taxes_path(controls, θspan, solution, pa, θespan, solutione, controlse, τ_prime, τ_prime_e);
+        (taxes, taxes_ent, taxes_rev, taxes_rev_ent) = taxes_path(controls, θspan, states, pa, θespan, solutione, controlse, τ_prime, τ_prime_e);
 
         taxes_full     = fill(NaN,Nspan,6);
         taxes_ent_full = fill(NaN,Nspan,4);
@@ -181,9 +186,9 @@ alg = Rosenbrock23()
         fill!(A_matrix,NaN);
 
         for i=1:Nspan
-            A_matrix[i,1] = solution[i,8]*pa.ς + pa.indicator*solution[i,1]^pa.ϕ-solution[i,6]*solution[i,1] + solution[i,4]/pa.he(θspan[i],solution[i,3]); #A
-            n_full_info   = ((solution[i,6]*pa.α*solution[i,3])/solution[i,8])^(1.0/(1.0-pa.α));
-            A_matrix[i,2] = -(1.0-pa.α)/pa.α*solution[i,8]*n_full_info; #A if z is 0 and n_full_info
+            A_matrix[i,1] = states[i,8]*pa.ς + pa.indicator*states[i,1]^pa.ϕ-states[i,6]*states[i,1] + states[i,4]/pa.he(θspan[i],states[i,3]); #A
+            n_full_info   = ((states[i,6]*pa.α*states[i,3])/states[i,8])^(1.0/(1.0-pa.α));
+            A_matrix[i,2] = -(1.0-pa.α)/pa.α*states[i,8]*n_full_info; #A if z is 0 and n_full_info
         end
 
         #Max evasion:
@@ -191,7 +196,7 @@ alg = Rosenbrock23()
         fill!(mat_for_z,NaN);
 
         for i=1:Nspan
-            mat_for_z[i,1] = solution[i,6]*solution[i,3]*controls[i,2]^pa.α-solution[i,8]*(controls[i,2]-pa.ς); #Max posible evasion.
+            mat_for_z[i,1] = states[i,6]*states[i,3]*controls[i,2]^pa.α-states[i,8]*(controls[i,2]-pa.ς); #Max posible evasion.
             mat_for_z[i,2] = controls[i,1]; #Evasion in model.
             mat_for_z[i,3] = solutione[i,4]*θespan[i]*controlse[i,2]^pa.α-solutione[i,6]*(controlse[i,2]-pa.ς); #Max posible evasion.
             mat_for_z[i,4] = controlse[i,1]; #Evasion in model.
@@ -202,15 +207,15 @@ alg = Rosenbrock23()
         proposition2 = fill(NaN,Nspan,2);
         proposition3 = fill(NaN,Nspan,6);
 
-        (proposition1, proposition2, proposition3) = propositions(controls,θspan,solution,τ_prime,pa,θespan,solutione);
+        (proposition1, proposition2, proposition3) = propositions(controls, θspan, states, τ_prime, pa, θespan, solutione);
 
 #ctrlvec = controls
 #θvec = θspan
-#solvec = solution
-#controls,θspan,solution,τ_prime,pa,θespan,solutione
+#solvec = states
+#controls,θspan,states,τ_prime,pa,θespan,solutione
 
         #Plots:
-        fig_graphs && graphs!(solution,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
+        fig_graphs && graphs!(states,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
                             bound_e,τ_prime,τ_prime_e,".\\Graphs",
                             utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_full, taxes_ent_full)
 
@@ -220,7 +225,7 @@ alg = Rosenbrock23()
                 for j = 1:Nspan
                     diff[j,1] = proposition3[j,1]+ proposition3[j,2]-proposition3[j,3]
                     #diff[j,2] = proposition1[j,1]- proposition1[j,2]-proposition1[j,3]
-                    diff[j,2] = -solution[j,2]- proposition1[j,2]-proposition1[j,3]
+                    diff[j,2] = -states[j,2]- proposition1[j,2]-proposition1[j,3]
                 end
 
     if fig_graphs
@@ -238,7 +243,7 @@ alg = Rosenbrock23()
                                 fig, prop1=plt.subplots(1,2)
                                 fig.suptitle("Proposition 1")
                                     #prop1[1].plot(θspan[:], proposition1[:,1])
-                                    prop1[1].plot(θspan[:], -solution[:,2])
+                                    prop1[1].plot(θspan[:], -states[:,2])
                                     prop1[1].plot(θspan[:], proposition1[:,2])
                                     prop1[1].plot(θspan[:], proposition1[:,3])
                                     prop1[1].legend(["-μ","Tl'/(1-Tl') εl/(1+εl) θw hw","εz z/n^α he"],loc="upper right")
@@ -251,14 +256,14 @@ alg = Rosenbrock23()
             #Definition of states and controls:
             θ = θspan[j];
 
-                  uw    = solution[j,1];
-                  μ     = solution[j,2];
-                  e     = solution[j,3];
-                  ϕ_e   = solution[j,4];
-                  y_agg = solution[j,5];
-                  λ     = solution[j,6];
-                  l_agg = solution[j,7];
-                  ω     = solution[j,8];
+                  uw    = states[j,1];
+                  μ     = states[j,2];
+                  e     = states[j,3];
+                  ϕ_e   = states[j,4];
+                  y_agg = states[j,5];
+                  λ     = states[j,6];
+                  l_agg = states[j,7];
+                  ω     = states[j,8];
 
                   zz    = controls[j,1];
                   nn    = controls[j,2];
@@ -287,13 +292,13 @@ alg = Rosenbrock23()
                         tax_ent[1,3].plot(θspan[1:500], to_plot[:,3])
                         tax_ent[1,3].set(ylabel="e*nn^pa.α-ω*e*nn - Tn - z", xlabel="θw")
                         #τ_c:
-                    tax_ent[2,1].plot(solution[:,3], to_plot[:,1])
+                    tax_ent[2,1].plot(states[:,3], to_plot[:,1])
                     tax_ent[2,1].set(ylabel="e*nn^pa.α-ω*e*nn", xlabel="e")
                         #τ_n:
-                    tax_ent[2,2].plot(solution[:,3], to_plot[:,2])
+                    tax_ent[2,2].plot(states[:,3], to_plot[:,2])
                     tax_ent[2,2].set(ylabel="e*nn^pa.α-ω*e*nn - Tn", xlabel="e")
                         #τ_c:
-                    tax_ent[2,3].plot(solution[:,3], to_plot[:,3])
+                    tax_ent[2,3].plot(states[:,3], to_plot[:,3])
                     tax_ent[2,3].set(ylabel="e*nn^pa.α-ω*e*nn - Tn - z", xlabel="e")
 
     end
@@ -303,12 +308,12 @@ alg = Rosenbrock23()
                     #     graphs[j,1] = controls[j,2]^pa.α
                     # end
 
-                    # graphs[2:500,2] = diff(controls[:,1])./diff(solution[:,3])
+                    # graphs[2:500,2] = diff(controls[:,1])./diff(states[:,3])
 
                     #                         fig, tax_ent=plt.subplots(1,2)
                     #                         fig.suptitle("")
                     #                             #τ_c:
-                    #                         tax_ent[1].plot(solution[:,3], graphs[:,1],solution[:,3], graphs[:,2])
+                    #                         tax_ent[1].plot(states[:,3], graphs[:,1],states[:,3], graphs[:,2])
                     #                             #τ_n:
                     #                         tax_ent[2].plot(θspan[1:500], graphs[:,2])
 
@@ -318,11 +323,11 @@ alg = Rosenbrock23()
                     #                         tax_ent[1,3].plot(θspan[1:500], to_plot[:,3])
                     #                         tax_ent[1,3].set(ylabel="e*nn^pa.α-ω*e*nn - Tn - z", xlabel="θw")
                     #                         #τ_c:
-                    #                     tax_ent[2,1].plot(solution[:,3], to_plot[:,1])
+                    #                     tax_ent[2,1].plot(states[:,3], to_plot[:,1])
                     #                     tax_ent[2,1].set(ylabel="e*nn^pa.α-ω*e*nn", xlabel="e")
                     #                         #τ_n:
-                    #                     tax_ent[2,2].plot(solution[:,3], to_plot[:,2])
+                    #                     tax_ent[2,2].plot(states[:,3], to_plot[:,2])
                     #                     tax_ent[2,2].set(ylabel="e*nn^pa.α-ω*e*nn - Tn", xlabel="e")
                     #                         #τ_c:
-                    #                     tax_ent[2,3].plot(solution[:,3], to_plot[:,3])
+                    #                     tax_ent[2,3].plot(states[:,3], to_plot[:,3])
                     #                     tax_ent[2,3].set(ylabel="e*nn^pa.α-ω*e*nn - Tn - z", xlabel="e")

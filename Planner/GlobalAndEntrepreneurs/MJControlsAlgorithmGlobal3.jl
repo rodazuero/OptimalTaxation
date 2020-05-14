@@ -10,10 +10,37 @@ function new_find_controls!(controls::Array{Float64,1}, θ::Float64, ss::State, 
 	corner_hamiltonian::Float64=NaN
 	max_hamiltonian::Float64=-Inf
     verbose && println("θ: ", θ,", e: ",ss.e )
-# 0.1 Recover densities:
-    h_e::Float64 = pa.he(θ, ss.e);
-    h_w::Float64 = pa.hw(θ, ss.e)
-
+# 0.1 Recover densities: check he=zero and solve
+    h_e::Float64 = pa.he(θ, ss.e)
+    h_w::Float64 = max(pa.hw(θ, ss.e), 0.0)
+    if h_e<1e-15
+        h_e=0.0
+        if ss.ϕ_e<0.0 
+            controls[2]=Inf # n_foc always positive
+            controls[4]=0.0 # z_foc always negative
+            den_l_temp= ss.λ*pa.χ*h_w - pa.χ/θ*(1.0+pa.ψ)*ss.μ
+            if den_l_temp > 0.0 
+                controls[1]=(ss.ω*θ*h_w/den_l_he0)^(1.0/pa.ψ)
+                controls[3]=0.0
+            else
+                controls[1]=Inf
+                controls[3]=Inf
+            end
+            return nothing
+        else
+            controls[2]=pa.ς # n_foc always negative
+            controls[4]=min(ss.e*pa.ς^pa.α, (1.0/pa.β)^(1.0/pa.σ)) # zfoc at z_max
+            den_l_temp=ss.λ*pa.χ*h_w - pa.χ/θ*(1.0+pa.ψ)*( ss.μ + ss.ϕ_e/( controls[2]^pa.α*(1.0-pa.β*controls[4]^pa.σ) ) )
+            if den_l_temp>0.0
+                controls[1]=(ss.ω*θ*h_w/den_l_he0)^(1.0/pa.ψ)
+                controls[3]=pa.χ*controls[1]^(1.0+pa.ψ)/(θ*controls[2]^pa.α*(1.0-pa.β*controls[4]^pa.σ))
+            else
+                controls[1]=Inf
+                controls[3]=Inf
+            end
+            return nothing
+        end
+    end
 # 0.2 Initialize constants
     n_full_info::Float64 = ((ss.λ*pa.α*ss.e)/ss.ω)^(1.0/(1.0-pa.α));
     z_lwbar::Float64 	= 0.0
@@ -158,7 +185,7 @@ function recover_controls!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solve
     (Nspan,~)=size(solvec)
 
     for j=Nspan:-1:1
-      θ     = θvec[j];
+      isnan( θvec[j]) ? continue : θ=θvec[j]
       uw    = solvec[j,1];
       μ     = solvec[j,2];
       e     = solvec[j,3];

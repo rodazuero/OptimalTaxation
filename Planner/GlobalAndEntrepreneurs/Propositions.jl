@@ -1,6 +1,6 @@
-function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Array{Float64},tax_prime::Array{Float64},pa,θevec::Array{Float64},solvece::Array{Float64})
+function propositions(controls::Array{Float64,2}, θvec::Array{Float64,1}, states::Array{Float64,2}, tax_prime::Array{Float64,2}, pa, θevec::Array{Float64,1}, solvece::Array{Float64,2})
 
-    (Nspan,~) = size(solvec)
+    (Nspan,~) = size(states)
     (Nespan,) = size(θevec)
 
     #Defining the propostions matrix:
@@ -17,19 +17,19 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
       #Definition of states and controls:
       θ = θvec[j];
 
-      uw    = solvec[j,1];
-      μ     = solvec[j,2];
-      e     = solvec[j,3];
-      ϕ_e   = solvec[j,4];
-      y_agg = solvec[j,5];
-      λ     = solvec[j,6];
-      l_agg = solvec[j,7];
-      ω     = solvec[j,8];
+      uw    = states[j,1];
+      μ     = states[j,2];
+      e     = states[j,3];
+      ϕ_e   = states[j,4];
+      y_agg = states[j,5];
+      λ     = states[j,6];
+      l_agg = states[j,7];
+      ω     = states[j,8];
 
-      zz    = ctrlvec[j,1];
-      nn    = ctrlvec[j,2];
-      ll    = ctrlvec[j,3];
-      pp    = ctrlvec[j,4];
+      zz    = controls[j,1];
+      nn    = controls[j,2];
+      ll    = controls[j,3];
+      pp    = controls[j,4];
 
       #Recover ditributions and elasticities:
       h_e     = pa.he(θ, e);
@@ -63,14 +63,14 @@ function propositions(ctrlvec::Array{Float64},θvec::Array{Float64},solvec::Arra
 
     #We have to get the values of the integrals:
     sol_int           = fill(NaN,Nspan)
-    my_integral_ub!(sol_int,proposition1[:,1],θspan,-solution[end,2]);
+    my_integral_ub!(sol_int, proposition1[:,1], θspan,-states[end,2]);
     proposition1[:,1] = sol_int;
 
     result           = fill(NaN,Nspan)
     my_integral_ub!(result,proposition3[:,2],θspan,0.0);
     proposition3[:,2] = result;
 
-    my_integral_ub!(sol_int,proposition3[:,3],θspan,-solution[end,2]);
+    my_integral_ub!(sol_int,proposition3[:,3],θspan,-states[end,2]);
     proposition3[:,3] = sol_int;
 
     proposition1[:,4] = proposition1[:,2]+proposition1[:,3];
