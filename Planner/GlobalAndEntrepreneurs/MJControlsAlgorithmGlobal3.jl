@@ -18,8 +18,8 @@ function new_find_controls!(controls::Array{Float64,1}, θ::Float64, ss::State, 
         if ss.ϕ_e<0.0
             controls[2]=Inf # n_foc always positive
             controls[4]=0.0 # z_foc always negative
-            den_l_temp= ss.λ*pa.χ*h_w - pa.χ/θ*(1.0+pa.ψ)*ss.μ
-            if den_l_temp > 0.0
+            den_l_he0= ss.λ*pa.χ*h_w - pa.χ/θ*(1.0+pa.ψ)*ss.μ
+            if den_l_he0 > 0.0
                 controls[1]=(ss.ω*θ*h_w/den_l_he0)^(1.0/pa.ψ)
                 controls[3]=0.0
             else
@@ -30,8 +30,8 @@ function new_find_controls!(controls::Array{Float64,1}, θ::Float64, ss::State, 
         else
             controls[2]=pa.ς # n_foc always negative
             controls[4]=min(ss.e*pa.ς^pa.α, (1.0/pa.β)^(1.0/pa.σ)) # zfoc at z_max
-            den_l_temp=ss.λ*pa.χ*h_w - pa.χ/θ*(1.0+pa.ψ)*( ss.μ + ss.ϕ_e/( controls[2]^pa.α*(1.0-pa.β*controls[4]^pa.σ) ) )
-            if den_l_temp>0.0
+            den_l_he0=ss.λ*pa.χ*h_w - pa.χ/θ*(1.0+pa.ψ)*( ss.μ + ss.ϕ_e/( controls[2]^pa.α*(1.0-pa.β*controls[4]^pa.σ) ) )
+            if den_l_he0>0.0
                 controls[1]=(ss.ω*θ*h_w/den_l_he0)^(1.0/pa.ψ)
                 controls[3]=pa.χ*controls[1]^(1.0+pa.ψ)/(θ*controls[2]^pa.α*(1.0-pa.β*controls[4]^pa.σ))
             else

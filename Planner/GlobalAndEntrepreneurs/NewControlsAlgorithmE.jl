@@ -1,69 +1,87 @@
-function new_find_controlse( θe::Float64, sse::StateE, pa, verbose=true )
+function new_find_controlse!( controlse::Array{Float64,1}, θe::Float64, sse::StateE, pa, verbose )
     #INPUT: states and parameters
     #OUTPUT: optimal controls
-    potential_n::Float64 = NaN;
-    potential_z::Float64 = NaN;
-    zze::Float64 = NaN;
-    nne::Float64 = NaN;
-    corner_zz::Float64 = NaN;
-    corner_nn::Float64 = NaN;
 
-    #Recover ditributions
-    h_e= pa.he(θ, θe);
-    #println(" he = ", h_e)
+    # 0.0 Preallocating
+        current_z::Float64 = 0.0;
+        current_n::Float64 = 0.0;
+        current_ham::Float64 = 0.0;
+        candidate_z::Float64 = NaN;
+        candidate_n::Float64 = NaN;
+        candidate_ham::Float64 = NaN;
+        previousCPOpositive::Bool = false; #Indicates change from positive to negative in the FOC.
+        candidate_cpo::Float64 = NaN;
 
-    #Defining bounds we use in various cases (limits of z):
-    n_full_info = ((sse.λe*pa.α*θe)/sse.ωe)^(1.0/(1.0-pa.α));
-    z_max   = (1.0/pa.β)^(1.0/pa.σ); #Max possible evasion.
-    z_lwbar = eps(); #The smallest possible z.
-    z_1     = z_max;
-    z_2     = -pa.σ*sse.μe*n_full_info^pa.α/(sse.λe*h_e);
-    #Keep the lower number:
-    z_upbar = min(z_1,z_2);
+    # 0.1 Recover densities:
+        h_e= pa.he(pa.θ_w_ub, θe);
 
-    #Defining the functions we are using:
-    #println(-sse.λe*h_e/(pa.σ*sse.μe), ", μ = ", sse.μe, ", θe = ", θe)
-    n_opt(z)   = (-sse.λe*z*h_e/(pa.σ*sse.μe))^(1.0/pa.α);
-    fun_z(z,n) = (sse.λe*pa.α*θe*n^(pa.α-1.0)*h_e - sse.ωe*h_e + pa.α*sse.μe*n^(pa.α-1.0)*(1.0-pa.β*z^pa.σ));
-    fun_nz(z)  = fun_z(z,n_opt(z));
+    # 0.2 Initialize constants
+        n_full_info::Float64 = ((sse.λe*pa.α*θe)/sse.ωe)^(1.0/(1.0-pa.α));
+        z_max::Float64 = (1.0/pa.β)^(1.0/pa.σ);
+        n_lwbar::Float64 = pa.ς; #The smallest possible n.
+        n_upbar::Float64 = n_full_info;
 
-    #Hamiltonian:
-    objective(ze,ne) = pa.indicator*sse.ue^pa.ϕ*h_e + sse.λe*( θe*ne^pa.α - pa.β*ze^(1.0+pa.σ)/(1.0+pa.σ) - sse.ue)*h_e - sse.ωe*ne*h_e + sse.μe*ne^pa.α*(1.0-pa.β*ze^pa.σ);
+    # 0.3 Define auxiliar functions:
+        z_opt(nvar)     = - pa.σ*sse.μe*nvar^pa.α/(sse.λe*h_e);
+        nfoc(nvar,zvar) = sse.λe*pa.α*θe*nvar^(pa.α-1.0)*h_e - sse.ωe*h_e + pa.α*sse.μe*nvar^(pa.α-1.0)*(1.0-pa.β*zvar^pa.σ);
+        nfoc_at_zopt(nvar) = nfoc(nvar,z_opt(nvar))
+        objective(nvar,zvar) = ( pa.indicator*sse.ue^pa.ϕ*h_e +
+                                 sse.λe*( θe*nvar^pa.α - pa.β*zvar^(1.0+pa.σ)/(1.0+pa.σ) - sse.ue)*h_e -
+                                 sse.ωe*nvar*h_e + sse.μe*nvar^pa.α*(1.0-pa.β*zvar^pa.σ) );
 
-    #1. The interior solution is:
-    #Using bisection method:
-    if fun_nz(z_lwbar)*fun_nz(z_upbar)<0
-        potential_z = find_zero(fun_nz, (z_lwbar,z_upbar), Bisection());
-    else
-        error("Bisection: signs equal --> Cannot solve.")
-    end
+     # 0.4 For Grid
+         Nz::Integer = 100; #Number of Ns
+         nstep::Float64 = (n_upbar - n_lwbar)/(Nz-1);
+         verbose && println("nstep = ", nstep, ", Nz = ", Nz)
+         ngrid = range(n_lwbar, stop = n_upbar, length = Nz);
 
-    potential_n = n_opt(potential_z);
+    # 1. Define the grid for the algorithm, we don't have a monotone function, so we cannot run the bisection directly:
+    for j = 1:Nz
 
-    #println("n = ", potential_n, "z = ", potential_z, "States = ", sse)
-    interior_hamiltonian = objective(potential_z,potential_n);
+        candidate_cpo = nfoc_at_zopt(ngrid[j]);
 
-    #2. The corner solution is:
-    corner_zz = 0.0;
-    corner_nn = 0.0;
+        if previousCPOpositive == 1
+            if candidate_cpo < 0
+                candidate_n   = find_zero(nfoc_at_zopt, (ngrid[j-1],ngrid[j]), Bisection());
+                candidate_z   = z_opt(candidate_n);
+                candidate_ham = objective(candidate_n,candidate_z);
+                    if candidate_ham > current_ham
+                        current_n   = candidate_n;
+                        current_z   = candidate_z;
+                        current_ham = candidate_ham;
+                    end #if
+                previousCPOpositive = false;
+            end #if
+        else
+                candidate_cpo > 0 ? previousCPOpositive = true : previousCPOpositive = false;
+        end #if
+     end #for
 
-    corner_hamiltonian = objective(corner_zz,corner_nn);
-
-    if corner_hamiltonian > interior_hamiltonian
-        zze = corner_zz;
-        nne = corner_nn;
-    else
-        zze = potential_z;
-        nne = potential_n;
-    end
+     if candidate_cpo>0 #here the value corresponds to the last value in the grid (n_upbound)
+         candidate_n   = n_upbar;
+         candidate_z   = z_opt(candidate_n);
+         candidate_ham = objective(candidate_n,candidate_z);
+         if candidate_ham > current_ham
+             current_n  = candidate_n;
+             current_z  = candidate_z;
+             current_ham = candidate_ham;
+         end #if
+     end #if
 
     #Final Output:
+    controlse[1] = current_n;
+    controlse[2] = current_z;
     #println("zze = ", zze, "nne = ", nne)
-    return zze, nne
 
 end
 
-function recover_controlse!(ctrlvec::Array{Float64}, θw::Float64 ,θvec::Array{Float64}, solvec::Array{Float64})
+function new_find_controlse( θe::Float64, sse::StateE, pa, verbosebool::Bool = false)
+    controlse = Array{Float64}(undef,2);
+    new_find_controlse!(controlse, θe::Float64, sse::StateE, pa, verbosebool);
+    return Tuple(controlse)
+end
+
+function recover_controlse!(ctrlvec::Array{Float64}, θvec::Array{Float64}, solvec::Array{Float64})
     (Nspan,~)=size(solvec)
 
     for j = Nspan:-1:1
@@ -74,7 +92,7 @@ function recover_controlse!(ctrlvec::Array{Float64}, θw::Float64 ,θvec::Array{
       ωe  = solvec[j,6];
       sse = StateE(ue, μe, λe, ωe);
 
-      (zze, nne)   = new_find_controlse( θw, θe, sse, pa)
+      (nne, zze)   = new_find_controlse( θe, sse, pa)
       ctrlvec[j,1] = zze;
       ctrlvec[j,2] = nne;
     end

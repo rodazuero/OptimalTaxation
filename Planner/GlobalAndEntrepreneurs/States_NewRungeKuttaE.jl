@@ -41,17 +41,13 @@ function find_statese!(du,u,pa,θe)
     θ = pa.θ_w_ub;
 
     #Construct state object
-    #sse = StateE(ue, μe, λe, ωe);
-    sse = StateE(ForwardDiff.value(ue), ForwardDiff.value(μe),
-                 ForwardDiff.value(λe), ForwardDiff.value(ωe) )
-    #println("sse = ", sse)
+    sse = StateE(ForwardDiff.value(ue), ForwardDiff.value(μe), ForwardDiff.value(λe), ForwardDiff.value(ωe));
 
     #Find optimal controls
-    (ze, ne) = new_find_controlse( θ, ForwardDiff.value(θe), sse, pa);
-    #println("zeRK = ", ze, "neRK = ", ne)
-    any(isnan,(ze, ne)) && error("Function find_statese gets NaN controls")
+    (ne, ze) = new_find_controlse( ForwardDiff.value(θe), sse, pa);
+    any(isnan,(ne, ze)) && error("Function find_statese gets NaN controls")
 
-    h_e=  pa.he(θ, θe);
+    h_e = pa.he(θ, θe);
 
     du[1] = ne^pa.α*(1.0 - pa.β*ze^pa.σ)
     if ue > 0.0

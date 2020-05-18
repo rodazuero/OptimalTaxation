@@ -22,7 +22,8 @@ RK_algorithm == true ? include("States_NewRungeKutta.jl") : include("original_St
 RK_algorithm == true ? include("NewMyRungeKuttaReverse.jl") : include("original_RK.jl")
 
 #Entrepreneurs Problem
-include("NewControlsAlgorithmE.jl")
+#include("NewControlsAlgorithmE.jl")
+include("ControlsAlgorithmEV2.jl")
 RK_algorithm == true ? include("States_NewRungeKuttaE.jl") : include("original_StatesEnt.jl")
 RK_algorithm == true ? include("NewMyRungeKuttaEReverse.jl") : include("original_RKEnt.jl")
 
@@ -39,8 +40,8 @@ include("Integrals.jl")
 #Define values for the model parameters:
 pa  = init_parameters();
 # Algorithm to solve differencial equations:
-alg = Tsit5()
-# alg = Rosenbrock23()
+#alg = Tsit5()
+alg = Rosenbrock23()
 #Entrepreneurs Problem
     #Initial boundary conditions (states from the global problem)
 
@@ -95,14 +96,18 @@ alg = Tsit5()
     Nespan = 500
     y_end= [ue0, μe0, ye0, λe0, le0, ωe0, 0.0, 0.0];
     eub = pa.θ_e_ub;
-    estep = (eub - elb)/(Nespan - 1);
-    espan = elb:estep:eub;
-    solutione = Array{Float64}(undef,Nespan,10);
-    fill!(solutione,NaN);
-    RK_algorithm == true ? my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,alg) : my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
-    #my_runge_kuttae_reverse!(solutione,y_end,espan,estep,pa,pa.θ_w_ub)
+    estep = (eub - elb)/(Nspan - 1);
+    espan = collect(elb:estep:eub);
+    statese = Array{Float64}(undef,Nspan,10);
+    fill!(statese,NaN);
 
-    #solutione[end,:]
+    if RK_algorithm == true
+        my_runge_kuttae_reverse!(statese,espan,y_end,estep,pa,alg)
+    else
+        my_runge_kuttae_reverse!(statese,y_end,espan,estep,pa,pa.θ_w_ub)
+    end
+
+    #statese[end,:]
     #using DelimitedFiles
     #writedlm("SolutionNewE.csv",states,';')
 
@@ -118,19 +123,19 @@ alg = Tsit5()
 
     controlse = Array{Float64}(undef,Nespan,2);
     fill!(controlse,NaN);
-    recover_controlse!(controlse, pa.θ_w_ub ,θespan, solutione);
+    recover_controlse!(controlse, θespan, statese);
     controlse
 
     #E= DataFrame(controlse)
     #names!(E,[:z, :n] )
     #CSV.write("ControlsEntrepreneurs.csv", E)
-    #RungeKuttaE=hcat(DataFrame(solutione),E, DataFrame(thetae=θespan))
+    #RungeKuttaE=hcat(DataFrame(statese),E, DataFrame(thetae=θespan))
     #CSV.write("RungeKuttaNewE.csv", RungeKuttaE)
 
     #Marginal taxes and taxes path:
     τ_prime_e = Array{Float64}(undef,Nespan,2);
     fill!(τ_prime_e,NaN);
-    marginal_taxese(controlse, θespan, solutione, pa);
+    marginal_taxese(controlse, θespan, statese, pa);
 
     #taxese = DataFrame(τ_prime_e)
     #names!(taxese,[:tau_c, :tau_n] )
@@ -138,16 +143,16 @@ alg = Tsit5()
     #CSV.write("marginal_taxes_e.csv",taxes2e)
 
 #Global Problem (Reverse)
-    uw_end    = solutione[1,1] #guess
-    μ_end     = solutione[1,2]
+    uw_end    = statese[1,1] #guess
+    μ_end     = statese[1,2]
     e_end     = elb;
     he_ub     = pa.he(pa.θ_w_ub,e_end)
-    ϕ_e_end   = -(pa.indicator*solutione[1,1]^pa.ϕ*he_ub+solutione[1,4]*(e_end*controlse[1,2]^pa.α -(pa.β/(1.0+pa.σ))*controlse[1,1]^(1.0+pa.σ)
-                - solutione[1,1])*he_ub - solutione[1,6]*controlse[1,2]*he_ub + solutione[1,2]*controlse[1,2]^pa.α*(1.0-pa.β*controlse[1,1]^pa.σ))
-    y_agg_end = solutione[1,3]
-    λ_end     = λe0 #guess
-    l_agg_end = solutione[1,5]
-    ω_end     = solutione[1,6] #guess=#
+    ϕ_e_end   = -(pa.indicator*statese[1,1]^pa.ϕ*he_ub+statese[1,4]*(e_end*controlse[1,2]^pa.α -(pa.β/(1.0+pa.σ))*controlse[1,1]^(1.0+pa.σ)
+                - statese[1,1])*he_ub - statese[1,6]*controlse[1,2]*he_ub + statese[1,2]*controlse[1,2]^pa.α*(1.0-pa.β*controlse[1,1]^pa.σ))
+    y_agg_end = statese[1,3]
+    λ_end     = 1.0 #guess
+    l_agg_end = statese[1,5]
+    ω_end     = statese[1,6] #guess=#
     l_new_end = 0.0
     y_new_end = 0.0
     ystar_end = 0.0
@@ -167,8 +172,8 @@ alg = Tsit5()
         my_runge_kutta_reverse!(states,y_end,xspan,xstep,pa)
         lenght_sol=Nspan
     end
-    display(xspan)
-    display(pa.θ_e_a)
+    #display(xspan)
+    #display(pa.θ_e_lb)
     #using DelimitedFiles
     #writedlm("SolutionNew.csv",states,';')
 
@@ -179,8 +184,8 @@ alg = Tsit5()
 
     recover_controls!(controls, θspan, states);
 
-    bound_e   = -(pa.indicator*solutione[1,1]^pa.ϕ*he_ub+solutione[1,4]*(e_end*controlse[1,2]^pa.α -(pa.β/(1.0+pa.σ))*controlse[1,1]^(1.0+pa.σ)
-                - solutione[1,1])*he_ub - solutione[1,6]*controlse[1,2]*he_ub + solutione[1,2]*controlse[1,2]^pa.α*(1.0-pa.β*controlse[1,1]^pa.σ))
+    bound_e   = -(pa.indicator*statese[1,1]^pa.ϕ*he_ub+statese[1,4]*(e_end*controlse[1,2]^pa.α -(pa.β/(1.0+pa.σ))*controlse[1,1]^(1.0+pa.σ)
+                - statese[1,1])*he_ub - statese[1,6]*controlse[1,2]*he_ub + statese[1,2]*controlse[1,2]^pa.α*(1.0-pa.β*controlse[1,1]^pa.σ))
 
     #C= DataFrame(controls)
     #names!(C,[:z, :n, :l, :p] )
@@ -192,7 +197,7 @@ alg = Tsit5()
         fill!(τ_prime,NaN);
         marginal_taxes(controls, θspan, states, pa)
 
-        (taxes, taxes_ent, taxes_rev, taxes_rev_ent) = taxes_path(controls, θspan, states, pa, θespan, solutione, controlse, τ_prime, τ_prime_e);
+        (taxes, taxes_ent, taxes_rev, taxes_rev_ent) = taxes_path(controls, θspan, states, pa, θespan, statese, controlse, τ_prime, τ_prime_e);
 
         taxes_full     = fill(NaN,Nspan,6);
         taxes_ent_full = fill(NaN,Nspan,4);
@@ -232,7 +237,7 @@ alg = Tsit5()
         for i=1:Nspan
             mat_for_z[i,1] = states[i,6]*states[i,3]*controls[i,2]^pa.α-states[i,8]*(controls[i,2]-pa.ς); #Max posible evasion.
             mat_for_z[i,2] = controls[i,1]; #Evasion in model.
-            mat_for_z[i,3] = solutione[i,4]*θespan[i]*controlse[i,2]^pa.α-solutione[i,6]*(controlse[i,2]-pa.ς); #Max posible evasion.
+            mat_for_z[i,3] = statese[i,4]*θespan[i]*controlse[i,2]^pa.α-statese[i,6]*(controlse[i,2]-pa.ς); #Max posible evasion.
             mat_for_z[i,4] = controlse[i,1]; #Evasion in model.
         end
 
@@ -241,15 +246,15 @@ alg = Tsit5()
         proposition2 = fill(NaN,Nspan,2);
         proposition3 = fill(NaN,Nspan,6);
 
-        (proposition1, proposition2, proposition3) = propositions(controls, θspan, states, τ_prime, pa, θespan, solutione);
+        (proposition1, proposition2, proposition3) = propositions(controls, θspan, states, τ_prime, pa, θespan, statese);
 
 #ctrlvec = controls
 #θvec = θspan
 #solvec = states
-#controls,θspan,states,τ_prime,pa,θespan,solutione
+#controls,θspan,states,τ_prime,pa,θespan,statese
 
         #Plots:
-        fig_graphs && graphs!(states,solutione,controls,controlse, θspan, θespan, pa.θ_w_ub,
+        fig_graphs && graphs!(states,statese,controls,controlse, θspan, θespan, pa.θ_w_ub,
                             bound_e,τ_prime,τ_prime_e,".\\Graphs",
                             utilities_prime,A_matrix,mat_for_z, proposition1, proposition2, proposition3, taxes_full, taxes_ent_full)
 
