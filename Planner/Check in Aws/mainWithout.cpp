@@ -1,8 +1,8 @@
-//
+//  OPTIMAL TAXATION AND INFORMALITY
+//  Code to check implementability (Problem without informality)
 //  main.cpp
-//  Equilibrium
 //
-//  Created by Rodrigo Azuero Melo on 5/11/18.
+//  Created by Rodrigo Azuero Melo on 5/11/18. Modified Jan-2021.
 //  Copyright © 2018 Rodrigo Azuero Melo. All rights reserved.
 //
 
@@ -60,831 +60,830 @@
 //#include "specialfunctions.cpp"
 #include "statistics.cpp"
 
+//0. Set space, general functions, and files to be included
+
+    //Space
+    using std::vector;
+    using namespace std::chrono;
+    using namespace std;
+    //using namespace Rcpp;
+
+    // File to write the allocations resulting from Equilibrium
+    ofstream AllocationsOPW("/home/ec2-user/InAws/AllocationsOPW.csv");
 
 
-using std::vector;
-using namespace std::chrono;
-using namespace std;
-//using namespace Rcpp;
+    typedef std::pair<double,double> mypair;
+    bool comparator ( const mypair& l, const mypair& r)
+    { return l.first < r.first; }
 
-ofstream AllocationsOPW("/home/ec2-user/InAws/AllocationsOPW.csv");
-
-
-typedef std::pair<double,double> mypair;
-bool comparator ( const mypair& l, const mypair& r)
-{ return l.first < r.first; }
-
-//Function for cholesky decomposition
-double *cholesky(double *A, int n) {
-    double *L = (double*)calloc(n * n, sizeof(double));
-    if (L == NULL)
-        exit(EXIT_FAILURE);
+    //Function for cholesky decomposition
+    double *cholesky(double *A, int n) {
+        double *L = (double*)calloc(n * n, sizeof(double));
+        if (L == NULL)
+            exit(EXIT_FAILURE);
     
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < (i+1); j++) {
-            double s = 0;
-            for (int k = 0; k < j; k++)
-                s += L[i * n + k] * L[j * n + k];
-            L[i * n + j] = (i == j) ?
-            sqrt(A[i * n + i] - s) :
-            (1.0 / L[j * n + j] * (A[i * n + j] - s));
-        }
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < (i+1); j++) {
+                double s = 0;
+                for (int k = 0; k < j; k++)
+                    s += L[i * n + k] * L[j * n + k];
+                L[i * n + j] = (i == j) ?
+                sqrt(A[i * n + i] - s) :
+                (1.0 / L[j * n + j] * (A[i * n + j] - s));
+            }
     
-    return L;
-}
-
-//Function to show matrix decomposition cholesky
-void show_matrix(double *A, int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++)
-            printf("%2.5f ", A[i * n + j]);
-        printf("\n");
+        return L;
     }
-}
+
+    //Function to show matrix decomposition cholesky
+    void show_matrix(double *A, int n) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++)
+                printf("%2.5f ", A[i * n + j]);
+            printf("\n");
+        }
+    }
 
 
-//Templates def
-//Define template for random number generator
-template<class T>
-double gen_normal_3(T &generator)
-{
-    return generator();
-}
-
-//Import the planner´s output to check implementability
-
-vector<vector<double>> Planner(int simdata) {
-
-    std::ifstream theFile("/home/ec2-user/InAws/Taxes_info.csv");
-    int SIZEPLANNER = 1000;
-    int INPUTS = 11;
-    //vector<vector<double>> PLANNERINFO(SIZEPLANNER);
-    //for (int it = 0; it < SIZEPLANNER; it++) {
-    //    PLANNERINFO[it].resize(INPUTS);
-    //}
-    vector<vector<double>> PLANNERINFO(SIZEPLANNER, vector<double>(INPUTS));
-    //vector<vector<double>> PLANNERINFO[SIZEPLANNER][INPUTS];
-    // ...
-
-    std::string line;
-    std::vector<std::vector<std::string> > values;
-    int it = 0;
-    int it2 = 0;
-    std::string line_value;
-    std::vector<std::string> line_values;
-    std::stringstream ss;
-    while (std::getline(theFile, line))
+    //Templates def
+    //Define template for random number generator
+    template<class T>
+    double gen_normal_3(T &generator)
     {
+        return generator();
+    }
 
-        ss << line;
-        //std::stringstream ss(line);
-        //std::string item;
-        //cout <<  << "linevalprev"<<endl;
-        while (std::getline(ss, line_value, ';'))
+//1. Import the planner´s output to check implementability
+
+    vector<vector<double>> Planner(int simdata) {
+
+        std::ifstream theFile("/home/ec2-user/InAws/Taxes_info.csv");
+        int SIZEPLANNER = 1000;
+        int INPUTS = 11;
+        
+        vector<vector<double>> PLANNERINFO(SIZEPLANNER, vector<double>(INPUTS));
+        
+        std::string line;
+        std::vector<std::vector<std::string> > values;
+        int it = 0;
+        int it2 = 0;
+        std::string line_value;
+        std::vector<std::string> line_values;
+        std::stringstream ss;
+        while (std::getline(theFile, line))
         {
-            line_values.push_back(line_value);
-            PLANNERINFO[it][it2] = ::atof(line_value.c_str());
-            //cout << MYARRAY[it][it2]<< " hahaha"<< endl;
-            //MYARRAY[it][it2]=std::stod (line_value); only for c++11 compi
-            it2 = it2 + 1;
-            if (it2 == INPUTS) {
-                it2 = 0;
-                //cout << "Linea" << it << endl;
+
+            ss << line;
+            //std::stringstream ss(line);
+            //std::string item;
+            //cout <<  << "linevalprev"<<endl;
+            while (std::getline(ss, line_value, ';'))
+            {
+                line_values.push_back(line_value);
+                PLANNERINFO[it][it2] = ::atof(line_value.c_str());
+                //cout << MYARRAY[it][it2]<< " hahaha"<< endl;
+                //MYARRAY[it][it2]=std::stod (line_value); only for c++11 compi
+                it2 = it2 + 1;
+                if (it2 == INPUTS) {
+                    it2 = 0;
+                    //cout << "Linea" << it << endl;
+                }
+            }
+            values.push_back(line_values);
+
+            //For c++11 used values.emplace_back(line_values);
+
+            //cout << line_value<< "line_value2"<< endl;
+            it = it + 1;
+            //Free the string types
+            line_value.clear();
+            line_values.clear();
+            ss.clear();
+            if (it == SIZEPLANNER) {
+                cout << "Ultima" << PLANNERINFO[SIZEPLANNER - 1][0] << PLANNERINFO[SIZEPLANNER - 1][10] << endl;
             }
         }
-        values.push_back(line_values);
 
-        //For c++11 used values.emplace_back(line_values);
+        
+        if (1 == 2) {
+            
+            cout << "Theta w in " << SIZEPLANNER << ":" << PLANNERINFO[SIZEPLANNER - 1][0] << endl;
+            cout << "Theta e in " << SIZEPLANNER << ":" << PLANNERINFO[SIZEPLANNER - 1][1] << endl;
+            cout << "Theta w in " << 1 << ":" << PLANNERINFO[1][0] << endl;
+            cout << "Theta e in " << 1 << ":" << PLANNERINFO[1][1] << endl;
 
-        //cout << line_value<< "line_value2"<< endl;
-        it = it + 1;
-        //Free the string types
-        line_value.clear();
-        line_values.clear();
-        ss.clear();
-        if (it == SIZEPLANNER) {
-            cout << "Ultima" << PLANNERINFO[SIZEPLANNER - 1][0] << PLANNERINFO[SIZEPLANNER - 1][10] << endl;
-        }
-    }
+            int m = SIZEPLANNER;
+            int n = INPUTS;
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
 
-    cout << "Theta w in " << SIZEPLANNER << ":" << PLANNERINFO[SIZEPLANNER - 1][0] << endl;
-    cout << "Theta e in " << SIZEPLANNER << ":" << PLANNERINFO[SIZEPLANNER - 1][1] << endl;
-    cout << "Theta w in " << 1 << ":" << PLANNERINFO[1][0] << endl;
-    cout << "Theta e in " << 1 << ":" << PLANNERINFO[1][1] << endl;
-
-    if (1 == 2) {
-        int m = SIZEPLANNER;
-        int n = INPUTS;
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-
-                // Prints ' ' if j != n-1 else prints '\n'           
-                cout << PLANNERINFO[i][j] << " \n"[j == n - 1];
+                    // Prints ' ' if j != n-1 else prints '\n'           
+                    cout << PLANNERINFO[i][j] << " \n"[j == n - 1];
+                }
             }
         }
-    }
-    return(PLANNERINFO);
-}
-
-// A. Create splines for taxes functions
-
-//A.1.1. Set the spline for Tn
-alglib::spline1dinterpolant setSplineTn(vector<vector<double>> taxesmatrix) {
-    
-    std::vector<double> Xtn(999), Ytn(999);
-
-    for (int it = 0; it < 999; it++) {
-        Xtn[it] = taxesmatrix[it + 1][2];
-        Ytn[it] = taxesmatrix[it + 1][3];
+        return(PLANNERINFO);
     }
 
-    alglib::real_1d_array AXtn, AYtn;
-    AXtn.setcontent(Xtn.size(), &(Xtn[0]));
-    AYtn.setcontent(Ytn.size(), &(Ytn[0]));
+// 2. Create splines for taxes functions
 
-    alglib::spline1dinterpolant splineTn;
+    //2.1 Tn
+        //2.1.1. Set the spline for Tn
+        alglib::spline1dinterpolant setSplineTn(vector<vector<double>> taxesmatrix) {
     
-    //1. Linear Spline
-    //alglib::spline1dbuildlinear(AXtn, AYtn, Xtn.size(), splineTn);
+            std::vector<double> Xtn(999), Ytn(999);
 
-    //2. Cubic spline (natural- second derivatives in bounds = 0)
-    //alglib::spline1dbuildcubic(AXtn, AYtn, Xtn.size(), 2, 0.0, 2, 0.0, splineTn);
+            for (int it = 0; it < 999; it++) {
+                Xtn[it] = taxesmatrix[it + 1][2];
+                Ytn[it] = taxesmatrix[it + 1][3];
+            }
 
-    //3. Hermite spline (includes first derivative)
-    std::vector<double> Dtn(999);
+            alglib::real_1d_array AXtn, AYtn;
+            AXtn.setcontent(Xtn.size(), &(Xtn[0]));
+            AYtn.setcontent(Ytn.size(), &(Ytn[0]));
 
-    for (int it = 0; it < 999; it++) {
-        Dtn[it] = taxesmatrix[it + 1][4];
-    }
-
-    alglib::real_1d_array ADtn;
-    ADtn.setcontent(Dtn.size(), &(Dtn[0]));
+            alglib::spline1dinterpolant splineTn;
     
-    alglib::spline1dbuildhermite(AXtn, AYtn, ADtn, Xtn.size(), splineTn);
+            //1. Linear Spline
+            //alglib::spline1dbuildlinear(AXtn, AYtn, Xtn.size(), splineTn);
+
+            //2. Cubic spline (natural- second derivatives in bounds = 0)
+            //alglib::spline1dbuildcubic(AXtn, AYtn, Xtn.size(), 2, 0.0, 2, 0.0, splineTn);
+
+            //3. Hermite spline (includes first derivative)
+            std::vector<double> Dtn(999);
+
+            for (int it = 0; it < 999; it++) {
+                Dtn[it] = taxesmatrix[it + 1][4];
+            }
+
+            alglib::real_1d_array ADtn;
+            ADtn.setcontent(Dtn.size(), &(Dtn[0]));
+    
+            alglib::spline1dbuildhermite(AXtn, AYtn, ADtn, Xtn.size(), splineTn);
 
    
-    if (1==2) {
+            if (1==2) {
 
-        cout << "-------Spline for Tn------" << endl;
+                cout << "-------Spline for Tn------" << endl;
 
-        for (size_t i = 0; i < 20; i++) {
-            printf("%f %f\n", Xtn[i], Ytn[i]);
-        }
+                for (size_t i = 0; i < 20; i++) {
+                    printf("%f %f\n", Xtn[i], Ytn[i]);
+                }
         
-        printf("\n");
-        for (int i = 500; i < 520; i++) {
-            double x = i;
-            printf("%f %f\n", x, alglib::spline1dcalc(splineTn, x));
+                printf("\n");
+                for (int i = 500; i < 520; i++) {
+                    double x = i;
+                    printf("%f %f\n", x, alglib::spline1dcalc(splineTn, x));
+                }
+                printf("\n");
+
+            }
+
+            cout << "-------End Spline for Tn------" << endl;
+
+            return(splineTn);
+
         }
-        printf("\n");
 
-    }
-
-    cout << "-------End Spline for Tn------" << endl;
-
-    return(splineTn);
-
-}
-
-//A.1.2 Tn Spline
-long double TnSpline(alglib::spline1dinterpolant splineTn,double nomina) {
-    double myspline = alglib::spline1dcalc(splineTn, nomina);
-    return(myspline);
-}
-
-//A.2.1. Set the spline for Tc
-alglib::spline1dinterpolant setSplineTc(vector<vector<double>> taxesmatrix) {
-
-    std::vector<double> Xtc(999), Ytc(999);
-
-    for (int it = 0; it < 999; it++) {
-        Xtc[it] = taxesmatrix[it + 1][5];
-        Ytc[it] = taxesmatrix[it + 1][6];
-    }
-
-    alglib::real_1d_array AXtc, AYtc;
-    AXtc.setcontent(Xtc.size(), &(Xtc[0]));
-    AYtc.setcontent(Ytc.size(), &(Ytc[0]));
-
-    alglib::spline1dinterpolant splineTc;
-
-    //1. Linear Spline
-    //alglib::spline1dbuildlinear(AXtc, AYtc, Xtc.size(), splineTc);
-
-    //2. Cubic spline (natural- second derivatives in bounds = 0)
-    //alglib::spline1dbuildcubic(AXtc, AYtc, Xtc.size(), 2, 0.0, 2, 0.0, splineTc);
-
-    //3. Hermite spline (includes first derivative)
-    std::vector<double> Dtc(999);
-
-    for (int it = 0; it < 999; it++) {
-        Dtc[it] = taxesmatrix[it + 1][7];
-    }
-
-    alglib::real_1d_array ADtc;
-    ADtc.setcontent(Dtc.size(), &(Dtc[0]));
-
-    alglib::spline1dbuildhermite(AXtc, AYtc, ADtc, Xtc.size(), splineTc);
-
-    if (1 == 2) {
-        cout << "-------Spline for Tc------" << endl;
-
-        for (size_t i = 0; i < 20; i++) {
-            printf("%f %f\n", Xtc[i], Ytc[i]);
+        //A.1.2 Function: Tn Spline
+        long double TnSpline(alglib::spline1dinterpolant splineTn,double nomina) {
+            double myspline = alglib::spline1dcalc(splineTn, nomina);
+            return(myspline);
         }
+
+    // 2.2 Tc
+        //2.2.1. Set the spline for Tc
+        alglib::spline1dinterpolant setSplineTc(vector<vector<double>> taxesmatrix) {
+
+            std::vector<double> Xtc(999), Ytc(999);
+
+            for (int it = 0; it < 999; it++) {
+                Xtc[it] = taxesmatrix[it + 1][5];
+                Ytc[it] = taxesmatrix[it + 1][6];
+            }
+
+            alglib::real_1d_array AXtc, AYtc;
+            AXtc.setcontent(Xtc.size(), &(Xtc[0]));
+            AYtc.setcontent(Ytc.size(), &(Ytc[0]));
+
+            alglib::spline1dinterpolant splineTc;
+
+            //1. Linear Spline
+            //alglib::spline1dbuildlinear(AXtc, AYtc, Xtc.size(), splineTc);
+
+            //2. Cubic spline (natural- second derivatives in bounds = 0)
+            //alglib::spline1dbuildcubic(AXtc, AYtc, Xtc.size(), 2, 0.0, 2, 0.0, splineTc);
+
+            //3. Hermite spline (includes first derivative)
+            std::vector<double> Dtc(999);
+
+            for (int it = 0; it < 999; it++) {
+                Dtc[it] = taxesmatrix[it + 1][7];
+            }
+
+            alglib::real_1d_array ADtc;
+            ADtc.setcontent(Dtc.size(), &(Dtc[0]));
+
+            alglib::spline1dbuildhermite(AXtc, AYtc, ADtc, Xtc.size(), splineTc);
+
+            if (1 == 2) {
+                cout << "-------Spline for Tc------" << endl;
+
+                for (size_t i = 0; i < 20; i++) {
+                    printf("%f %f\n", Xtc[i], Ytc[i]);
+                }
         
+                    printf("\n");
+                for (int i = 500; i < 520; i++) {
+                    double x = i;
+                    printf("%f %f\n", x, alglib::spline1dcalc(splineTc, x));
+                }
+                printf("\n");
+
+            }
+
+            cout << "-------End Spline for Tc------" << endl;
+
+            return(splineTc);
+
+        }
+
+        //A.2.2 Tc Spline
+        long double TcSpline(alglib::spline1dinterpolant splineTc, double pretax) {
+            double myspline = alglib::spline1dcalc(splineTc, pretax);
+            return(myspline);
+        }
+
+     //2.3 Tl   
+        //2.3.1. Set the spline for Tl
+        alglib::spline1dinterpolant setSplineTl(vector<vector<double>> taxesmatrix) {
+
+            std::vector<double> Xtl(499), Ytl(499);
+
+            for (int it = 0; it < 499; it++) {
+                Xtl[it] = taxesmatrix[it + 1][8];
+                Ytl[it] = taxesmatrix[it + 1][9];
+            }
+
+            alglib::real_1d_array AXtl, AYtl;
+            AXtl.setcontent(Xtl.size(), &(Xtl[0]));
+            AYtl.setcontent(Ytl.size(), &(Ytl[0]));
+
+            alglib::spline1dinterpolant splineTl;
+
+        //1. Linear Spline
+        //alglib::spline1dbuildlinear(AXtl, AYtl, Xtl.size(), splineTl);
+
+        //2. Cubic spline (natural- second derivatives in bounds = 0)
+        //alglib::spline1dbuildcubic(AXtl, AYtl, Xtl.size(), 2, 0.0, 2, 0.0, splineTl);
+
+        //3. Hermite spline (includes first derivative)
+        std::vector<double> Dtl(499);
+
+        for (int it = 0; it < 499; it++) {
+            Dtl[it] = taxesmatrix[it + 1][10];
+        }
+
+        alglib::real_1d_array ADtl;
+        ADtl.setcontent(Dtl.size(), &(Dtl[0]));
+
+        alglib::spline1dbuildhermite(AXtl, AYtl, ADtl, Xtl.size(), splineTl);
+
+        if (1 == 2) {
+            cout << "-------Spline for Tl------" << endl;
+
+            for (size_t i = 0; i < 20; i++) {
+                printf("%f %f\n", Xtl[i], Ytl[i]);
+            }
+        
+                printf("\n");
+            for (int i = 500; i < 520; i++) {
+                double x = i;
+                printf("%f %f\n", x, alglib::spline1dcalc(splineTl, x));
+            }
             printf("\n");
-        for (int i = 500; i < 520; i++) {
-            double x = i;
-            printf("%f %f\n", x, alglib::spline1dcalc(splineTc, x));
+
         }
-        printf("\n");
 
-    }
+        cout << "-------End Spline for Tl------" << endl;
 
-    cout << "-------End Spline for Tc------" << endl;
+        return(splineTl);
 
-    return(splineTc);
-
-}
-
-//A.2.2 Tc Spline
-long double TcSpline(alglib::spline1dinterpolant splineTc, double pretax) {
-    double myspline = alglib::spline1dcalc(splineTc, pretax);
-    return(myspline);
-}
-
-//A.3.1. Set the spline for Tl
-alglib::spline1dinterpolant setSplineTl(vector<vector<double>> taxesmatrix) {
-
-    std::vector<double> Xtl(499), Ytl(499);
-
-    for (int it = 0; it < 499; it++) {
-        Xtl[it] = taxesmatrix[it + 1][8];
-        Ytl[it] = taxesmatrix[it + 1][9];
-    }
-
-    alglib::real_1d_array AXtl, AYtl;
-    AXtl.setcontent(Xtl.size(), &(Xtl[0]));
-    AYtl.setcontent(Ytl.size(), &(Ytl[0]));
-
-    alglib::spline1dinterpolant splineTl;
-
-    //1. Linear Spline
-    //alglib::spline1dbuildlinear(AXtl, AYtl, Xtl.size(), splineTl);
-
-    //2. Cubic spline (natural- second derivatives in bounds = 0)
-    //alglib::spline1dbuildcubic(AXtl, AYtl, Xtl.size(), 2, 0.0, 2, 0.0, splineTl);
-
-    //3. Hermite spline (includes first derivative)
-    std::vector<double> Dtl(499);
-
-    for (int it = 0; it < 499; it++) {
-        Dtl[it] = taxesmatrix[it + 1][10];
-    }
-
-    alglib::real_1d_array ADtl;
-    ADtl.setcontent(Dtl.size(), &(Dtl[0]));
-
-    alglib::spline1dbuildhermite(AXtl, AYtl, ADtl, Xtl.size(), splineTl);
-
-    if (1 == 2) {
-        cout << "-------Spline for Tl------" << endl;
-
-        for (size_t i = 0; i < 20; i++) {
-            printf("%f %f\n", Xtl[i], Ytl[i]);
         }
-        
-            printf("\n");
-        for (int i = 500; i < 520; i++) {
-            double x = i;
-            printf("%f %f\n", x, alglib::spline1dcalc(splineTl, x));
+
+        //A.2.2 Tl Spline
+        long double TlSpline(alglib::spline1dinterpolant splineTl, double income) {
+            double myspline = alglib::spline1dcalc(splineTl, income);
+            return(myspline);
         }
-        printf("\n");
+
+
+// 3. Create basic functions for the agents´ problems
+
+    //3.0 Payroll taxes definition (marginal rate)
+
+    long double Tn(double nf){
+        return(0.09);
+    }
+
+    //3.1. Payroll taxes definition (actual payroll)
+    //long double TnActual(double nf){
+    //    return(0.09*nf);
+    //}
+
+
+    //3.1. Payroll taxes definition (actual payroll)
+    long double TnActual(double nomina){
+    
+    
+        //double term1=pow(nf,2);
+        //double term2=1+term1;
+        //double term3=-1/term2;
+        //double term4=term3+1;
+        //double term5=0.45*term4;
+        //double rate=term5+0.05;
+    
+    
+        return(0.09*nomina);
+    }
+
+    //3.2. Production. C*0 to eliminate c
+    long double production(double n, double aalpha, double tthetae,double c){
+        double prod=tthetae*pow((c*1+n),aalpha);
+    
+        return(prod);
+    }
+
+    //3.3. Pre-tax profits.Checked. C*0 to eliminate c
+    long double profm(double n, double aalpha, double tthetae, double w, double c){
+        double pi1=tthetae*pow((c*1+n),aalpha)-w*n-TnActual(n*w);
+        return(pi1);
+    
+    }
+
+    //3.4. Pre-tax profits.Checked. C*0 to eliminate c + Spline for Tn
+    long double profmSpline(double n, double aalpha, double tthetae, double w, double c, alglib::spline1dinterpolant splineTn) {
+        long double taxn = TnSpline(splineTn, n * w);
+        double pi1 = tthetae * pow((c * 1 + n), aalpha) - w * n - taxn;
+        return(pi1);
 
     }
 
-    cout << "-------End Spline for Tl------" << endl;
-
-    return(splineTl);
-
-}
-
-//A.2.2 Tl Spline
-long double TlSpline(alglib::spline1dinterpolant splineTl, double income) {
-    double myspline = alglib::spline1dcalc(splineTl, income);
-    return(myspline);
-}
-
-
-//0. Payroll taxes definition (marginal rate)
-
-long double Tn(double nf){
-    return(0.09);
-}
-
-//1. Payroll taxes definition (actual payroll)
-//long double TnActual(double nf){
-//    return(0.09*nf);
-//}
-
-
-//1. Payroll taxes definition (actual payroll)
-long double TnActual(double nomina){
-    
-    
-    //double term1=pow(nf,2);
-    //double term2=1+term1;
-    //double term3=-1/term2;
-    //double term4=term3+1;
-    //double term5=0.45*term4;
-    //double rate=term5+0.05;
-    
-    
-    return(0.09*nomina);
-}
-
-//2. Production. C*0 to eliminate c
-long double production(double n, double aalpha, double tthetae,double c){
-    double prod=tthetae*pow((c*1+n),aalpha);
-    
-    return(prod);
-}
-
-//3. Pre-tax profits.Checked. C*0 to eliminate c
-long double profm(double n, double aalpha, double tthetae, double w, double c){
-    double pi1=tthetae*pow((c*1+n),aalpha)-w*n-TnActual(n*w);
-    return(pi1);
-    
-}
-
-//3.1. Pre-tax profits.Checked. C*0 to eliminate c + Spline for Tn
-long double profmSpline(double n, double aalpha, double tthetae, double w, double c, alglib::spline1dinterpolant splineTn) {
-    long double taxn = TnSpline(splineTn, n * w);
-    double pi1 = tthetae * pow((c * 1 + n), aalpha) - w * n - taxn;
-    return(pi1);
-
-}
-
-//4. Corporate tax profits, marginal. C*0 to eliminate c
-long double Tc(double z, double n, double aalpha,double tthetae, double w,double c){
-    double profm=tthetae*pow((c*1+n),aalpha)-w*n-TnActual(n*w);
-    double arg=profm-z;
-    double firsterm=-exp(-arg);
-    //If negative profits, set zero marginal rate
-    if (profm<0){
-        firsterm=0;
+    //3.5. Corporate tax profits, marginal. C*0 to eliminate c
+    long double Tc(double z, double n, double aalpha,double tthetae, double w,double c){
+        double profm=tthetae*pow((c*1+n),aalpha)-w*n-TnActual(n*w);
+        double arg=profm-z;
+        double firsterm=-exp(-arg);
+        //If negative profits, set zero marginal rate
+        if (profm<0){
+            firsterm=0;
+        }
+        return(firsterm);
     }
-    return(firsterm);
-}
 
-//4. Tc Actual corporate taxes
-//4. Tc Actual corporate taxes. In hundreds of dollars.
-// For instance. 189=5000*12*0.315/100 c*0 to eliminate c
-long double TcActual(double z, double n, double aalpha, double tthetae, double w,double c){
+    //3.6. Tc Actual corporate taxes
+    // For instance. 189=5000*12*0.315/100 c*0 to eliminate c
+    long double TcActual(double z, double n, double aalpha, double tthetae, double w,double c){
     
     
     
-    double profm=tthetae*pow((c*1+n),aalpha)-w*n-TnActual(n*w);
-    double arg=profm-z;
-    double ans=0;
-    double tax=0;
-    double prod=tthetae*pow((c*1+n),aalpha);
-    if(prod-z<=0){
-        ans=0;
-    }
-    else if (prod-z<189){
-        ans=0.756;
-    } else if (prod-z<302.4){
-        ans=1.89;
-    } else if (prod-z<491.4){
-        ans=7.56;
-    } else if (prod-z<756){
-        ans=15.12;
-    } else if (prod-z<1134){
-        ans=22.68;
-    }else if (prod-z>=1134){
-        arg=profm-z;
-        tax=0.3;
-        ans=arg*tax;
-        if(ans<0){
+        double profm=tthetae*pow((c*1+n),aalpha)-w*n-TnActual(n*w);
+        double arg=profm-z;
+        double ans=0;
+        double tax=0;
+        double prod=tthetae*pow((c*1+n),aalpha);
+        if(prod-z<=0){
             ans=0;
         }
-    }
+        else if (prod-z<189){
+            ans=0.756;
+        } else if (prod-z<302.4){
+            ans=1.89;
+        } else if (prod-z<491.4){
+            ans=7.56;
+        } else if (prod-z<756){
+            ans=15.12;
+        } else if (prod-z<1134){
+            ans=22.68;
+        }else if (prod-z>=1134){
+            arg=profm-z;
+            tax=0.3;
+            ans=arg*tax;
+            if(ans<0){
+                ans=0;
+            }
+        }
     
-    return(ans);
-    //double firsterm=-exp(-arg);
-    //double tax=firsterm+1;
-    //double tax=0.5*(exp(arg)-1);
+        return(ans);
+        //double firsterm=-exp(-arg);
+        //double tax=firsterm+1;
+        //double tax=0.5*(exp(arg)-1);
     
-    //if(tax<0){
-    //    tax=0;
-    //}
+        //if(tax<0){
+        //    tax=0;
+        //}
    
-}
-
-//5. Personal income tax
-long double PIT(double tthetaw, double w, double l){
-    double x=tthetaw*w*l;
-    double a=1000;
-    double ans=0;
-    if(x<a){
-        ans=(100/a)*x-100;
-    }else if(x<36000){
-        ans=0.0;
-    }else if(x<66000){
-        ans=pow(x,2)/100000-9*x/25;
-    }else if(x>=66000){
-        ans=0.3*x;
     }
-    
-    return(ans);
-}
 
-//6. Personal income tax marginal
-long double PITM(double tthetaw, double w, double l){
-    return(0.5);
-}
+    //3.7. Personal income tax
+    long double PIT(double tthetaw, double w, double l){
+        double x=tthetaw*w*l;
+        double a=1000;
+        double ans=0;
+        if(x<a){
+            ans=(100/a)*x-100;
+        }else if(x<36000){
+            ans=0.0;
+        }else if(x<66000){
+            ans=pow(x,2)/100000-9*x/25;
+        }else if(x>=66000){
+            ans=0.3*x;
+        }
+    
+        return(ans);
+    }
 
-//7. Final profits
-long double FinProfits(const double *Args, double paramvec[8], alglib::spline1dinterpolant splineTn, alglib::spline1dinterpolant splineTc){
-    //vector<double> paramvec=*(vector<double>*)params;
-    //Before, it was (const double *Args, void *params){
-    
-    double w=paramvec[0];
-    double aalpha=paramvec[1];
-    double ddelta=paramvec[2];
-    double ggamma=paramvec[3];
-    double bbeta=paramvec[4];
-    double ssigma=paramvec[5];
-    double tthetae=paramvec[6];
-    double c=paramvec[7];//added
-    
-    
-    // cout << ggamma << " ggamma "<< endl;
-    // cout << ddelta << " ddelta "<< endl;
-    
-    
-    
-    
-    
-    
-    double n=Args[0];
-    double z=Args[1];
-    
-    //Operational
-    //double term1=profm(n, aalpha, tthetae, w,c);
-    double term1 = profmSpline(n, aalpha, tthetae, w, c, splineTn);
-    double Tcbase = term1-z;
+    //3.8. Personal income tax marginal
+    long double PITM(double tthetaw, double w, double l){
+        return(0.5);
+    }
 
-    //Corporate taxes
-    //double taxes=TcActual(z,n,aalpha,tthetae,w,c);
-    long double taxes = TcSpline(splineTc, Tcbase);
+    //3.9. Final profits
+        //3.9.1 Set the basic profits function
+        long double FinProfits(const double *Args, double paramvec[8], alglib::spline1dinterpolant splineTn, alglib::spline1dinterpolant splineTc){
+            //vector<double> paramvec=*(vector<double>*)params;
+            //Before, it was (const double *Args, void *params){
     
+            double w=paramvec[0];
+            double aalpha=paramvec[1];
+            double ddelta=paramvec[2];
+            double ggamma=paramvec[3];
+            double bbeta=paramvec[4];
+            double ssigma=paramvec[5];
+            double tthetae=paramvec[6];
+            double c=paramvec[7];//added
+           
+            double n=Args[0];
+            double z=Args[1];
+    
+            //Operational
+            //double term1=profm(n, aalpha, tthetae, w,c);
+            double term1 = profmSpline(n, aalpha, tthetae, w, c, splineTn);
+            double Tcbase = term1-z;
 
-    //Cost of evasion
+            //Corporate taxes
+            //double taxes=TcActual(z,n,aalpha,tthetae,w,c);
+            long double taxes = TcSpline(splineTc, Tcbase);
     
-    double evcost=pow(z,1+ssigma)*(bbeta/(1+ssigma));
+            //Cost of evasion
     
-    //Evasion costs
-    double infcost=0.0;
-    double ans=term1-taxes-infcost-evcost;
+            double evcost=pow(z,1+ssigma)*(bbeta/(1+ssigma));
     
-    return(ans);
+            //Evasion costs
+            double infcost=0.0;
+            double ans=term1-taxes-infcost-evcost;
     
-    
-}
+            return(ans);
+        
+            }
 
-//8. Maximize profits
-//Defining the profit function to be maximized by object nlopt
-int iterat=0;
+        //3.9.2 Maximize profits: Defining the profit function to be maximized by object nlopt
+        int iterat=0;
 
-typedef struct {
-    double* myParams;
-    alglib::spline1dinterpolant mysplineTn;
-    alglib::spline1dinterpolant mysplineTc;
-}profitsFin_data;
+        //Structure to pass objective information
+        typedef struct {
+            double* myParams;
+            alglib::spline1dinterpolant mysplineTn;
+            alglib::spline1dinterpolant mysplineTc;
+        }profitsFin_data;
 
-double profitsFinMaxim(unsigned n, const double *x, double *grad, void *profitsFinMaxim_data){
-    //Void to double
-    //cout << profitsFinMaxim_data<< " this stuff"<< endl;
+        //Objective Function
+        double profitsFinMaxim(unsigned n, const double *x, double *grad, void *profitsFinMaxim_data){
+            //Void to double
+            //cout << profitsFinMaxim_data<< " this stuff"<< endl;
     
-    //double *Params = (double *)profitsFinMaxim_data;
+            //double *Params = (double *)profitsFinMaxim_data;
     
-    profitsFin_data* d = (profitsFin_data*)profitsFinMaxim_data;
+            profitsFin_data* d = (profitsFin_data*)profitsFinMaxim_data;
 
-    double* Params = d->myParams;
-    alglib::spline1dinterpolant splTc= d->mysplineTc;
-    alglib::spline1dinterpolant splTn= d->mysplineTn;
+            double* Params = d->myParams;
+            alglib::spline1dinterpolant splTc= d->mysplineTc;
+            alglib::spline1dinterpolant splTn= d->mysplineTn;
     
-    double result=FinProfits(x, Params, splTn, splTc);
-    //cout << result << " evalF"<< endl;
-    iterat=iterat+1;
-    //printf("Iteration=(%d); Feval=%0.10g\n", iterat, result);
-    return(result);
-}
+            double result=FinProfits(x, Params, splTn, splTc);
+            //cout << result << " evalF"<< endl;
+            iterat=iterat+1;
+            //printf("Iteration=(%d); Feval=%0.10g\n", iterat, result);
+            return(result);
+        }
 
-typedef struct {
-    double* myParams;
-    alglib::spline1dinterpolant mysplineTn;
-}constraint_data;
+        //Structure to pass constraint information
+        typedef struct {
+            double* myParams;
+            alglib::spline1dinterpolant mysplineTn;
+        }constraint_data;
 
-double profitsConstraint(unsigned n, const double* x, double* grad, void* data)
-{
-    //double* Params = (double*)profitsFinMaxim_data;
+        //Constraint Function
+        double profitsConstraint(unsigned n, const double* x, double* grad, void* data)
+        {
+            //double* Params = (double*)profitsFinMaxim_data;
     
-    constraint_data* d = (constraint_data*) data;
+            constraint_data* d = (constraint_data*) data;
 
-    alglib::spline1dinterpolant splTn= d->mysplineTn;
-    double* Params= d->myParams;
+            alglib::spline1dinterpolant splTn= d->mysplineTn;
+            double* Params= d->myParams;
     
-    double w = Params[0];
-    double aalpha = Params[1];
-    double ddelta = Params[2];
-    double ggamma = Params[3];
-    double bbeta = Params[4];
-    double ssigma = Params[5];
-    double tthetae = Params[6];
-    double c = Params[7];
+            double w = Params[0];
+            double aalpha = Params[1];
+            double ddelta = Params[2];
+            double ggamma = Params[3];
+            double bbeta = Params[4];
+            double ssigma = Params[5];
+            double tthetae = Params[6];
+            double c = Params[7];
 
-    //printf("Iteration=(%d); Feval=%0.10g\n", iterat, result);
-    return(x[1] - tthetae * pow((c*1 + x[0]), aalpha) + w*x[0] + TnSpline(splTn, w*x[0]));
-}
+            //printf("Iteration=(%d); Feval=%0.10g\n", iterat, result);
+            return(x[1] - tthetae * pow((c*1 + x[0]), aalpha) + w*x[0] + TnSpline(splTn, w*x[0]));
+        }
 
 
-//9. Defininf a function such that for given parameters, returns the optimal inputs and the maximum profits
-vector<double> profitsFinMaxim(double InitialCond[2],
-                               double w,
-                               double aalpha,
-                               double ddelta,
-                               double ggamma,
-                               double bbeta,
-                               double ssigma,
-                               double tthetae,
-                               double c,
-                               alglib::spline1dinterpolant splineTn, 
-                               alglib::spline1dinterpolant splineTc){
+        //Nlopt Function: Define a function such that for given parameters, returns the optimal inputs and the maximum profits
+        vector<double> profitsFinMaxim(double InitialCond[2],
+                                       double w,
+                                       double aalpha,
+                                       double ddelta,
+                                       double ggamma,
+                                       double bbeta,
+                                       double ssigma,
+                                       double tthetae,
+                                       double c,
+                                       alglib::spline1dinterpolant splineTn, 
+                                       alglib::spline1dinterpolant splineTc){
     
     
-    //Modifying parameters to find internal solution to profits
+            //Modifying parameters to find internal solution to profits
     
-    double Params[8]={};
+            double Params[8]={};
     
-    Params[0]=w;
-    Params[1]=aalpha;
-    Params[2]=ddelta;
-    Params[3]=ggamma;
-    Params[4]=bbeta;
-    Params[5]=ssigma;
-    Params[6]=tthetae;
-    Params[7]=c;
+            Params[0]=w;
+            Params[1]=aalpha;
+            Params[2]=ddelta;
+            Params[3]=ggamma;
+            Params[4]=bbeta;
+            Params[5]=ssigma;
+            Params[6]=tthetae;
+            Params[7]=c;
 
-    //Set the structures to pass in the optimization
-    profitsFin_data datap = {Params,  splineTn, splineTc};
+            //Set the structures to pass in the optimization
+            profitsFin_data datap = {Params,  splineTn, splineTc};
      
   
-    constraint_data data = {Params, splineTn};
+            constraint_data data = {Params, splineTn};
 
     
-    //Defining object to be optimized
-    //First. lower bounds for ni, nf, z.
-    double lb[2];
-    lb[0]=0.0;
-    lb[1]=0,0;
+            //Defining object to be optimized
+            //First. lower bounds for ni, nf, z.
+            double lb[2];
+            lb[0]=0.0;
+            lb[1]=0,0;
          
    
 
-     //Setting up optimization
+             //Setting up optimization
 
-    nlopt_opt optProfits;
-    //nlopt_opt localOpt;
-    //nlopt_opt subsOpt;
+            nlopt_opt optProfits;
+            //nlopt_opt localOpt;
+            //nlopt_opt subsOpt;
 
-    //Define the optimization algorithm
+            //Define the optimization algorithm
 
-        //1.Nelder-Mead (Local, non-gradient)
-        optProfits = nlopt_create(NLOPT_LN_NELDERMEAD, 2);
-        //2.DIRECT -Dividing rectangles- (Global, non-gradient)
-        //optProfits = nlopt_create(NLOPT_GN_ORIG_DIRECT, 2);
-        //3.COBYLA (Local, non-gradient)
-        //optProfits = nlopt_create(NLOPT_LN_COBYLA, 2);
-        //4.ISRES (Global, non-gradient)
-        //optProfits = nlopt_create(NLOPT_GN_ISRES, 2);
+                //1.Nelder-Mead (Local, non-gradient)
+                optProfits = nlopt_create(NLOPT_LN_NELDERMEAD, 2);
+                //2.DIRECT -Dividing rectangles- (Global, non-gradient)
+                //optProfits = nlopt_create(NLOPT_GN_ORIG_DIRECT, 2);
+                //3.COBYLA (Local, non-gradient)
+                //optProfits = nlopt_create(NLOPT_LN_COBYLA, 2);
+                //4.ISRES (Global, non-gradient)
+                //optProfits = nlopt_create(NLOPT_GN_ISRES, 2);
 
-    //Do not support nonlinear constraints 
-        //5. CRS (Global, non-gradient)
-        //optProfits = nlopt_create(NLOPT_GN_CRS2_LM, 2);
-        //6. ESCH (Global, non-gradient)
-        //optProfits = nlopt_create(NLOPT_GN_ESCH, 2);
-        //7. StoGO (Global, non-gradient)
-        //optProfits = nlopt_create(NLOPT_GD_STOGO, 2);
+            //Do not support nonlinear constraints 
+                //5. CRS (Global, non-gradient)
+                //optProfits = nlopt_create(NLOPT_GN_CRS2_LM, 2);
+                //6. ESCH (Global, non-gradient)
+                //optProfits = nlopt_create(NLOPT_GN_ESCH, 2);
+                //7. StoGO (Global, non-gradient)
+                //optProfits = nlopt_create(NLOPT_GD_STOGO, 2);
 
-        //8. MLSL -Multi Level Single Linkage- (Global, non-gradient)
-        //optProfits = nlopt_create(NLOPT_G_MLSL_LDS, 2);
-        //localOpt= nlopt_create(NLOPT_LN_COBYLA, 2);
-        //nlopt_set_local_optimizer(optProfits,localOpt);
+                //8. MLSL -Multi Level Single Linkage- (Global, non-gradient)
+                //optProfits = nlopt_create(NLOPT_G_MLSL_LDS, 2);
+                //localOpt= nlopt_create(NLOPT_LN_COBYLA, 2);
+                //nlopt_set_local_optimizer(optProfits,localOpt);
 
-    //Augmented Lagragian + Subsidiary algorithm
-        //9. NLOPT_AUGLAG
-        //optProfits = nlopt_create(NLOPT_AUGLAG, 2);
+            //Augmented Lagragian + Subsidiary algorithm
+                //9. NLOPT_AUGLAG
+                //optProfits = nlopt_create(NLOPT_AUGLAG, 2);
 
-        //Set the subsidiary algorithm (local or global)
-        //subsOpt= nlopt_create(NLOPT_LN_NELDERMEAD, 2);
-        //subsOpt= nlopt_create(NLOPT_GN_CRS2_LM, 2);
-        //subsOpt= nlopt_create(NLOPT_GN_ESCH, 2);
-        //subsOpt= nlopt_create(NLOPT_GD_STOGO, 2);
+                //Set the subsidiary algorithm (local or global)
+                //subsOpt= nlopt_create(NLOPT_LN_NELDERMEAD, 2);
+                //subsOpt= nlopt_create(NLOPT_GN_CRS2_LM, 2);
+                //subsOpt= nlopt_create(NLOPT_GN_ESCH, 2);
+                //subsOpt= nlopt_create(NLOPT_GD_STOGO, 2);
 
-        //nlopt_set_local_optimizer(optProfits,subsOpt);
+                //nlopt_set_local_optimizer(optProfits,subsOpt);
 
-        nlopt_set_lower_bounds(optProfits, lb);
-        nlopt_set_max_objective(optProfits, profitsFinMaxim, (profitsFin_data*)&datap);
+                nlopt_set_lower_bounds(optProfits, lb);
+                nlopt_set_max_objective(optProfits, profitsFinMaxim, (profitsFin_data*)&datap);
 
-    // Upper bound for z (cannot exceed "pre-tax profits")
-    //nlopt_add_inequality_constraint(optProfits, profitsConstraint, (constraint_data*)&data, 1e-8);
+            // Upper bound for z (cannot exceed "pre-tax profits")
+            //nlopt_add_inequality_constraint(optProfits, profitsConstraint, (constraint_data*)&data, 1e-8);
 
-    //Tolerance, abs or rel.
-    //General 
-    nlopt_set_xtol_rel(optProfits, 1.0e-8);
-    //nlopt_set_ftol_abs(optProfits, 1.0e-8);
-    //Subsidiary algorithm
-    //nlopt_set_xtol_rel(subsOpt, 1.0e-8);
-    //nlopt_set_ftol_abs(subsOpt, 1.0e-8);
+            //Tolerance, abs or rel.
+            //General 
+            nlopt_set_xtol_rel(optProfits, 1.0e-8);
+            //nlopt_set_ftol_abs(optProfits, 1.0e-8);
+            //Subsidiary algorithm
+            //nlopt_set_xtol_rel(subsOpt, 1.0e-8);
+            //nlopt_set_ftol_abs(subsOpt, 1.0e-8);
 
-    //Number of evaluations
-    //nlopt_set_population(optProfits, 1000000);
-    //nlopt_set_maxeval(optProfits, 1.0e+18);
+            //Number of evaluations
+            //nlopt_set_population(optProfits, 1000000);
+            //nlopt_set_maxeval(optProfits, 1.0e+18);
 
-    double minf3; /* the minimum objective value, upon return */
+            double minf3; /* the minimum objective value, upon return */
 
-    //Setting up initial conditions
-    double x3[2];
-    x3[0] = InitialCond[0];
-    x3[1] = InitialCond[1];
+            //Setting up initial conditions
+            double x3[2];
+            x3[0] = InitialCond[0];
+            x3[1] = InitialCond[1];
 
 
-    //Finding optimal
-    nlopt_optimize(optProfits, x3, &minf3);
+            //Finding optimal
+            nlopt_optimize(optProfits, x3, &minf3);
 
     
-    //if (nlopt_optimize(optProfits, x3, &minf3) < 0) {
-    //    printf("nlopt failed!\n");
-    //}
-    //else {
-    //   printf("found minimum at f(%g) = %0.10g\n", x3[0], minf3);
-    //}
+            //if (nlopt_optimize(optProfits, x3, &minf3) < 0) {
+            //    printf("nlopt failed!\n");
+            //}
+            //else {
+            //   printf("found minimum at f(%g) = %0.10g\n", x3[0], minf3);
+            //}
     
     
-    double n=x3[0];
-    double z=x3[1];
+            double n=x3[0];
+            double z=x3[1];
 
-    double Args[3];
+            double Args[3];
         
-    Args[0]=n;
-    Args[1]=z;    
+            Args[0]=n;
+            Args[1]=z;    
     
     
-    //Findin the profits
-    double Prof=FinProfits(Args, Params, splineTn, splineTc);
+            //Finding the profits
+            double Prof=FinProfits(Args, Params, splineTn, splineTc);
     
-    vector<double> Ans;
-    Ans[0]=n;
-    Ans[1]=z;
-    Ans[2]=Prof;
-    nlopt_destroy(optProfits);
+            vector<double> Ans;
+            Ans[0]=n;
+            Ans[1]=z;
+            Ans[2]=Prof;
+            nlopt_destroy(optProfits);
     
-    return(Ans);
-}
+            return(Ans);
+        }
 
 
 
 
+    //3.10. Value of workers
 
-//10. Value of workers
-double ValueWorkers(const double *Args, double ParamWorkers[6], alglib::spline1dinterpolant splineTl){
-    double w=ParamWorkers[0];
-    double kkappa=ParamWorkers[1];
-    double rrho=ParamWorkers[2];
-    double psi=ParamWorkers[3];
-    double chi=ParamWorkers[4];
-    double tthetaw=ParamWorkers[5];
+        //3.10.1 Set the basic objective function
+      
+         double ValueWorkers(const double *Args, double ParamWorkers[6], alglib::spline1dinterpolant splineTl){
+            double w=ParamWorkers[0];
+            double kkappa=ParamWorkers[1];
+            double rrho=ParamWorkers[2];
+            double psi=ParamWorkers[3];
+            double chi=ParamWorkers[4];
+            double tthetaw=ParamWorkers[5];
     
-    double l=Args[0];
+            double l=Args[0];
 
  
-    //Term1 is total income
-    double term1=(w*l)*tthetaw;
+            //Term1 is total income
+            double term1=(w*l)*tthetaw;
     
-    //Term2 total disutility from working
-    double term2=pow(l,1+psi)*(chi/(1+psi));
+            //Term2 total disutility from working
+            double term2=pow(l,1+psi)*(chi/(1+psi));
     
-    //Term 3 is consumption penalty from informality
-    double term3=0.0;
+            //Term 3 is consumption penalty from informality
+            double term3=0.0;
     
-    //Term4 is net transfers to.from gogernment
-    //double Taxes=PIT(tthetaw,wf,lf);
-    double base=tthetaw*w*l;
-    double Taxes=TlSpline(splineTl, base);
+            //Term4 is net transfers to.from gogernment
+            //double Taxes=PIT(tthetaw,wf,lf);
+            double base=tthetaw*w*l;
+            double Taxes=TlSpline(splineTl, base);
     
     
-    double ans=term1-term2-term3-Taxes;
-    return(ans);
-}
+            double ans=term1-term2-term3-Taxes;
+            return(ans);
+        }
+
+        //3.10.2 Maximize profits: Defining the profit function to be maximized by object nlopt
+
+        //Structure to pass 
+        typedef struct {
+            double* myParamsW;
+            alglib::spline1dinterpolant mysplineTl;
+        }workers_data;
+
+        int iteratvalworkers=0;
+        
+        // Objective Function   
+        double valueWorkerMax(unsigned n, const double *x, double *grad, void *valueWorkerMax_data){
+            //Void to double
+            //cout << profitsFinMaxim_data<< " this stuff"<< endl;
+            //double *Params = (double *)valueWorkerMax_data;
+
+            workers_data* d = (workers_data*)valueWorkerMax_data;
+
+            double* Params = d->myParamsW;
+            alglib::spline1dinterpolant splTl= d->mysplineTl;
+
+    
+            double result=ValueWorkers(x, Params, splTl);
+            //cout << result << " evalF"<< endl;
+            iteratvalworkers=iteratvalworkers+1;
+            //printf("Iteration=(%d); Feval=%0.10g\n", iteratvalworkers, result);
+            return(result);
+        }
 
 
-
-//11. Maximize value of workers
-
-typedef struct {
-    double* myParamsW;
-    alglib::spline1dinterpolant mysplineTl;
-}workers_data;
-
-int iteratvalworkers=0;
-double valueWorkerMax(unsigned n, const double *x, double *grad, void *valueWorkerMax_data){
-    //Void to double
-    //cout << profitsFinMaxim_data<< " this stuff"<< endl;
-    //double *Params = (double *)valueWorkerMax_data;
-
-    workers_data* d = (workers_data*)valueWorkerMax_data;
-
-    double* Params = d->myParamsW;
-    alglib::spline1dinterpolant splTl= d->mysplineTl;
-
-    
-    double result=ValueWorkers(x, Params, splTl);
-    //cout << result << " evalF"<< endl;
-    iteratvalworkers=iteratvalworkers+1;
-    //printf("Iteration=(%d); Feval=%0.10g\n", iteratvalworkers, result);
-    return(result);
-}
-
-
-
-vector<double> valueWorkerFinMaxim(double InitialCond[1],
-                                   double w,
-                                   double kkappa,
-                                   double rrho,
-                                   double psi,
-                                   double chi,
-                                   double tthetaw,
-                                   alglib::spline1dinterpolant splineTl){
-    double Params[6]={};
-    Params[0]=w;
-    Params[1]=kkappa;
-    Params[2]=rrho;
-    Params[3]=psi;
-    Params[4]=chi;
-    Params[5]=tthetaw;
+        // Nlopt Function   
+        vector<double> valueWorkerFinMaxim(double InitialCond[1],
+                                           double w,
+                                           double kkappa,
+                                           double rrho,
+                                           double psi,
+                                           double chi,
+                                           double tthetaw,
+                                           alglib::spline1dinterpolant splineTl){
+            double Params[6]={};
+            Params[0]=w;
+            Params[1]=kkappa;
+            Params[2]=rrho;
+            Params[3]=psi;
+            Params[4]=chi;
+            Params[5]=tthetaw;
     
     
     
-    //Set the structures to pass in the optimization
-    workers_data dataw = { Params,  splineTl};
+            //Set the structures to pass in the optimization
+            workers_data dataw = { Params,  splineTl};
     
-    //Defining the object to be maximized
-    double lbWorker[1];
-    lbWorker[0]=0;
-    
-    
-    nlopt_opt optWorkers;
-    optWorkers = nlopt_create(NLOPT_LN_NELDERMEAD, 1);
-    
-    nlopt_set_lower_bounds(optWorkers, lbWorker);
-    nlopt_set_max_objective(optWorkers, valueWorkerMax,(workers_data*)&dataw);
+            //Defining the object to be maximized
+            double lbWorker[1];
+            lbWorker[0]=0;
     
     
-    nlopt_set_xtol_rel(optWorkers, 1.0e-8);
-    nlopt_set_ftol_abs(optWorkers,1.0e-8);
-    double MaxfWorker; /* the minimum objective value, upon return */
-    double x3Worker[1];
-    x3Worker[0]=InitialCond[0];
+            nlopt_opt optWorkers;
+            optWorkers = nlopt_create(NLOPT_LN_NELDERMEAD, 1);
+    
+            nlopt_set_lower_bounds(optWorkers, lbWorker);
+            nlopt_set_max_objective(optWorkers, valueWorkerMax,(workers_data*)&dataw);
+    
+    
+            nlopt_set_xtol_rel(optWorkers, 1.0e-8);
+            nlopt_set_ftol_abs(optWorkers,1.0e-8);
+            double MaxfWorker; /* the minimum objective value, upon return */
+            double x3Worker[1];
+            x3Worker[0]=InitialCond[0];
     
       
-    //memcpy(Params, (x3**)pointer, sizeof Params);
+            //memcpy(Params, (x3**)pointer, sizeof Params);
     
-    //cout <<FinProfits(x3,Params)<< " test inicial"<< endl;
-    //cout << x3[2]<< " x[2]"<< endl;
-    nlopt_optimize(optWorkers, x3Worker, &MaxfWorker);
-    nlopt_destroy(optWorkers);
-    //if (nlopt_optimize(optWorkers, x3Worker, &MaxfWorker) < 0) {
-    //    printf("nlopt failed!\n");
-    //}
-    //else {
-    //    printf("found minimum at f(%g) = %0.10g\n",x3Worker[0], MaxfWorker);
-    //}
+            //cout <<FinProfits(x3,Params)<< " test inicial"<< endl;
+            //cout << x3[2]<< " x[2]"<< endl;
+            nlopt_optimize(optWorkers, x3Worker, &MaxfWorker);
+            nlopt_destroy(optWorkers);
+            //if (nlopt_optimize(optWorkers, x3Worker, &MaxfWorker) < 0) {
+            //    printf("nlopt failed!\n");
+            //}
+            //else {
+            //    printf("found minimum at f(%g) = %0.10g\n",x3Worker[0], MaxfWorker);
+            //}
     
-    //Actual value of workers
+            //Actual value of workers
     
-    vector<double> ans;
-    ans.resize(2);
-    ans[0]=x3Worker[0];
+            vector<double> ans;
+            ans.resize(2);
+            ans[0]=x3Worker[0];
         
-    ans[1]=MaxfWorker;
-    return(ans);
+            ans[1]=MaxfWorker;
+            return(ans);
         
-}
+        }
 
-//Vector de decisión
+//4. Decision vector function
 vector<vector<double> > iDecision(vector<double> Ttheta,
                                   vector<double> Params,
                                   vector<double> InitLWorkers,
@@ -917,97 +916,97 @@ vector<vector<double> > iDecision(vector<double> Ttheta,
         
     //Computing the value of the workers
     
-    vector<double> ansValWorker;
-    ansValWorker.resize(2);
-    double InitialVworkers[1];
-    InitialVworkers[0]=InitLWorkers[0];
+        vector<double> ansValWorker;
+        ansValWorker.resize(2);
+        double InitialVworkers[1];
+        InitialVworkers[0]=InitLWorkers[0];
      
     
     
     
-    if(1==1){
-        cout << " inside of the idecision stuff "<< endl;
-        cout <<  w<< " w "<< endl;
-        cout <<  aalpha<< " aalpha "<< endl;
-        cout <<  ddelta<< " ddelta "<< endl;
-        cout <<  ggamma<< " ggamma "<< endl;
-        cout <<  bbeta<< " bbeta "<< endl;
-        cout <<  ssigma<< " ssigma "<< endl;
-        cout <<  kkappa<< " kkappa "<< endl;
-        cout <<  rrho<< " rrho "<< endl;
-        cout <<  psi<< " psi "<< endl;
-        cout <<  chi<< " chi "<< endl;
-        cout << c << " c " << endl;
-        cout << tthetaw << " tthetaw "<< endl;
-        cout << tthetae << " tthetae "<< endl;
-        cout << InitialVworkers[0] << " InitialVworkers[0]"<< endl;
-    }
+        if(1==1){
+            cout << " inside of the idecision stuff "<< endl;
+            cout <<  w<< " w "<< endl;
+            cout <<  aalpha<< " aalpha "<< endl;
+            cout <<  ddelta<< " ddelta "<< endl;
+            cout <<  ggamma<< " ggamma "<< endl;
+            cout <<  bbeta<< " bbeta "<< endl;
+            cout <<  ssigma<< " ssigma "<< endl;
+            cout <<  kkappa<< " kkappa "<< endl;
+            cout <<  rrho<< " rrho "<< endl;
+            cout <<  psi<< " psi "<< endl;
+            cout <<  chi<< " chi "<< endl;
+            cout << c << " c " << endl;
+            cout << tthetaw << " tthetaw "<< endl;
+            cout << tthetae << " tthetae "<< endl;
+            cout << InitialVworkers[0] << " InitialVworkers[0]"<< endl;
+        }
     
         
-    ansValWorker=valueWorkerFinMaxim(InitialVworkers,w, kkappa,rrho,psi, chi, tthetaw, splineTl);
+        ansValWorker=valueWorkerFinMaxim(InitialVworkers,w, kkappa,rrho,psi, chi, tthetaw, splineTl);
     
-    //Loading answers of value of workers
-    double l=ansValWorker[0];
-    double ValueofWorker=ansValWorker[1];
+        //Loading answers of value of workers
+        double l=ansValWorker[0];
+        double ValueofWorker=ansValWorker[1];
     
-    if(1==1){
-        cout << " Worker "<< endl;
-        cout <<  l<< "l"<< endl;
-    }
+        if(1==1){
+            cout << " Worker "<< endl;
+            cout <<  l<< "l"<< endl;
+        }
     
 
     
     //Computing the Profits answer
-    vector<double> ansProfits;
-    ansProfits.resize(3);
-    double InitialVProfits[2];
-    InitialVProfits[0]=InitProf[0];
-    InitialVProfits[1]=InitProf[1];
-    ansProfits=profitsFinMaxim(InitialVProfits,  w, aalpha,ddelta,ggamma,bbeta,ssigma,tthetae,c, splineTn, splineTc);
-    //Loading the answer of vlaue of profits
-    double n=ansProfits[0];
-    double z=ansProfits[1];
-    double prof=ansProfits[2];
+        vector<double> ansProfits;
+        ansProfits.resize(3);
+        double InitialVProfits[2];
+        InitialVProfits[0]=InitProf[0];
+        InitialVProfits[1]=InitProf[1];
+        ansProfits=profitsFinMaxim(InitialVProfits,  w, aalpha,ddelta,ggamma,bbeta,ssigma,tthetae,c, splineTn, splineTc);
+        //Loading the answer of vlaue of profits
+        double n=ansProfits[0];
+        double z=ansProfits[1];
+        double prof=ansProfits[2];
     
-    if(1==1){
-        cout << " Entrepreneur "<< endl;
-        cout << n<< "n"<< endl;
-        cout << z<< "z"<< endl;
-        cout << prof<< "prof"<< endl;
-    }
+        if(1==1){
+            cout << " Entrepreneur "<< endl;
+            cout << n<< "n"<< endl;
+            cout << z<< "z"<< endl;
+            cout << prof<< "prof"<< endl;
+        }
     
-    vector<vector<double> > ans;
-    ans.resize(3);
-    for (int it=0; it<3; it++){
-        ans[it].resize(3);
-    }
-    //Loading to the matrix ans the solutions
-    ans[0][0]=0;
-    if(prof>ValueofWorker){
-        ans[0][0]=1;
-    }
+        vector<vector<double> > ans;
+        ans.resize(3);
+        for (int it=0; it<3; it++){
+            ans[it].resize(3);
+        }
+        //Loading to the matrix ans the solutions
+        ans[0][0]=0;
+        if(prof>ValueofWorker){
+            ans[0][0]=1;
+        }
     
-    ans[0][1]=n;
-    ans[1][1]=z;
-    ans[2][1]=prof;
+        ans[0][1]=n;
+        ans[1][1]=z;
+        ans[2][1]=prof;
     
-    ans[0][2]=l;
-    ans[1][2]=ValueofWorker;
+        ans[0][2]=l;
+        ans[1][2]=ValueofWorker;
 
-    if(1==1){
-        cout << " Entrepreneur/Worker Matrix"<< endl;
-        cout <<  ans[0][1]<< "n"<< endl;
-        cout <<  ans[1][1]<< "z"<< endl;
-        cout <<  ans[2][1]<< "prof"<< endl;
-        cout <<  ans[0][2]<< "l"<< endl;
-        cout <<  ans[1][2]<< "ValueWorker"<< endl;
-    }
+        if(1==1){
+            cout << " Entrepreneur/Worker Matrix"<< endl;
+            cout <<  ans[0][1]<< "n"<< endl;
+            cout <<  ans[1][1]<< "z"<< endl;
+            cout <<  ans[2][1]<< "prof"<< endl;
+            cout <<  ans[0][2]<< "l"<< endl;
+            cout <<  ans[1][2]<< "ValueWorker"<< endl;
+        }
 
 
     return(ans);
 }
 
-
+//5. Equilibrium function: Compute the agents´allocations given a params set, a matrix with the planner problem information and initial conditions
 int EquilibriumOP(int simdata,double vec1, double vec2, double vec3, double vec4, double vec5, double vec6, double vec7, double vec8, double vec9, double vec10, double vec11, double vec12, double vec13, double vec14, double vec15, arma::vec WagesInit,
         arma::vec armaInitLWorkers, arma::vec armaInitProf, vector<vector<double>> PLANNERINFO) {
 
@@ -1153,6 +1152,8 @@ int EquilibriumOP(int simdata,double vec1, double vec2, double vec3, double vec4
                 Ttheta[1] = exp(c2[2] * z1 + c2[3] * z2 + mmu2);
             }
             else {
+                //Obtain the thetas from the planner´s matrix
+
                 //cout << "ELSE " << endl;
                 //cout <<"it: " << it+1 <<"Theta w " << PLANNERINFO[it+1][0] << endl;
                 //cout << "it: " << it + 1 << "Theta e " << PLANNERINFO[it+1][1] << endl;
@@ -1204,7 +1205,7 @@ int EquilibriumOP(int simdata,double vec1, double vec2, double vec3, double vec4
                 cout << StorageAllocation[8] << "check" << endl;
                }
         
-            //Writing the csv file of the allocations
+            //Writing the csv file of allocations
             AllocationsOPW.open("/home/ec2-user/InAws/AllocationsOPW.csv", ios::out | ios::app);
 
             for (int j = 0; j < 15; j++) {
@@ -1218,7 +1219,7 @@ int EquilibriumOP(int simdata,double vec1, double vec2, double vec3, double vec4
         return(0);
 }
 
-
+//5. Extract params information and run the equilibrium allocations
 void OptParamsTM(int simdata,arma::vec WagesVectorIn,
     arma::vec InitLWorkersDecision,
     arma::vec InitProfDecision, vector<vector<double>> PLANNERSIZE) {
@@ -1271,10 +1272,6 @@ void OptParamsTM(int simdata,arma::vec WagesVectorIn,
     }
 
 
-
-
-
-
     vector<double> VectorOthers(21);
     VectorOthers[15] = InitLWorkersDecision[0];
     VectorOthers[16] = InitLWorkersDecision[1];
@@ -1324,12 +1321,8 @@ void OptParamsTM(int simdata,arma::vec WagesVectorIn,
 
 
 
-int main(int argc, const char * argv[]) {
-    
-    
-    
-    
-    
+int main(int argc, const char * argv[]) {  
+       
     
     //Testing functions
     //Setting parameters to test
@@ -1846,28 +1839,11 @@ int main(int argc, const char * argv[]) {
     //EquilibriumMoments(VecOthers, WagesVectorIn,InitLWorkersDecision,InitProfDecision);
     //cout << " finalizing equilibrium moments "<< endl;
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+          
     
     //cout << WagesEquilibrium[0] << " WagesEquilibrium[0]"<< endl;
     //cout << WagesEquilibrium[1] << " WagesEquilibrium[1]"<< endl;
-    
-    
-    
+     
     
     
     
