@@ -1,9 +1,9 @@
+//  OPTIMAL TAXATION AND INFORMALITY
+//  Code to explore the optimization algorithms available in NLopt
+//  mainFunction.cpp
 //
-//  main.cpp
-//  Equilibrium
-//
-//  Created by Rodrigo Azuero Melo on 5/11/18.
-//  Copyright Â© 2018 Rodrigo Azuero Melo. All rights reserved.
+//  Created by Rodrigo Azuero Melo on 5/11/18. Modified Jan-2021.
+//  Copyright © 2018 Rodrigo Azuero Melo. All rights reserved.
 //
 
 // [[Rcpp::depends(BH)]]
@@ -79,17 +79,15 @@ long double Quadratic(const double* Args, double paramvec[3]) {
 
     //Without penalization (restriction)
     double my_function = a*pow(myx, 2) + b*myx + c;
-    //Including penalization (restriction)
-    //double my_function = a * pow(myx, 2) + b * myx + c+ 1.0*pow(-5.0-myx,1);
-
+    
     return(my_function);
 }
 
 
 
-//1. Minimize the quadratic function 
+// Minimize the quadratic function 
 
-//Defining the function to be maximized by object nlopt
+//Define the function to be maximized by object nlopt
 int ite = 0;
 
 double quadMin(unsigned n, const double *x, double *grad, void *cdata){
@@ -105,18 +103,14 @@ double quadMin(unsigned n, const double *x, double *grad, void *cdata){
     if (grad) {
         grad[0] = a*2.0*x[0] + b;
     }
-    //Including penalization (restriction)
-    //if (grad) {
-    //    grad[0] = a * 2.0 * x[0] + b - 1.0;
-    //    }
-
+    
     double result = Quadratic(x, Params);
     ite= ite+1;
     
     return(result);
 }
 
-//Defining the  constraint
+//Define the constraint
 typedef struct {
     double a, b, c;
 }my_params;
@@ -138,11 +132,11 @@ double constraint(unsigned n, const double* x, double* grad, void* cdata)
     return(-0.5 - x[0]);
 }
 
-//9. Defininf a function such that for given parameters, returns the optimal inputs and the maximum profits
+//Definine the Nlopt optimization function
 vector<double> Minimization(double InitialCond, double a,double b,double c) {
 
 
-    //Modifying parameters to find internal solution 
+    //Modify parameters to find internal solution 
 
     double Params[3] = {};
 
@@ -155,14 +149,14 @@ vector<double> Minimization(double InitialCond, double a,double b,double c) {
 
     cout << " PARa " << data.a << " PARb " << data.b << " PARc " << data.c << endl;
 
-    //Defining object to be optimized
+    //Define the object to be optimized
     //First. lower bounds for ni, nf, z.
     //double lb[1];
     //lb[0] = -5.0;
     
     // double pre_profits= profm(double ni, double nf, double aalpha, double tthetae, double wi, double wf, double c)
 
-     //Setting up optimization
+     //Set up optimization
 
     nlopt_opt optProfits;
     nlopt_opt localOpt;
@@ -179,7 +173,7 @@ vector<double> Minimization(double InitialCond, double a,double b,double c) {
         //4.ISRES (Global, non-gradient)
         optProfits = nlopt_create(NLOPT_GN_ISRES, 1);
         
-    //Do not support nonlinear constraints 
+    //Those who do not support nonlinear constraints 
         //5. CRS (Global, non-gradient)
         //optProfits = nlopt_create(NLOPT_GN_CRS2_LM, 1);
         //6. ESCH (Global, non-gradient)
@@ -223,13 +217,13 @@ vector<double> Minimization(double InitialCond, double a,double b,double c) {
     //nlopt_set_population(optProfits, 1000000);
     nlopt_set_maxeval(optProfits, 1.0e+18);
 
-    //Setting up initial conditions
+    //Set up initial conditions
     double x1[1];
     x1[0] = InitialCond;
    
 
     double minf3; /* the minimum objective value, upon return */
-    //Finding optimal
+    //Find optimal
     nlopt_optimize(optProfits, x1, &minf3);
 
     printf("found minimum after %d evaluations\n", ite);
@@ -243,7 +237,7 @@ vector<double> Minimization(double InitialCond, double a,double b,double c) {
     double control[1];
     control[0]= x1[0];
     
-    //Finding the profits
+    //Find the profits
     long double MinFound = Quadratic(control, Params);
 
     vector<double> Ans;
@@ -262,7 +256,7 @@ int main(int argc, const char* argv[]) {
 
 
 
-    //3. Testing Quadratic Function
+    //Testing Quadratic Function
     cout << " -------------------------------------------------------------------- " << endl;
     cout << " Testing Quadratic Function " << endl;
 
