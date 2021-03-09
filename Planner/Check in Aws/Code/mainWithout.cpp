@@ -1,9 +1,9 @@
 //  OPTIMAL TAXATION AND INFORMALITY
 //  Code to check implementability (Problem without informality)
-//  main.cpp
+//  mainWithouth.cpp
 //
 //  Created by Rodrigo Azuero Melo on 5/11/18. Modified Jan-2021.
-//  Copyright Â© 2018 Rodrigo Azuero Melo. All rights reserved.
+//  Copyright © 2018 Rodrigo Azuero Melo. All rights reserved.
 //
 
 // [[Rcpp::depends(BH)]]
@@ -113,7 +113,7 @@
         return generator();
     }
 
-//1. Import the plannerÂ´s output to check implementability
+//1. Import the planner´s output to check implementability
 
     vector<vector<double>> Planner(int simdata) {
 
@@ -246,7 +246,7 @@
 
         }
 
-        //A.1.2 Function: Tn Spline
+        //2.1.2 Function: Tn Spline
         long double TnSpline(alglib::spline1dinterpolant splineTn,double nomina) {
             double myspline = alglib::spline1dcalc(splineTn, nomina);
             return(myspline);
@@ -309,7 +309,7 @@
 
         }
 
-        //A.2.2 Tc Spline
+        //2.2.2 Tc Spline
         long double TcSpline(alglib::spline1dinterpolant splineTc, double pretax) {
             double myspline = alglib::spline1dcalc(splineTc, pretax);
             return(myspline);
@@ -372,14 +372,14 @@
 
         }
 
-        //A.2.2 Tl Spline
+        //2.3.2 Tl Spline
         long double TlSpline(alglib::spline1dinterpolant splineTl, double income) {
             double myspline = alglib::spline1dcalc(splineTl, income);
             return(myspline);
         }
 
 
-// 3. Create basic functions for the agentsÂ´ problems
+// 3. Create basic functions for the agents´ problems
 
     //3.0 Payroll taxes definition (marginal rate)
 
@@ -1006,7 +1006,7 @@ vector<vector<double> > iDecision(vector<double> Ttheta,
     return(ans);
 }
 
-//5. Equilibrium function: Compute the agentsÂ´allocations given a params set, a matrix with the planner problem information and initial conditions
+//5. Equilibrium function: Compute the agents´allocations given a params set, a matrix with the planner problem information and initial conditions
 int EquilibriumOP(int simdata,double vec1, double vec2, double vec3, double vec4, double vec5, double vec6, double vec7, double vec8, double vec9, double vec10, double vec11, double vec12, double vec13, double vec14, double vec15, arma::vec WagesInit,
         arma::vec armaInitLWorkers, arma::vec armaInitProf, vector<vector<double>> PLANNERINFO) {
 
@@ -1152,7 +1152,7 @@ int EquilibriumOP(int simdata,double vec1, double vec2, double vec3, double vec4
                 Ttheta[1] = exp(c2[2] * z1 + c2[3] * z2 + mmu2);
             }
             else {
-                //Obtain the thetas from the plannerÂ´s matrix
+                //Obtain the thetas from the planner´s matrix
 
                 //cout << "ELSE " << endl;
                 //cout <<"it: " << it+1 <<"Theta w " << PLANNERINFO[it+1][0] << endl;
@@ -1219,7 +1219,7 @@ int EquilibriumOP(int simdata,double vec1, double vec2, double vec3, double vec4
         return(0);
 }
 
-//5. Extract params information and run the equilibrium allocations
+//6. Extract params information and run the equilibrium allocations
 void OptParamsTM(int simdata,arma::vec WagesVectorIn,
     arma::vec InitLWorkersDecision,
     arma::vec InitProfDecision, vector<vector<double>> PLANNERSIZE) {
