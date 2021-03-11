@@ -643,14 +643,15 @@
 
     
             //Defining object to be optimized
-            //First. lower bounds for ni, nf, z.
+            //First. lower bounds for n, z.
             double lb[2];
             lb[0]=0.0;
-            lb[1]=0,0;
+            lb[1]=0.0;
          
    
 
              //Setting up optimization
+             //Further info at: https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/
 
             nlopt_opt optProfits;
             //nlopt_opt localOpt;
@@ -845,8 +846,48 @@
             lbWorker[0]=0;
     
     
+           //Setting up optimization
+           //Further info at: https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/
+
             nlopt_opt optWorkers;
-            optWorkers = nlopt_create(NLOPT_LN_NELDERMEAD, 1);
+            //nlopt_opt localOptW;
+            //nlopt_opt subsOptW;
+
+            //Define the optimization algorithm
+
+                //1.Nelder-Mead (Local, non-gradient)
+                optWorkers = nlopt_create(NLOPT_LN_NELDERMEAD, 1);
+                //2.DIRECT -Dividing rectangles- (Global, non-gradient)
+                //optWorkers = nlopt_create(NLOPT_GN_ORIG_DIRECT, 1);
+                //3.COBYLA (Local, non-gradient)
+                //optWorkers = nlopt_create(NLOPT_LN_COBYLA, 1);
+                //4.ISRES (Global, non-gradient)
+                //optWorkers = nlopt_create(NLOPT_GN_ISRES, 1);
+
+            //Do not support nonlinear constraints 
+                //5. CRS (Global, non-gradient)
+                //optWorkers = nlopt_create(NLOPT_GN_CRS2_LM, 1);
+                //6. ESCH (Global, non-gradient)
+                //optWorkers = nlopt_create(NLOPT_GN_ESCH, 1);
+                //7. StoGO (Global, non-gradient)
+                //optWorkers = nlopt_create(NLOPT_GD_STOGO, 1);
+
+                //8. MLSL -Multi Level Single Linkage- (Global, non-gradient)
+                //optWorkers = nlopt_create(NLOPT_G_MLSL_LDS, 1);
+                //localOptW= nlopt_create(NLOPT_LN_COBYLA, 1);
+                //nlopt_set_local_optimizer(optWorkers,localOptW);
+
+            //Augmented Lagragian + Subsidiary algorithm
+                //9. NLOPT_AUGLAG
+                //optWorkers = nlopt_create(NLOPT_AUGLAG, 1);
+
+                //Set the subsidiary algorithm (local or global)
+                //subsOptW= nlopt_create(NLOPT_LN_NELDERMEAD, 1);
+                //subsOptW= nlopt_create(NLOPT_GN_CRS2_LM, 1);
+                //subsOptW= nlopt_create(NLOPT_GN_ESCH, 1);
+                //subsOptW= nlopt_create(NLOPT_GD_STOGO, 1);
+
+                //nlopt_set_local_optimizer(optWorkers,subsOptW);
     
             nlopt_set_lower_bounds(optWorkers, lbWorker);
             nlopt_set_max_objective(optWorkers, valueWorkerMax,(workers_data*)&dataw);
