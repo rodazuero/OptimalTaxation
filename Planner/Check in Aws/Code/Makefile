@@ -155,7 +155,7 @@ parallelw:
 	$(CC) $(SOURCEPARALLELW) $(INC_PARAMS) $(LNLOPT)   $(CFLAGS) $(DLIB)  -o $(OUTPUTPARALLELW)
 
 parallelrunw: parallelw
-	nohup ./$(OUTPUTPARALLELW)  > nohupPARALLRW.out&
+	nohup /home/ec2-user/InAws/paralleloutputw > nohupPARALLRW.out&
 
 tryfunction: 
 	$(CC) $(SOURCETRYFUNCTION) $(INC_PARAMS) $(LNLOPT)   $(CFLAGS) $(DLIB)  -o $(OUTPUTNEW)
